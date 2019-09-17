@@ -1,0 +1,28 @@
+description: The Trolley Dilemma
+actions: [pull, refrain]
+background: []
+patients: [person1, person2]
+consequences: [d1, d2]
+mechanisms: 
+    d2: pull
+    d1: Not('pull')
+utilities:
+    d2: -1
+    d1: -1
+    Not('d2'): 1
+    Not('d1'): 1
+    pull: 0
+    refrain: 0
+intentions:
+    pull: [pull, Not('d1')]
+    refrain: [refrain]
+goals:
+    pull: [Not('d1')]
+    refrain: []
+affects:
+    pull: []
+    refrain: []
+    d1: [[person1, -]]
+    d2: [[person2, -]]
+    Not('d1'): [[person1, +]]
+    Not('d2'): [[person2, +]]

@@ -1,0 +1,19 @@
+{
+    "description": "",
+    "action": "push_man",
+    "consequences": {
+        "push_man": ["man_on_track"],
+        "man_on_track": ["tram_stops", "man_dies"],
+        "tram_stops": ["people_saved"]
+    },
+    "utilities": {
+        "push_man": -1,
+        "man_on_track": -1,
+        "tram_stops": 1,
+        "man_dies": -1,
+        "people_saved": 5
+    },
+    "intended": [
+        "tram_stops", "people_saved"
+    ]
+}

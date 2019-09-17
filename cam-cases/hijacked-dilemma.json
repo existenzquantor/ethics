@@ -1,0 +1,23 @@
+{
+    "description": "The Hijacked Airplane Dilemma",
+    "actions": ["shoot the airplane", "refrain from shooting the airplane"],
+    "consequences": ["people in airplane die", "airplane crashes building", "people in building die"],
+    "mechanisms": {
+        "people in airplane die": "Or('shoot the airplane', Not('shoot the airplane'))",
+        "airplane crashes building": "Not('shoot the airplane')",
+        "people in building die": "airplane crashes building"
+    },
+    "utilities": {
+        "shoot the airplane": -1,
+        "people in airplane die": -100, "airplane crashes building": -1, "people in building die": -500,
+        "Not('people in airplane die')": 100, "Not('airplane crashes building')": 1, "Not('people in building die')": 500
+    },
+    "intentions": {
+        "shoot the airplane": ["shoot the airplane", "Not('airplane crashes building')", "Not('people in building die')"],
+        "refrain from shooting the airplane": []
+    },
+    "goals": {
+        "shoot the airplane": ["shoot the airplane", "Not('airplane crashes building')", "Not('people in building die')"],
+        "refrain from shooting the airplane": []
+    }
+}

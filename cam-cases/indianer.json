@@ -1,0 +1,19 @@
+{
+    "description": "Kill Indians",
+    "actions": ["accept", "refrain"],
+    "consequences": ["c1", "c2", "c3", "c4"],
+    "mechanisms": {
+        "c1": "'accept'",
+        "c2": "'refrain'",
+        "c3": "Or('accept', 'refrain')",
+        "c4": "'accept'"
+    },
+    "utilities": {
+        "c1": -1, "c2": -20, "c3": 10, "c4": 20,
+        "Not('c1')": 0, "Not('c2')": 0, "Not('c3')": -10, "Not('c4')": -20
+    },
+    "intentions": {
+        "accept": ["accept", "c1"],
+        "refrain": ["refrain", "c2"]
+    }
+}

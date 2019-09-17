@@ -1,0 +1,84 @@
+{
+    "actions": [
+                    {
+                     "name": "pull",
+                     "intrinsicvalue": "neutral",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {"trackRight": true},
+                                     "effect": {"trackLeft": true, "trackRight": false}
+                                    },
+                                    {
+                                     "condition": {"trackLeft": true},
+                                     "effect": {"trackLeft": false, "trackRight": true}
+                                    }
+                                ]
+                    },
+                    {
+                     "name": "warnMan",
+                     "intrinsicvalue": "good",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {},
+                                     "effect": {"manOnTrack": false}
+                                    }
+                                ]
+                    }
+                ],
+    "events": [
+                    {
+                     "name": "approach",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {"trackLeft": true, "manOnTrack": true},
+                                     "effect": {"1alive": false}
+                                    },
+                                    {
+                                     "condition": {"trackRight": true, "menInTram": true},
+                                     "effect": {"4alive": false}
+                                    },
+                                    {
+                                     "condition": {},
+                                     "effect": {"dummybad": true}
+                                    }
+                                ],
+                     "timepoints": [1]
+                    }    
+               ],
+     "utilities": [
+                   {
+                    "fact": {"4alive": true},
+                    "utility": 4
+                   },
+                   {
+                    "fact": {"4alive": false},
+                    "utility": -4
+                   },
+                   {
+                    "fact": {"1alive": true},
+                    "utility": 1
+                   },
+                   {
+                    "fact": {"1alive": false},
+                    "utility": -1
+                   }
+                   ],
+     "affects": {
+                 "4humans": 
+                    {
+                     "pos": [{"4alive": true}], 
+                     "neg": [{"4alive": false}]
+                    }, 
+                 "1human": 
+                    {
+                     "pos": [{"1alive": true}], 
+                     "neg": [{"1alive": false}]
+                    }
+                },
+    "plan": ["pull", "warnMan"],
+    "goal": {},
+    "initialState": {"manOnTrack": true, "menInTram": true, "4alive": true, "1alive": true, "trackLeft": false, "trackRight": true}
+}

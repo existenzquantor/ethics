@@ -1,0 +1,61 @@
+{
+    "actions": [
+                    {
+                     "name": "giveFlowers",
+                     "intrinsicvalue": "good",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {},
+                                     "effect": {"happy_celia": true}
+                                    }
+                                ]
+                    }
+                ],
+    "events": [
+                    {
+                     "name": "happy_alice",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {"happy_celia": true},
+                                     "effect": {"happy_alice": true}
+                                    }
+                                ],
+                     "timepoints": [0]
+                    }    
+               ],
+     "utilities": [
+                   {
+                    "fact": {"happy_celia": true},
+                    "utility": 1
+                   },
+                   {
+                    "fact": {"happy_celia": false},
+                    "utility": -1
+                   },
+                   {
+                    "fact": {"happy_alice": true},
+                    "utility": 1
+                   },
+                   {
+                    "fact": {"happy_alice": false},
+                    "utility": -1
+                   }
+                   ],
+     "affects": {
+                 "celia": 
+                    {
+                     "pos": [{"happy_celia": true}], 
+                     "neg": [{"happy_celia": false}]
+                    }, 
+                 "alice": 
+                    {
+                     "pos": [{"happy_alice": true}], 
+                     "neg": [{"happy_alice": false}]
+                    }
+                },
+    "plan": ["giveFlowers"],
+    "goal": {"happy_alice": true},
+    "initialState": {"happy_celia": false, "happy_alice": false}
+}

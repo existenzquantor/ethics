@@ -1,0 +1,62 @@
+{
+    "actions": [
+    {
+        "name": "forward",
+        "intrinsicvalue": "neutral",
+        "preconditions": {},
+        "effects": [
+                        {
+                            "condition": {"2meterfromstairs": true},
+                            "effect": {"2meterfromstairs": false, "1meterfromstairs": true}
+                        }, 
+                        {
+                            "condition": {"1meterfromstairs": true, "safetysensorbroken": true},
+                            "effect": {"1meterfromstairs": false, "robotbroken": true}
+                        },
+                        {
+                            "condition": {"1meterfromstairs": true, "safetysensorbroken": false},
+                            "effect": {"stop": false}
+                        }
+                    ]
+    },
+    {
+        "name": "safetysensorbreaks",
+        "intrinsicvalue": "neutral",
+        "preconditions": {},
+        "effects": [
+                        {
+                            "condition": {},
+                            "effect": {"safetysensorbroken": true}
+                        }
+                   ]
+    },
+    {
+        "name": "safetysensorrepair",
+        "intrinsicvalue": "neutral",
+        "preconditions": {},
+        "effects": [
+                        {
+                            "condition": {},
+                            "effect": {"safetysensorbroken": false}
+                        }
+                   ]
+    },
+    {
+        "name": "servecoffee",
+        "intrinsicvalue": "neutral",
+        "preconditions": {},
+        "effects": [
+                        {
+                            "condition": {},
+                            "effect": {"peterhascoffee": true}
+                        }
+                   ]
+    }
+               ],
+    "events": [],
+    "utilities": [],
+    "affects": {},
+    "plan": ["forward", "safetysensorbreaks", "safetysensorbreaks", "servecoffee", "forward"],
+    "goal": {},
+    "initialState": {"2meterfromstairs": true, "1meterfromstairs": false, "stop": false, "safetysensorbroken": false, "peterhascoffee": false, "robotbroken": false}
+}

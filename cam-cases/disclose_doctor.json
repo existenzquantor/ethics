@@ -1,0 +1,19 @@
+    {
+        "description":"Robot discloses secret to doctor who tries to diagnose what is wrong with the patient.",
+        "actions": ["disclosing", "refraining"],
+        "background":[],
+        "consequences": ["help", "healthy"],
+        "mechanisms": {
+                        "help": "'disclosing'",
+                        "healthy": "'help'"
+                      },
+        "utilities": {
+                        "disclosing": 0,
+                        "help": 1,
+                        "Not('healthy')": -10
+        },
+        "intentions": {
+                        "disclosing": ["disclosing", "healthy"],
+                        "refraining": ["refraining"]
+                      }
+    }

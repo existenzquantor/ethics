@@ -1,0 +1,15 @@
+{
+    "description":"",
+    "action": "a1",
+    "consequences": {
+        "a1": ["c1", "c2"]
+    },
+    "utilities": {
+        "a1": 0,
+        "c1": 10,
+        "c2": -4
+    },
+    "intended": [
+        "a1", "c1"
+    ]
+}

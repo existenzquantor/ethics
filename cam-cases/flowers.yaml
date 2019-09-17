@@ -1,0 +1,16 @@
+description: Flower Example
+actions: [giveflowers, refraining]
+patients: [celia, alice]
+consequences: [celiahappy, alicehappy]
+mechanisms:
+    celiahappy: giveflowers
+    alicehappy: celiahappy
+goals:
+    giveflowers: [alicehappy]
+    refraining: []
+affects:
+    giveflowers: []
+    celiahappy: [[celia, +]]
+    alicehappy: [[alice, +]]
+    Not('celiahappy'): [[celia, -]]
+    Not('alicehappy'): [[alice, -]]

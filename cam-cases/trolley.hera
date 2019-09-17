@@ -1,0 +1,13 @@
+pull is an action.
+refrain is an action.
+
+person 1 dies if pull.
+person 2 dies if not pull.
+person 3 dies if not pull.
+
+person 1 dies is bad.
+Its negation is good.
+person 2 dies is bad.
+Its negation is good.
+person 3 dies is bad.
+Its negation is good.

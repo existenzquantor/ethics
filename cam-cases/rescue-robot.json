@@ -1,0 +1,30 @@
+{
+    "description": "The Rescue Robot Dilemma",
+    "actions": ["a1", "a2", "a3"],
+    "background": ["b1"],
+    "consequences": ["c1", "c2", "c3", "c4"],
+    "mechanisms": {
+                   "c1": "And('b1', 'a1')", 
+                   "c2": "'a1'", 
+                   "c3": "And('b1', 'a2')", 
+                   "c4": "'a2'"
+                  },
+    "utilities":  {  
+                   "a1": 0,
+                   "a2":0,
+                   "a3":0,
+                   "c1": 10, 
+                   "c2": -4, 
+                   "c3": 10, 
+                   "c4": -4,
+                   "Not('c1')": -10,
+                   "Not('c2')": 4,
+                   "Not('c3')": -10,
+                   "Not('c4')": 4
+                  },
+    "intentions": {
+                   "a1": ["a1", "c1"], 
+                   "a2": ["a2", "c3"], 
+                   "a3": ["a3"]
+                  }
+}

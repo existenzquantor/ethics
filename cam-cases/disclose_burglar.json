@@ -1,0 +1,19 @@
+    {
+        "description":"Robot discloses secret to burglar who is looking for the safe.",
+        "actions": ["disclosing", "refraining"],
+        "background":[],
+        "consequences": ["help", "robbed"],
+        "mechanisms": {
+                        "help": "'disclosing'",
+                        "robbed": "'help'"
+                      },
+        "utilities": {
+                        "disclosing": 0,
+                        "help": 1,
+                        "robbed": -10
+        },
+        "intentions": {
+                        "disclosing": ["disclosing", "help"],
+                        "refraining": ["refraining"]
+                      }
+    }

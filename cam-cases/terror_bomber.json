@@ -1,0 +1,20 @@
+{
+    "description":"",
+    "action": "bomb",
+    "consequences": {
+        "bomb": ["school hit"],
+        "school hit": ["children die"],
+        "children die": ["army demoralized"],
+        "army demoralized": ["war over"]
+    },
+    "utilities": {
+        "bomb": 0,
+        "school hit": 0,
+        "children die": -10,
+        "army demoralized": 0,
+        "war over": 100
+    },
+    "intended": [
+        "bomb", "school hit", "children die", "army demoralized", "war over"
+    ]
+}

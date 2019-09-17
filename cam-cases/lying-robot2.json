@@ -1,0 +1,28 @@
+{
+    "description":"Robot that lies",
+    "actions": ["lying_0", "asking_0", "refraining_0", "lying_1", "asking_1", "refraining_1"],
+    "background": [],
+    "consequences": ["exercises_0", "exercises_1", "healthy_0", "healthy_1", "party_0", "party_1"],
+    "mechanisms": {
+                    "exercises_0": "'lying_0'",
+                    "exercises_1": "'lying_1'",
+                    "healthy_0": "'exercises_0'",
+                    "healthy_1": "Or('healthy_0', 'exercises_1')",
+                    "party_0": "And('healthy_0', 'asking_0')",
+                    "party_1": "And('healthy_1', 'asking_1')"
+                  },
+    "utilities": {
+        "healthy_0": 10,
+        "healthy_1": 10,
+        "party_0": 5,
+        "party_1": 5
+    },
+    "intentions": {
+        "lying_0": ["lying_0", "healthy_0"],
+        "lying_1": ["lying_1", "healthy_1"],
+        "refraining_0": ["refraining_0"],
+        "refraining_1": ["refraining_1"],
+        "asking": ["asking", "party"],
+        "asking_1": ["asking_1", "party_1"]
+                  }
+}

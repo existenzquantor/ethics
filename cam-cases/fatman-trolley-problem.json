@@ -1,0 +1,22 @@
+{
+    "description":"The Fatman Trolley Case",
+    "actions": ["push", "refrain"],
+    "background": ["tram_approaches"],
+    "consequences": ["man_on_track", "tram_hits_man", "tram_stops", "five_survive"],
+    "mechanisms": {
+                    "man_on_track": "'push'",
+                    "tram_hits_man": "And('man_on_track', 'tram_approaches')",
+                    "tram_stops": "'tram_hits_man'",
+                    "five_survive": "'tram_stops'"
+                  },
+    "utilities": {
+        "tram_hits_man": -1,
+        "five_survive": 5,
+        "Not('tram_hits_man')": 1,
+        "Not('five_survive')": -5
+    },
+    "intentions": {
+        "push": ["push", "tram_stops", "five_survive"],
+        "refrain": ["refrain"]
+                  }
+}

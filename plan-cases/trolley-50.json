@@ -1,0 +1,82 @@
+{
+    "actions": [
+                    {
+                     "name": "pull",
+                     "intrinsicvalue": "neutral",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {"trackRight": true},
+                                     "effect": {"trackLeft": true, "trackRight": false}
+                                    },
+                                    {
+                                     "condition": {"trackLeft": true},
+                                     "effect": {"trackLeft": false, "trackRight": true}
+                                    }
+                                ]
+                    }
+                ],
+    "events": [
+                    {
+                     "name": "approach",
+                     "preconditions": {},
+                     "effects": [
+                                    {
+                                     "condition": {"trackLeft": true},
+                                     "effect": {"50die": false, "amoebe1dies": false, "amoebe2dies": true}
+                                    },
+                                    {
+                                     "condition": {"trackRight": true},
+                                     "effect": {"50die": true, "amoebe1dies": true, "amoebe2dies": false}
+                                    }
+                                ],
+                     "timepoints": [0]
+                    }    
+               ],
+     "utilities": [
+                   {
+                    "fact": {"50die": true},
+                    "utility": -50
+                   },
+                   {
+                    "fact": {"50die": false},
+                    "utility": 50
+                   },
+                   {
+                    "fact": {"amoebe1dies": true},
+                    "utility": -1
+                   },
+                   {
+                    "fact": {"amoebe1dies": false},
+                    "utility": 1
+                   },
+                   {
+                    "fact": {"amoebe2dies": true},
+                    "utility": -1
+                   },
+                   {
+                    "fact": {"amoebe2dies": false},
+                    "utility": 1
+                   }
+                   ],
+     "affects": {
+                 "50people": 
+                    {
+                     "pos": [{"50die": false}], 
+                     "neg": [{"50die": true}]
+                    }, 
+                 "amoebe1": 
+                    {
+                     "pos": [{"amoebe1dies": false}], 
+                     "neg": [{"amoebe1dies": true}]
+                    }, 
+                 "amoebe2": 
+                    {
+                     "pos": [{"amoebe2dies": false}], 
+                     "neg": [{"amoebe2dies": true}]
+                    }
+                },
+    "plan": ["pull"],
+    "goal": {"50die": false},
+    "initialState": {"50die": false, "amoebe1dies": false, "amoebe2dies": false, "trackLeft": false, "trackRight": true}
+}

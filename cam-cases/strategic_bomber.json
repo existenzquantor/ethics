@@ -1,0 +1,24 @@
+{
+    "description":"Strategic bomber bombs an arms factory in order to weaken the enemy and win the war. Next to the factory is a school and it inevitable that the school will be hit. The factory has to be bombed during school hours.",
+    "action": "bomb",
+    "consequences": {
+        "bomb": ["factory hit", "school hit"],
+        "school hit": ["children die"],
+        "children die": ["army demoralized"],
+        "army demoralized": ["war over"],
+        "factory hit": ["army weak"],
+        "army weak": ["war over"]
+    },
+    "utilities": {
+        "bomb": 0,
+        "school hit": -1,
+        "children die": -20,
+        "army demoralized": 5,
+        "factory hit": 10,
+        "army weak": 50,
+        "war over": 100
+    },
+    "intended": [
+        "bomb", "factory hit", "army weak", "war over"
+    ]
+}

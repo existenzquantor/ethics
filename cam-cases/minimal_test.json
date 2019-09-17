@@ -1,0 +1,23 @@
+{
+    "description":"Test for Minimality",
+    "actions": ["act", "refrain"],
+    "background": [],
+    "consequences": ["c1", "c2", "c3", "c4"],
+    "mechanisms": {
+                    "c1": "'act'",
+                    "c2": "'act'",
+                    "c3": "'act'",
+                    "c4": "'act'"
+                  },
+    "utilities": {
+        "c1": 2,
+        "Not('c1')": 0,
+        "c2": 1,
+        "Not('c2')": 0,
+        "c3": 1,
+        "Not('c3')": 0,
+        "c4": 0,
+        "Not('c4')": 2
+    },
+    "intentions": {}
+}

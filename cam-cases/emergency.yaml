@@ -1,0 +1,18 @@
+description: Emergency Case
+actions: [arrive1_0, leave1_1, arrive2_2, leave2_3]
+events: [die_3]
+background: [alive_0]
+consequences: [alive_1, alive_2, alive_3, alive_4, doc1_4, doc2_4]
+mechanisms: 
+    doc1_4: And('arrive1_0', Not('leave1_1'))
+    doc2_4: And('arrive2_2', Not('leave2_3'))
+    alive_1: 'alive_0'
+    alive_2: 'alive_1'
+    alive_3: 'alive_2' 
+    alive_4: Or(Not('die_3'), And('doc1_4', 'doc2_4')) 
+utilities:
+intentions:
+    arrive1_0: [arrive1_0]
+    arrive2_2: [arrive2_2]
+    leave1_1: [leave1_1]
+    leave2_3: [leave2_3]

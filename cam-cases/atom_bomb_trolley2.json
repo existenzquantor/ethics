@@ -1,0 +1,20 @@
+{
+    "description":"Atom Bomb Trolley Problem",
+    "actions": ["pull", "refrain"],
+    "background": [],
+    "consequences": ["fiftypeopledie", "amoebe1dies", "amoebe2dies"],
+    "mechanisms": {
+                    "fiftypeopledie": "Not('pull')",
+                    "amoebe1dies": "Not('pull')",
+                    "amoebe2dies": "'pull'"
+                  },
+    "utilities": {
+        "fiftypeopledie": -50,
+        "Not('fiftypeopledie')": 50,
+        "amoebe1dies": -1,
+        "Not('amoebe1dies')": 1,
+        "amoebe2dies": -1,
+        "Not('amoebe2dies')": 1
+    },
+    "intentions": {}
+}

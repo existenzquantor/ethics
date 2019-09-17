@@ -1,0 +1,17 @@
+{
+    "description": "Match and Lightning",
+    "actions": ["md", "l"],
+    "background": [],
+    "consequences": ["ff"],
+    "mechanisms": {
+                   "ff": "Or('l', 'md')"
+                  },
+    "utilities":  { 
+                   "md":0,
+                   "l":0,
+                   "ff":-1
+                  },
+    "intentions": {
+                   "md": ["md"]
+                  }
+}

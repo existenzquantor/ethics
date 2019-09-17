@@ -1,0 +1,19 @@
+{
+    "description":"Robot that lies",
+    "actions": ["lying", "refraining"],
+    "background": [],
+    "consequences": ["healthy"],
+    "mechanisms": {
+                    "healthy": "'lying'"
+                  },
+    "utilities": {
+	    "lying": -1,
+        "Not('lying')": 0,
+        "healthy": 1,
+        "Not('healthy')": -1
+    },
+    "intentions": {
+        "lying": ["lying", "healthy"],
+        "refraining": ["refraining"]
+                  }
+}
