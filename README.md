@@ -246,7 +246,7 @@ The console output of the above script is quite lengthy. Therefore, let us focus
  'inus': [Not(End('celia')), Means('celia')]}
 ```
 
-
+Goal-focused deontology argues that Bob's plan is permissible. It says that for permissibility it was already sufficient that being happy is not bad and that not being happy was not a goal. Moreover, as celia being happy was not a goal, it also does not matter if she being happy is morally bad. Hence, we have two *sufficient reasons*. The *necessary reasons* state conditions whose negation would result in another judgment: If it were bad that alice is happy, then Bob's plan would be impermissible etc. The *inus reasons* point to *necessary reasons that are part of sufficient reasons* and often are most concise.
 
 ## Causal Agency Models
 
