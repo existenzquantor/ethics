@@ -153,6 +153,9 @@ print("GoalDeontology: ", perm)
 perm = sit.evaluate(KantianHumanity)
 print("Kantian: ", perm)
 
+perm = sit.evaluate(KantianHumanity, 2)
+print("Kantian Reading #2: ", perm)
+
 perm = sit.evaluate(DoNoHarm)
 print("DoNoHarm: ", perm)
 
@@ -203,6 +206,9 @@ print("GoalDeontology: ", perm)
 
 perm = sit.explain(KantianHumanity)
 print("Kantian: ", perm)
+
+perm = sit.explain(KantianHumanity, 2)
+print("Kantian Reading #2: ", perm)
 
 perm = sit.explain(DoNoHarm)
 print("DoNoHarm: ", perm)
