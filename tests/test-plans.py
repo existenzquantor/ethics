@@ -4,7 +4,7 @@ from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalH
 print("*"*50)
 print("JSON")
 print("*"*50)
-sit = Situation("cases-plans/flowers.json")
+sit = Situation("cases/plans/flowers.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -37,7 +37,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("cases-plans/trolley-50.json")
+sit = Situation("cases/plans/trolley-50.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -72,7 +72,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("cases-plans/coal-dilemma.json")
+sit = Situation("cases/plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -107,7 +107,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("cases-plans/coal-dilemma.json")
+sit = Situation("cases/plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -144,7 +144,7 @@ if p:
 else:
     print("No Plan found")
 
-sit.creativeAlternatives += [Situation("cases-plans/coal-dilemma-creative1.json")]
+sit.creativeAlternatives += [Situation("cases/plans/coal-dilemma-creative1.json")]
 a = planner.makeMoralSuggestion(AvoidAvoidableHarm)
 print(a, a.plan)
 
@@ -153,7 +153,7 @@ print(a, a.plan)
 print("*"*50)
 print("YAML")
 print("*"*50)
-sit = Situation("cases-plans/flowers.yaml")
+sit = Situation("cases/plans/flowers.yaml")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
