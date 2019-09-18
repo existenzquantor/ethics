@@ -24,6 +24,11 @@ If the module is already installed, you might instead want to update it running:
 pip3 install --upgrade ethics
 ```
 
+Alternatively, you can checkout this git repository and run:
+```console
+python3 setup.py install
+```
+
 ## Moral Planning Domain Definitions
 
 ### Plan Situations
