@@ -134,14 +134,17 @@ initialState: {happy_celia: false, happy_alice: false}
 That is, initially, neither Celia not Alice were happy. Bob then gave the flowers to Celia in order to make Alice happy. Hence, some information that might be relevant is not explicit, for instance, that after Bob’s giving flowers, both Celia and Alice are happy. This must be deduced by the reasoner. Indeed, the reasoner is capable of doing that. To evaluate Bob’s plan using the ethical principles defined in the HERA framework, we first have to load the described situation. We do that by loading a JSON file that contains the description outlined above. HERA provides a Python interface for doing so.
 ```python
 from ethics.plans.semantics import Situation
-sit = Situation("flowers.json")
+sit = Situation("./cases/plans/flowers.yaml")
 ```
 Next, we can check permissibility of the situation according to several principles.
 ```python
-from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple
+from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
 
 perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
+
+perm = sit.evaluate(GoalDeontology)
+print("GoalDeontology: ", perm)
 
 perm = sit.evaluate(KantianHumanity)
 print("Kantian: ", perm)
@@ -157,7 +160,26 @@ print("Utilitarianism: ", perm)
 
 perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
+
+perm = sit.evaluate(AvoidAvoidableHarm)
+print("AvoidAvoidableHarm: ", perm)
+
+perm = sit.evaluate(AvoidAnyHarm)
+print("AvoidAnyHarm: ", perm)
 ```
+The output is:
+```console
+Deontology:  True
+GoalDeontology:  True
+Kantian:  False
+DoNoHarm:  True
+DoNoInstrumentalHarm:  True
+Utilitarianism:  True
+DoubleEffectPrinciple:  True
+AvoidAvoidableHarm:  True
+AvoidAnyHarm:  True
+```
+
 ### Plan Evaluation
 
 ### Plan Explanation
