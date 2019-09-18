@@ -1,5 +1,5 @@
-from ethics.cam_semantics import CausalModel
-from ethics.cam_principles import DeontologicalPrinciple, UtilitarianPrinciple, DoNoHarmPrinciple, KantianHumanityPrinciple, KantianHumanityPrincipleReading2, DeontologicalPrinciple, DoubleEffectPrinciple, DoNoInstrumentalHarmPrinciple, DoNoInstrumentalHarmPrincipleWithoutIntentions,IntentionFocusedDeontologicalPrinciple, ParetoPrinciple, GoalFocusedDeontologicalPrinciple
+from ethics.cam.semantics import CausalModel
+from ethics.cam.principles import DeontologicalPrinciple, UtilitarianPrinciple, DoNoHarmPrinciple, KantianHumanityPrinciple, KantianHumanityPrincipleReading2, DeontologicalPrinciple, DoubleEffectPrinciple, DoNoInstrumentalHarmPrinciple, DoNoInstrumentalHarmPrincipleWithoutIntentions,IntentionFocusedDeontologicalPrinciple, ParetoPrinciple, GoalFocusedDeontologicalPrinciple
 from ethics.language import *
 
 

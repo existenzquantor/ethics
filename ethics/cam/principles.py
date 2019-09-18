@@ -1,4 +1,4 @@
-from ethics.cam_semantics import *
+from ethics.cam.semantics import *
 from ethics.language import *
 from ethics.tools import *
 from ethics.explanations import generateReasons, identifyINUSReasons
