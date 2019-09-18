@@ -132,7 +132,32 @@ goal: {happy_alice: true}
 initialState: {happy_celia: false, happy_alice: false}
 ```
 That is, initially, neither Celia not Alice were happy. Bob then gave the flowers to Celia in order to make Alice happy. Hence, some information that might be relevant is not explicit, for instance, that after Bob’s giving flowers, both Celia and Alice are happy. This must be deduced by the reasoner. Indeed, the reasoner is capable of doing that. To evaluate Bob’s plan using the ethical principles defined in the HERA framework, we first have to load the described situation. We do that by loading a JSON file that contains the description outlined above. HERA provides a Python interface for doing so.
+```python
+from ethics.plans.semantics import Situation
+sit = Situation("flowers.json")
+```
+Next, we can check permissibility of the situation according to several principles.
+```python
+from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple
 
+perm = sit.evaluate(Deontology)
+print("Deontology: ", perm)
+
+perm = sit.evaluate(KantianHumanity)
+print("Kantian: ", perm)
+
+perm = sit.evaluate(DoNoHarm)
+print("DoNoHarm: ", perm)
+
+perm = sit.evaluate(DoNoInstrumentalHarm)
+print("DoNoInstrumentalHarm: ", perm)
+
+perm = sit.evaluate(Utilitarianism)
+print("Utilitarianism: ", perm)
+
+perm = sit.evaluate(DoubleEffectPrinciple)
+print("DoubleEffectPrinciple: ", perm)
+```
 ### Plan Evaluation
 
 ### Plan Explanation
