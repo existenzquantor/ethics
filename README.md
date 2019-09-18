@@ -230,6 +230,24 @@ perm = sit.explain(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
 ```
 
+The console output of the above script is quite lengthy. Therefore, let us focus on two explantions given by the Goal-focused Deontology and by the Kantian principle.
+```python
+{'permissible': True, 
+ 'principle': 'GoalDeontology',
+ 'sufficient': [And(And(And(Not(Bad('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice')))), 
+               And(And(And(Not(Goal('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice'))))], 
+ 'necessary': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia'))), Or(Not(Bad('happy_celia')), Not(Goal('happy_celia')))],
+ 'inus': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia')))]}
+
+{'permissible': False, 
+ 'principle': 'KantianHumanity',
+ 'sufficient': [And(Means('celia'), Not(End('celia')))],
+ 'necessary': [Not(End('celia')), Means('celia')],
+ 'inus': [Not(End('celia')), Means('celia')]}
+```
+
+
+
 ## Causal Agency Models
 
 ### Models
