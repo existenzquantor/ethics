@@ -184,8 +184,44 @@ AvoidAvoidableHarm:  True
 AvoidAnyHarm:  True
 ```
 
-
 ### Plan Explanation
+
+The HERA Python software package ethics has recently been updated by a module for explanations. That is, an HERA agent can explain its moral permissibility judgments. This functionality can, for instance, be used to generate natural-language explanations for humans to understand the decisions made by an ethical reasoning agent, e.g., the decisions made by a social robot. The following tutorial will showcase how the new functionality can be used programmatically.
+
+Consider the same situation as above but this time we call ```explain``` rather than ```evaluate```:
+```python
+from ethics.plans.semantics import Situation
+sit = Situation("./cases/plans/flowers.yaml")
+
+from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
+
+perm = sit.explain(Deontology)
+print("Deontology: ", perm)
+
+perm = sit.explain(GoalDeontology)
+print("GoalDeontology: ", perm)
+
+perm = sit.explain(KantianHumanity)
+print("Kantian: ", perm)
+
+perm = sit.explain(DoNoHarm)
+print("DoNoHarm: ", perm)
+
+perm = sit.explain(DoNoInstrumentalHarm)
+print("DoNoInstrumentalHarm: ", perm)
+
+perm = sit.explain(Utilitarianism)
+print("Utilitarianism: ", perm)
+
+perm = sit.explain(DoubleEffectPrinciple)
+print("DoubleEffectPrinciple: ", perm)
+
+perm = sit.explain(AvoidAvoidableHarm)
+print("AvoidAvoidableHarm: ", perm)
+
+perm = sit.explain(AvoidAnyHarm)
+print("AvoidAnyHarm: ", perm)
+```
 
 ## Causal Agency Models
 
