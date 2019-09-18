@@ -167,7 +167,7 @@ print("AvoidAvoidableHarm: ", perm)
 perm = sit.evaluate(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
 ```
-The output is:
+Just as expected, all principles but the Kantian will permit Bob's plan. The Kantian principle forbids it, because it uses Celia merely as a means. That is, the console output should look like this:
 ```console
 Deontology:  True
 GoalDeontology:  True
