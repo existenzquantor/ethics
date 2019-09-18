@@ -179,6 +179,7 @@ Just as expected, all principles but the Kantian will permit Bob's plan. The Kan
 Deontology:  True
 GoalDeontology:  True
 Kantian:  False
+Kantian Reading #2:  False
 DoNoHarm:  True
 DoNoInstrumentalHarm:  True
 Utilitarianism:  True
