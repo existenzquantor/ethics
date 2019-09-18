@@ -26,11 +26,25 @@ def minimalSets(setofsets):
 
 def generateReasons(model, principle, *args):
     perm = principle.permissible()
-    suff = generateSufficientReasons(model, principle, perm)
-    necc = generateNecessaryReasons(model, principle, perm)
+    #suff = generateSufficientReasons(model, principle, perm)
+    #necc = generateNecessaryReasons(model, principle, perm)
 
-    cants, cates = PrimeCompilator(principle.buildConjunction()).compile()    
 
+    if perm:
+        cants, cates = PrimeCompilator(principle.buildConjunction()).compile()
+    else:
+        cants, cates = PrimeCompilator(Not(principle.buildConjunction()).nnf()).compile()
+        
+    suff = [Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))]
+    necc = set()
+    for cc in cates:
+        necc_reason = []
+        for c in cc:
+            if model.models(c):
+                necc_reason.append(c)
+        if len(necc_reason) > 0:
+            necc.add(Formula.makeDisjunction(necc_reason))
+    necc = list(necc)
     result = []
     if args:
         perm = model.evaluate(principle, args)

@@ -19,23 +19,6 @@ class PrimeStructure:
         
         # Sort to make it comparable
         self.structure.sort(key=lambda tuple: tuple[0])
-        
-    def to_formula(self, mapping):
-        f = []
-        for s in self.structure:
-            if s[0] in mapping:
-                if s[1]:
-                    f.append(myEval(mapping[s[0]]))
-                else:
-                    f.append(Not(myEval(mapping[s[0]])))
-            else:
-                if s[1]:
-                    f.append(myEval(s[0]))
-                else:
-                    f.append(Not(myEval(s[0])))
-        if self.structure_type == Structure.implicant:
-            return Formula.makeConjunction(f)
-        return Formula.makeDisjunction(f)
                     
     def __str__(self):
         return "[" + ", ".join([str(Atom(atom)) if truth else str(Not(Atom(atom))) for (atom, truth) in self.structure]) + "]"
@@ -187,6 +170,7 @@ class PrimeCompilator:
             model_dict = dict()
 
             for atom, bit in model.items():
+                atom = convert_pyeda_atom_to_hera(atom)
                 model_dict[str(atom)] = bit == 1
 
             for full_model in self.__calculate_full_models_from_partial_model(list(model_dict.items())):
@@ -225,13 +209,44 @@ class PrimeCompilator:
  
         # Remove duplicates
         self.prime_implicants = list(dict.fromkeys(self.prime_implicants))
-        self.prime_implicates = list(dict.fromkeys(self.prime_implicates))            
+        self.prime_implicates = list(dict.fromkeys(self.prime_implicates))
+
 
         map_back = dict((value, key) for key, value in self.non_boolean_mapping.items())
-        self.prime_implicants = [p.to_formula(map_back) for p in self.prime_implicants]
-        self.prime_implicates = [p.to_formula(map_back) for p in self.prime_implicates]
+            
+        cants = []
+        for p in self.prime_implicants:
+            cant = []
+            for s in p.structure:
+                if s[0] in map_back:
+                    if s[1] == 0:
+                        cant.append(Not(myEval(map_back[s[0]])))
+                    else:
+                        cant.append(myEval(map_back[s[0]]))
+                else:
+                    if s[1] == 0:
+                        cant.append(Not(myEval(s[0])))
+                    else:
+                        cant.append(myEval(s[0]))
+            cants.append(cant)
+            
+        cates = []
+        for p in self.prime_implicates:
+            cate = []
+            for s in p.structure:
+                if s[0] in map_back:
+                    if s[1] == 0:
+                        cate.append(Not(myEval(map_back[s[0]])))
+                    else:
+                        cate.append(myEval(map_back[s[0]]))
+                else:
+                    if s[1] == 0:
+                        cate.append(Not(myEval(s[0])))
+                    else:
+                        cate.append(myEval(s[0]))
+            cates.append(cate)
 
-        return self.prime_implicants, self.prime_implicates
+        return cants, cates
 
     
     def __compile(self):
