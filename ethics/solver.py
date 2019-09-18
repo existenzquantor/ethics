@@ -107,7 +107,7 @@ def theorySAT(cand_model):
     
 def smtAllModels(formula):
     formula = subToAtoms(formula)
-    s = TableauxSolver()
+    s = BDDSolver() #TableauxSolver()
     s.append_formula(formula)
     models = []
     for mod in s.enum_models():
@@ -122,10 +122,11 @@ def smtAllModels(formula):
 def satisfiable(formula, model = False):
     if(isinstance(formula, list)):
         formula = Formula.makeConjunction(formula)
-
+    
     formula = subToAtoms(formula)
-    s = TableauxSolver()
+    s = BDDSolver() #TableauxSolver()
     s.append_formula(formula)
+    
     if model:
         return s.get_model()
     return s.satisfiable()
@@ -133,6 +134,34 @@ def satisfiable(formula, model = False):
 def entails(formula1, formula2):
     return not satisfiable(And(formula1, Not(formula2).nnf()))
 
+
+class BDDSolver():
+    def __init__(self):
+        self.formulae = []
+        
+    def append_formula(self, f):
+        self.formulae.append(f)
+    
+    def enum_models(self):
+        f = convert_formula_to_pyeda(Formula.makeConjunction(self.formulae))
+        f = pyeda.inter.expr2bdd(f)
+        pyeda_models = list(f.satisfy_all())
+        if pyeda_models:
+            return [convert_pyeda_model_to_hera(pm) for pm in pyeda_models]
+        return []
+        
+    def get_model(self):
+        f = convert_formula_to_pyeda(Formula.makeConjunction(self.formulae))
+        f = pyeda.inter.expr2bdd(f)
+        pyeda_model = f.satisfy_one()
+        if pyeda_model:
+            return convert_pyeda_model_to_hera(pyeda_model)
+        return False
+        
+    def satisfiable(self):
+        return self.get_model()
+
+"""
 class TableauxSolver():
     def __init__(self):
         self.formulae = set()
@@ -265,4 +294,4 @@ class Branch:
             if not self.expandOr():
                 if not self.expandAnd():
                     break
-        
+"""

@@ -3,8 +3,8 @@ from ethics.cam_principles import DeontologicalPrinciple, UtilitarianPrinciple, 
 from ethics.language import *
 
 
-trolley1 = CausalModel("./cam-cases/trolley-dilemma.json", {"pull":0, "refrain":1})
-trolley2 = CausalModel("./cam-cases/trolley-dilemma.json", {"pull":1, "refrain":0})
+trolley1 = CausalModel("./cases-cam/trolley-dilemma.json", {"pull":0, "refrain":1})
+trolley2 = CausalModel("./cases-cam/trolley-dilemma.json", {"pull":1, "refrain":0})
 
 trolley1.alternatives.append(trolley2)
 trolley2.alternatives.append(trolley1)
@@ -20,7 +20,8 @@ print(trolley1.explain(KantianHumanityPrincipleReading2))
 print(trolley1.explain(IntentionFocusedDeontologicalPrinciple))
 print(trolley1.explain(GoalFocusedDeontologicalPrinciple))
 print(trolley1.explain(DoNoInstrumentalHarmPrinciple))
-#print(trolley1.explain(DoubleEffectPrinciple))
+print(trolley1.explain(DoubleEffectPrinciple))
+
 print("*"*50)
 print("PULL")
 print("*"*50)
@@ -32,5 +33,4 @@ print(trolley2.explain(KantianHumanityPrincipleReading2))
 print(trolley2.explain(IntentionFocusedDeontologicalPrinciple))
 print(trolley1.explain(GoalFocusedDeontologicalPrinciple))
 print(trolley2.explain(DoNoInstrumentalHarmPrinciple))
-#print(trolley2.explain(DoubleEffectPrinciple))
-
+print(trolley2.explain(DoubleEffectPrinciple))

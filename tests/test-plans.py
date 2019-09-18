@@ -4,7 +4,7 @@ from ethics.plan_principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHa
 print("*"*50)
 print("JSON")
 print("*"*50)
-sit = Situation("plan-cases/flowers.json")
+sit = Situation("cases-plans/flowers.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -37,7 +37,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("plan-cases/trolley-50.json")
+sit = Situation("cases-plans/trolley-50.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -72,7 +72,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("plan-cases/coal-dilemma.json")
+sit = Situation("cases-plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -107,7 +107,7 @@ else:
 
 print("*"*50)
 
-sit = Situation("plan-cases/coal-dilemma.json")
+sit = Situation("cases-plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -144,7 +144,7 @@ if p:
 else:
     print("No Plan found")
 
-sit.creativeAlternatives += [Situation("plan-cases/coal-dilemma-creative1.json")]
+sit.creativeAlternatives += [Situation("cases-plans/coal-dilemma-creative1.json")]
 a = planner.makeMoralSuggestion(AvoidAvoidableHarm)
 print(a, a.plan)
 
@@ -153,7 +153,7 @@ print(a, a.plan)
 print("*"*50)
 print("YAML")
 print("*"*50)
-sit = Situation("plan-cases/flowers.yaml")
+sit = Situation("cases-plans/flowers.yaml")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
@@ -173,15 +173,15 @@ print("Kantian Explanation:", sit.explain(KantianHumanity))
 
 perm = sit.evaluate(DoNoHarm)
 print("DoNoHarm: ", perm)
-#print("DoNoHarm Explanation:", sit.explain(DoNoHarm))
+print("DoNoHarm Explanation:", sit.explain(DoNoHarm))
 
 perm = sit.evaluate(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
-#print("AvoidAnyHarm Explanation:", sit.explain(AvoidAnyHarm))
+print("AvoidAnyHarm Explanation:", sit.explain(AvoidAnyHarm))
 
 perm = sit.evaluate(DoNoInstrumentalHarm)
 print("DoNoInstrumentalHarm: ", perm)
-#print("DoNoInstrumentalHarm Explanation:", sit.explain(DoNoInstrumentalHarm))
+print("DoNoInstrumentalHarm Explanation:", sit.explain(DoNoInstrumentalHarm))
 
 perm = sit.evaluate(Utilitarianism)
 print("Utilitarianism: ", perm)
@@ -191,7 +191,7 @@ print("DoubleEffectPrinciple: ", perm)
 
 perm = sit.evaluate(AvoidAvoidableHarm)
 print("AvoidAvoidableHarm: ", perm)
-#print("AvoidAvoidableHarm Explanation:", sit.explain(AvoidAvoidableHarm))
+print("AvoidAvoidableHarm Explanation:", sit.explain(AvoidAvoidableHarm))
 
 
 planner = Planner(sit)

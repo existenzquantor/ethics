@@ -1,6 +1,7 @@
 from ethics.language import *
 from ethics.tools import *
 from ethics.solver import *
+from ethics.primes import *
 from itertools import combinations
 
 def noDuplicate(r, s):
@@ -27,6 +28,8 @@ def generateReasons(model, principle, *args):
     perm = principle.permissible()
     suff = generateSufficientReasons(model, principle, perm)
     necc = generateNecessaryReasons(model, principle, perm)
+
+    cants, cates = PrimeCompilator(principle.buildConjunction()).compile()    
 
     result = []
     if args:
@@ -82,9 +85,8 @@ def suffReasons(fo, mode = None, cm = None):
     mode -- suff or necc
     cm -- the causal agency model
     """
-
     models = smtAllModels(fo)
-
+    
     if mode == "suff":
         # Actually, for sufficient reasons we are only interested in the model which corresponds
         # to the given situation. In future, room for optimization.

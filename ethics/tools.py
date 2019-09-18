@@ -1,5 +1,6 @@
 from ethics.language import *
 from itertools import combinations, chain
+import pyeda.inter
 
 def makeSetOfAlternatives(*models):
     for m in models:
@@ -52,6 +53,34 @@ def mapBackToFormulae(l, m): # l: model, m: map
                 if m[mm] + ll == 0:
                     erg.append(myEval(mm).getNegation().nnf())
     return erg
+
+
+def convert_formula_to_pyeda(formula):
+    if isinstance(formula, Atom):
+        return pyeda.inter.expr("v"+bytearray(str(formula).encode()).hex())
+    if isinstance(formula, Not):
+        return pyeda.inter.Not(convert_formula_to_pyeda(formula.f1))
+    if isinstance(formula, And):
+        return pyeda.inter.And(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2)) 
+    if isinstance(formula, Or):
+        return pyeda.inter.Or(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2))
+    if isinstance(formula, Impl):
+        return pyeda.inter.Implies(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2))
+    if isinstance(formula, BiImpl):
+        return pyeda.inter.Equal(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2))
+    return pyeda.inter.expr("v"+bytearray(str(formula).encode()).hex())
+    
+def convert_pyeda_atom_to_hera(atom):
+    return myEval(bytearray.fromhex(str(atom)[1:]).decode())
+
+def convert_pyeda_model_to_hera(model):
+    m = []
+    for v in model:
+        if model[v] == 1:
+            m.append(convert_pyeda_atom_to_hera(v))
+        else:
+            m.append(Not(convert_pyeda_atom_to_hera(v)))
+    return m
 
 def powerset(s):
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
