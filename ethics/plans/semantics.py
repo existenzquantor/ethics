@@ -5,6 +5,7 @@ import copy
 import itertools
 
 from ethics.language import *
+from ethics.tools import myEval
 
 class Action:
     """Representation of an endogeneous action"""
@@ -466,7 +467,46 @@ class Situation:
         if isinstance(l, Not):
             return {str(l.f1): False}
         return {str(l.f1): True}
+
+    def __dict_to_literal(self, d):
+        k = list(d.keys())[0]
+        v = list(d.values())[0]
+        l = myEval(k)
+        if v:
+            return l
+        return Not(l)
+
+    def __dict_to_literals(self, d):
+        lits = []
+        for x in d:
+            lits.append(self.__dict_to_literal({x:d[x]}))
+        return lits
+
+    def get_all_consequences_lits(self):
+        return self.__dict_to_literals(self.getAllConsequences())
         
+
+    def __evaluate_term(self, term):
+        if isinstance(term, int):
+            return term
+        if isinstance(term, Minus):
+            return -1*self.__evaluate_term(term.f1)
+        if isinstance(term, Add):
+            return self.__evaluate_term(term.t1) + self.__evaluate_term(term.t2)
+        if isinstance(term, Sub):
+            return self.__evaluate_term(term.t1) - self.__evaluate_term(term.t2)
+        if isinstance(term, U):
+            return self.__sum_up(term.t1)
+            
+    def __sum_up(self, formula):
+        if formula is None:
+            return 0
+        if isinstance(formula, bool):
+            return 0
+        if isinstance(formula, And):
+            return self.__sum_up(formula.f1) + self.__sum_up(formula.f2)
+        return self.getUtility(self.__literal_to_dict(formula))
+
     def models(self, formula):
         if isinstance(formula, Not):
             return not self.models(formula.f1)
@@ -508,8 +548,16 @@ class Situation:
         if isinstance(formula, Avoidable):
             return self.__literal_to_dict(formula.f1) in self.getGenerallyAvoidableHarmfulFacts()
         if isinstance(formula, Goal):
-            return str(formula.f1) in self.goal
-
+            d = self.__literal_to_dict(formula.f1) 
+            k = list(d.keys())[0]
+            v = list(d.values())[0]
+            return k in self.goal and self.goal[k] == v
+        if isinstance(formula, Eq):
+            return self.__evaluate_term(formula.f1) == self.__evaluate_term(formula.f2)
+        if isinstance(formula, Gt):
+            return self.__evaluate_term(formula.f1) > self.__evaluate_term(formula.f2)
+        if isinstance(formula, GEq):
+            return self.__evaluate_term(formula.f1) >= self.__evaluate_term(formula.f2)
 
 class Planner:
     """ A very simplistic planner """

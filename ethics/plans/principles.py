@@ -174,24 +174,54 @@ class KantianHumanity(Principle):
 class Utilitarianism(Principle):
     def __init__(self, model, *args):
         super().__init__(model)
+
+    def __build_formula(self):
         
+        u = U(Formula.makeConjunction(self.model.get_all_consequences_lits()))
+        v = []
+        for w in self.model.alethicAlternatives:
+            v.append(U(Formula.makeConjunction(w.get_all_consequences_lits())))
+        f = None
+        for w in v:
+            f = GEq(u, w) if f is None else And(f, GEq(u, w))
+        if f is None: # no alternatives
+            f = True
+        self.formulae = [f]
+        self.result = [self.model.models(f)]
+        return self.result        
+
     def permissible(self):
         """The situation is permissible iff there is no alternative which yields more overall utility.
                 
         Keyword arguments:
         situation -- The situation
         """
+        """
         u = self.model.getFinalUtility()
         for a in self.model.alethicAlternatives:
             if a.getFinalUtility() > u:
                 return False
         return True
-
+        """
+        if len(self.model.alethicAlternatives) == 0:
+            self.model.alethicAlternatives.append(self.model)
+        self.__build_formula()
+        return self.model.models(self.formulae[0]) 
 
 class DoubleEffectPrinciple(Principle):
     def __init__(self, model, *args):
         super().__init__(model)
-        
+
+    def __build_formula(self):
+        self.formulae = [Formula.makeConjunction([Not(Bad(Atom(a.name))) for a in self.model.plan.endoActions])]         
+        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Goal(Atom(c)))) for c in self.model.getAllConsequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Goal(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae += [Formula.makeDisjunction([And(Good(Atom(c)), Goal(Atom(c))) for c in self.model.getAllConsequences()] + \
+                            [And(Good(Not(Atom(c))), Goal(Not(Atom(c)))) for c in self.model.getAllConsequences()])]
+        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Instrumental(Atom(c)))) for c in self.model.getAllConsequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Instrumental(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae += [Gt(U(Formula.makeConjunction(self.model.get_all_consequences_lits())),0)]
+
     def permissible(self):
         """The situation is permissible iff
            1) it is permissible according the deontology
@@ -202,20 +232,5 @@ class DoubleEffectPrinciple(Principle):
         Keyword arguments:
         situation -- The situation
         """
-        # Deontology
-        if not Deontology(self.model).permissible():
-            return False
-        # No bad goals, one good one
-        foundgood = False
-        for k,v in self.model.goal.items():
-            if self.model.getUtility({k:v}) < 0:
-                return False
-            if self.model.getUtility({k:v}) > 0:
-                foundgood = True
-        if not foundgood:
-            return False
-        # No bad means
-        if not DoNoInstrumentalHarm(self.model).permissible():
-            return False
-        # All in all positive
-        return self.model.getFinalUtility() > 0
+        self.__build_formula()
+        return self.model.models(Formula.makeConjunction(self.formulae)) 
