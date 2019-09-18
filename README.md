@@ -167,6 +167,19 @@ print("AvoidAvoidableHarm: ", perm)
 perm = sit.evaluate(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
 ```
+The output is:
+```console
+Deontology:  True
+GoalDeontology:  True
+Kantian:  False
+DoNoHarm:  True
+DoNoInstrumentalHarm:  True
+Utilitarianism:  True
+DoubleEffectPrinciple:  True
+AvoidAvoidableHarm:  True
+AvoidAnyHarm:  True
+```
+
 ### Plan Evaluation
 
 ### Plan Explanation
