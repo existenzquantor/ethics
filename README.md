@@ -252,8 +252,16 @@ The Kantian principle, on the other hand, renders Bob's plan impermissible. The 
 
 ## Causal Agency Models
 
+tbd
+
 ### Models
+
+tbd
 
 ### Evaluation
 
+tbd 
+
 ### Explanation
+
+tbd
