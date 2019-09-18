@@ -131,7 +131,11 @@ plan: [giveFlowers]
 goal: {happy_alice: true}
 initialState: {happy_celia: false, happy_alice: false}
 ```
-That is, initially, neither Celia not Alice were happy. Bob then gave the flowers to Celia in order to make Alice happy. Hence, some information that might be relevant is not explicit, for instance, that after Bob’s giving flowers, both Celia and Alice are happy. This must be deduced by the reasoner. Indeed, the reasoner is capable of doing that. To evaluate Bob’s plan using the ethical principles defined in the HERA framework, we first have to load the described situation. We do that by loading a JSON file that contains the description outlined above. HERA provides a Python interface for doing so.
+That is, initially, neither Celia not Alice were happy. Bob then gave the flowers to Celia in order to make Alice happy. Hence, some information that might be relevant is not explicit, for instance, that after Bob’s giving flowers, both Celia and Alice are happy. This must be deduced by the reasoner. Indeed, the reasoner is capable of doing that. 
+
+### Plan Evaluation
+
+To evaluate Bob’s plan using the ethical principles defined in the HERA framework, we first have to load the described situation. We do that by loading a JSON file that contains the description outlined above. HERA provides a Python interface for doing so.
 ```python
 from ethics.plans.semantics import Situation
 sit = Situation("./cases/plans/flowers.yaml")
@@ -148,6 +152,9 @@ print("GoalDeontology: ", perm)
 
 perm = sit.evaluate(KantianHumanity)
 print("Kantian: ", perm)
+
+perm = sit.evaluate(KantianHumanity, 2)
+print("Kantian Reading #2: ", perm)
 
 perm = sit.evaluate(DoNoHarm)
 print("DoNoHarm: ", perm)
@@ -167,11 +174,12 @@ print("AvoidAvoidableHarm: ", perm)
 perm = sit.evaluate(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
 ```
-The output is:
+Just as expected, all principles but the Kantian will permit Bob's plan. The Kantian principle forbids it, because it uses Celia merely as a means. That is, the console output should look like this:
 ```console
 Deontology:  True
 GoalDeontology:  True
 Kantian:  False
+Kantian Reading #2:  False
 DoNoHarm:  True
 DoNoInstrumentalHarm:  True
 Utilitarianism:  True
@@ -180,9 +188,67 @@ AvoidAvoidableHarm:  True
 AvoidAnyHarm:  True
 ```
 
-### Plan Evaluation
-
 ### Plan Explanation
+
+The HERA Python software package ethics has recently been updated by a module for explanations. That is, an HERA agent can explain its moral permissibility judgments. This functionality can, for instance, be used to generate natural-language explanations for humans to understand the decisions made by an ethical reasoning agent, e.g., the decisions made by a social robot. The following tutorial will showcase how the new functionality can be used programmatically.
+
+Consider the same situation as above but this time we call ```explain``` rather than ```evaluate```:
+```python
+from ethics.plans.semantics import Situation
+sit = Situation("./cases/plans/flowers.yaml")
+
+from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
+
+perm = sit.explain(Deontology)
+print("Deontology: ", perm)
+
+perm = sit.explain(GoalDeontology)
+print("GoalDeontology: ", perm)
+
+perm = sit.explain(KantianHumanity)
+print("Kantian: ", perm)
+
+perm = sit.explain(KantianHumanity, 2)
+print("Kantian Reading #2: ", perm)
+
+perm = sit.explain(DoNoHarm)
+print("DoNoHarm: ", perm)
+
+perm = sit.explain(DoNoInstrumentalHarm)
+print("DoNoInstrumentalHarm: ", perm)
+
+perm = sit.explain(Utilitarianism)
+print("Utilitarianism: ", perm)
+
+perm = sit.explain(DoubleEffectPrinciple)
+print("DoubleEffectPrinciple: ", perm)
+
+perm = sit.explain(AvoidAvoidableHarm)
+print("AvoidAvoidableHarm: ", perm)
+
+perm = sit.explain(AvoidAnyHarm)
+print("AvoidAnyHarm: ", perm)
+```
+
+The console output of the above script is quite lengthy. Therefore, let us focus on two explantions given by the Goal-focused Deontology and by the Kantian principle.
+```python
+{'permissible': True, 
+ 'principle': 'GoalDeontology',
+ 'sufficient': [And(And(And(Not(Bad('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice')))), 
+               And(And(And(Not(Goal('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice'))))], 
+ 'necessary': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia'))), Or(Not(Bad('happy_celia')), Not(Goal('happy_celia')))],
+ 'inus': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia')))]}
+
+{'permissible': False, 
+ 'principle': 'KantianHumanity',
+ 'sufficient': [And(Means('celia'), Not(End('celia')))],
+ 'necessary': [Not(End('celia')), Means('celia')],
+ 'inus': [Not(End('celia')), Means('celia')]}
+```
+
+Goal-focused deontology argues that Bob's plan is permissible. It says that for permissibility it was already sufficient that being happy is not bad and that not being happy was not a goal. Moreover, as celia being happy was not a goal, it also does not matter if she being happy is morally bad. Hence, we have two *sufficient reasons*. The *necessary reasons* state conditions whose negation would result in another judgment: If it were bad that alice is happy, then Bob's plan would be impermissible etc. The *INUS reasons* point to *necessary reasons that are part of sufficient reasons* and often are most concise.
+
+The Kantian principle, on the other hand, renders Bob's plan impermissible. The reason is that Celia is used as a means (to make Alice happy) but not as an End (i.e., her being happy is not among Bob's goals). To fix this, either Bob has to consider Celia as an end, or find another plan that does not use Celia as a means. This is what the INUS reasons say.
 
 ## Causal Agency Models
 
