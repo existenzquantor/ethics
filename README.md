@@ -138,10 +138,13 @@ sit = Situation("flowers.json")
 ```
 Next, we can check permissibility of the situation according to several principles.
 ```python
-from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple
+from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
 
 perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
+
+perm = sit.evaluate(GoalDeontology)
+print("GoalDeontology: ", perm)
 
 perm = sit.evaluate(KantianHumanity)
 print("Kantian: ", perm)
@@ -157,6 +160,12 @@ print("Utilitarianism: ", perm)
 
 perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
+
+perm = sit.evaluate(AvoidAvoidableHarm)
+print("AvoidAvoidableHarm: ", perm)
+
+perm = sit.evaluate(AvoidAnyHarm)
+print("AvoidAnyHarm: ", perm)
 ```
 ### Plan Evaluation
 
