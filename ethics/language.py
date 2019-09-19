@@ -55,6 +55,7 @@ class Formula(object):
             return self.f1.getAllCALLiterals()
         return self.f1.getAllCALLiterals() + self.f2.getAllCALLiterals()
         
+    @staticmethod
     def make_cnf(f):
         if isinstance(f, Atom):
             return f
@@ -173,6 +174,7 @@ class Formula(object):
             return [self]
 
 
+    @staticmethod
     def makeConjunction(s):
         """
         >>> Formula.makeConjunction(["a"])
@@ -197,6 +199,7 @@ class Formula(object):
             return True
         return f
 
+    @staticmethod
     def makeDisjunction(s):
         """
         >>> Formula.makeDisjunction(["a"])
@@ -367,10 +370,6 @@ class Formula(object):
             return self.f1.stripParentsFromMechanism()
         if isinstance(self, TwoPlaced):
             return self.f1.stripParentsFromMechanism() + self.f2.stripParentsFromMechanism()
-        if isinstance(self, OnePlacedTerm):
-            return self.t1.stripParentsFromMechanism()
-        if isinstance(self, TwoPlacedTerm):
-            return self.t1.stripParentsFromMechanism() + self.f2.stripParentsFromMechanism()
         
         
         #else:
@@ -630,6 +629,15 @@ class Term(object):
             return "Sub("+str(t1)+", +"+str(t2)+")"
         if isinstance(self, Add):
             return "Add("+str(t1)+", +"+str(t2)+")"
+
+    def stripParentsFromMechanism(self):
+        """ Only for preprocessing the mechanisms. """
+        if isinstance(self, Atom):
+            return [self]
+        if isinstance(self, OnePlacedTerm):
+            return self.t1.stripParentsFromMechanism()
+        if isinstance(self, TwoPlacedTerm):
+            return self.t1.stripParentsFromMechanism() + self.t2.stripParentsFromMechanism()
 
 class OnePlacedTerm(Term):
     def __init__(self, t1):

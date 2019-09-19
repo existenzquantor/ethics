@@ -15,6 +15,7 @@ class Principle(object):
         self.result = []
         self.symbolformula = dict()
         self.counter = 0
+        self.label = ""
         
     def buildConjunction(self):
         return Formula.makeConjunction(self.formulae)

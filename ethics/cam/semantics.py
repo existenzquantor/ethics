@@ -13,7 +13,10 @@ class Model(object):
         self.alternatives = []
         
     def models(self, formula):
-        return self.checker.models(self, formula)
+        try:
+            return self.checker.models(self, formula)
+        except:
+            raise "No Model Checker"
 
     def evaluate(self, principle):
         try:
@@ -280,7 +283,7 @@ class CausalModel(CausalNetwork):
             
     def __affects(self, affects, formula, posneg):
         if isinstance(formula, And):
-            return self._affects(affects, formula.f1, posneg) and self._affects(affects, formula.f2, posneg)
+            return self.__affects(affects, formula.f1, posneg) and self.__affects(affects, formula.f2, posneg)
         return formula in [i[0] for i in affects if i[1] == posneg]
         
     def get_actual_goals(self):

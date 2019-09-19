@@ -4,8 +4,10 @@ import io
 import copy
 import itertools
 
-from ethics.language import *
-from ethics.tools import myEval
+from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
+                            Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
+                            Goal, Means, Means2, Eq, Gt, GEq, End
+from ethics.tools import myEval, minimalSets
 
 class Action:
     """Representation of an endogeneous action"""
@@ -248,7 +250,7 @@ class Situation:
             return False
         for e in self.__get_sub_events():
             sne = self.simulate(skipEvents = e)
-            if self.__is_satisfied(effect, sn):
+            if self.__is_satisfied(effect, sne):
                 for p in self.__get_sub_plans():
                     sn = self.simulate(skipEndo = p, skipEvents = e)
                     if not self.__is_satisfied(effect, sn):
