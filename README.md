@@ -33,7 +33,7 @@ python3 setup.py install
 
 ### Plan Situations
 
-Moral Planning Domain Definitions are a format for describing sequences of actions and events in situations that require moral reasoning. The formalism allows to specify which action plan an agent has performed or is about to perform in light of the fact that events out of the agent’s control happen. The general idea is that actions and events alter the current state of the world as described by a set of facts that hold. Thus, actions and events turn world states into new world states. To start with, we consider the Giving Flowers case, which was introduced as an example particularly tailored to the Kantian Humanity principle. 
+Moral Planning Domain Definitions is a format for describing sequences of actions and events in situations that require moral reasoning. The formalism allows to specify which action plan an agent has performed or is about to perform in light of the fact that events out of the agent's control may happen. The general idea is that actions and events alter the current state of the world as described by a set of facts that hold. Thus, actions and events turn world states into new world states. To start with, we consider the Giving Flowers case, which was introduced as an example particularly tailored to the Kantian Humanity principle. 
 The situations reads:
 > Bob is giving flowers to Celia, however, not to make Celia happy, but to make Alice happy, who is happy if Celia is happy.
 
