@@ -65,7 +65,7 @@ class PrimeCompilator:
     """Class that extracts all prime implicants and prime implicates from a given formula.
     """
 
-    def __init__(self, formula, verbose=False):
+    def __init__(self, formula, use_mhs_only=False, verbose=False):
         """Main initializer.
         Use instances of this class to determine all prime implicants and implicates of 
         the given formula.
@@ -88,6 +88,7 @@ class PrimeCompilator:
 
         self.verbose = verbose
         self.formula = formula
+        self.use_mhs_only = use_mhs_only
         
         self.non_boolean_mapping = dict()
 
@@ -207,7 +208,7 @@ class PrimeCompilator:
                 | (self.__find_atoms(sub_formula.f2)))
 
 
-    def __find_all_models(self, formula):
+    def __find_all_models(self, formula, complete_models=True):
         """Finds and returns all models of the given formula using pyeda's binary decision diagrams.
         
         Parameters
@@ -233,7 +234,10 @@ class PrimeCompilator:
                 atom = convert_pyeda_atom_to_hera(atom)
                 model_dict[str(atom)] = bit == 1
 
-            for full_model in self.__calculate_full_models_from_partial_model(list(model_dict.items())):
+            partial_model = list(model_dict.items())
+            used_models = self.__calculate_full_models_from_partial_model(partial_model) if complete_models else [partial_model]
+
+            for full_model in used_models:
                 models.append(dict(full_model))
 
         return models        
@@ -252,7 +256,6 @@ class PrimeCompilator:
         [[(atom_name, truth_value)]]
             The complete models.
         """
-
         atoms_in_model = [atom for atom, truth in model]
 
         full_models = []
@@ -273,9 +276,9 @@ class PrimeCompilator:
         -------
         (prime implicants, prime implicates)
         """
-        
+
         # Calculate the prime implicants and implicates
-        prime_implicants, prime_implicates = self.__compile()
+        prime_implicants, prime_implicates = self.__compile_alternative() if self.use_mhs_only else self.__compile()
 
         # Convert into Prime Structure
         self.prime_implicants = [PrimeStructure(Structure.implicant, implicant) for implicant in prime_implicants]
@@ -284,7 +287,6 @@ class PrimeCompilator:
         # Remove duplicates
         self.prime_implicants = list(dict.fromkeys(self.prime_implicants))
         self.prime_implicates = list(dict.fromkeys(self.prime_implicates))
-
 
         map_back = dict((value, key) for key, value in self.non_boolean_mapping.items())
             
@@ -321,6 +323,83 @@ class PrimeCompilator:
             cates.append(cate)
 
         return cants, cates
+
+
+    def __compile_alternative(self):
+        
+        prime_implicants = []
+        prime_implicates = []
+
+        # Find all models
+        models = self.__find_all_models(self.formula, complete_models=False)
+
+        # Convert models to lists of tuples
+        models = [list(model.items()) for model in models]
+
+        # Create sets from assignments
+        sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=True)
+
+        # Calculate prime implicates by finding all minimal hitting sets
+        tree = minihit.RcTree(sets)
+        tree.solve(prune=True, sort=False)
+        hitting_sets = list(tree.generate_minimal_hitting_sets())
+
+        # Remove all clauses that are trivially true 
+        # (containing both positive and negative literals of the same atom)
+        hitting_sets = self.__remove_trivial_clauses(hitting_sets)
+
+        # Generate prime implicates from the hitting sets (just type casting)
+        for hitting_set in hitting_sets:
+            prime_implicate = self.__convert_hitting_set_into_assignment(list(hitting_set))
+            prime_implicates.append(prime_implicate)
+
+        # Now take the hitting sets (prime implicates) and find again all minimal hitting sets
+        # Those then are all prime implicants
+        tree = minihit.RcTree(hitting_sets)
+        tree.solve(prune=True, sort=False)
+        hitting_sets = list(tree.generate_minimal_hitting_sets())
+
+        # Generate prime implicates from the hitting sets (just type casting)
+        for hitting_set in hitting_sets:
+            prime_implicant = self.__convert_hitting_set_into_assignment(list(hitting_set))
+            prime_implicants.append(prime_implicant)
+
+        # Flip implicants and implicates if necessary
+        if self.using_negation:
+            actual_prime_implicants = [[(name, not truth) for name, truth in prime_implicate] for prime_implicate in prime_implicates]
+            actual_prime_implicates = [[(name, not truth) for name, truth in prime_implicant] for prime_implicant in prime_implicants]
+            prime_implicants, prime_implicates = actual_prime_implicants, actual_prime_implicates
+
+        return prime_implicants, prime_implicates
+
+    
+    def __remove_trivial_clauses(self, sets):
+        """Removes all sets that contain both positive and negative literals
+        of the same atom.
+        
+        Parameters
+        ----------
+        sets : [set()]
+            A list containing all the sets.
+        
+        Returns
+        -------
+        [set()]
+            The filtered sets.
+        """
+        filtered_sets = []
+        for current_set in sets:
+            found_atoms = set()
+            for literal in current_set:
+                if literal[1:] in found_atoms:
+                    found_atoms = set()
+                    break
+                found_atoms.add(literal[1:])
+            
+            if len(found_atoms) > 0:
+                filtered_sets.append(current_set)
+
+        return filtered_sets
 
     
     def __compile(self):
