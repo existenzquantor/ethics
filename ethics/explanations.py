@@ -7,9 +7,9 @@ def generateReasons(model, principle, *args):
     #necc = generateNecessaryReasons(model, principle, perm)
 
     if perm:
-        cants, cates = PrimeCompilator(principle.buildConjunction()).compile()
+        cants, cates = PrimeCompilator(principle.buildConjunction(), use_mhs_only =True).compile()
     else:
-        cants, cates = PrimeCompilator(Not(principle.buildConjunction()).nnf()).compile()
+        cants, cates = PrimeCompilator(Not(principle.buildConjunction()).nnf(), use_mhs_only=True).compile()
     suff = [Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))]
     necc = set()
     for cc in cates:

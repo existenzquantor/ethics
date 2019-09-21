@@ -149,7 +149,7 @@ a = planner.makeMoralSuggestion(AvoidAvoidableHarm)
 print(a, a.plan)
 
 
-"""
+
 print("*"*50)
 print("YAML")
 print("*"*50)
@@ -200,4 +200,4 @@ if p:
     print("Planned: ", p.plan)
 else:
     print("No Plan found")
-"""
+
