@@ -1,18 +1,15 @@
 from ethics.language import *
 from ethics.primes import *
 
-
 def generateReasons(model, principle, *args):
     perm = principle.permissible()
     #suff = generateSufficientReasons(model, principle, perm)
     #necc = generateNecessaryReasons(model, principle, perm)
 
-
     if perm:
         cants, cates = PrimeCompilator(principle.buildConjunction()).compile()
     else:
         cants, cates = PrimeCompilator(Not(principle.buildConjunction()).nnf()).compile()
-        
     suff = [Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))]
     necc = set()
     for cc in cates:
