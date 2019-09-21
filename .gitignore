@@ -3,3 +3,4 @@ sandbox
 build
 dist
 *.egg-info
+.vscode

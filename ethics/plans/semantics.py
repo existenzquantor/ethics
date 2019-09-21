@@ -7,7 +7,7 @@ import itertools
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import myEval, minimalSets
+from ethics.tools import myEval, minimalSets, timeit
 
 class Action:
     """Representation of an endogeneous action"""
@@ -158,7 +158,7 @@ class Situation:
         """Get the Negation of the fact"""
         v = list(fact.values())[0]
         return {list(fact.keys())[0]:not v}
-
+    
     def getGenerallyAvoidableHarmfulFacts(self):
         """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be true."""
         avoidable = []
@@ -194,7 +194,7 @@ class Situation:
         for k, v in sn.items():
             utility += self.getUtility({k:v})
         return utility
-        
+    
     def __is_instrumental_at(self, effect, positions):
         """Determine if the goal is reached also if some effect is blocked at particular positions of the execution.
         
@@ -204,7 +204,7 @@ class Situation:
         """
         sn = self.simulate(blockEffect = effect, blockPositions = positions)
         return not self.satisfies_goal(sn)    
-        
+
     def __is_instrumental(self, effect):
         """Determine if an effect is instrumental, i.e., if blocking this effect somewhere during plan execution will render the goal unachieved."""
         for p in self.__get_sub_plans(len(self.plan.endoActions)):
@@ -238,7 +238,7 @@ class Situation:
             if reading == 2 and self.__caused(e):
                 return True
         return False
-        
+    
     def __caused(self, effect):
         """Check if some given effect is caused by the agent's actions.
         
@@ -260,9 +260,14 @@ class Situation:
     def __is_sufficient(self, skip, effect):
         """Check if some actions are sufficient for the effect to finally occur.
         
-        Keyword arguments:
-        skip -- actions to skip
-        effect -- The effect
+        Parameters:
+        ----------
+            skip (list): actions to skip
+            effect (dict): the effect
+
+        Returns:
+        -------
+            bool: sufficiency
         """
         sn = self.simulate(skipEndo=[not b for b in skip])
         if self.__is_satisfied(effect, sn):
