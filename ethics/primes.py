@@ -65,7 +65,7 @@ class PrimeCompilator:
     """Class that extracts all prime implicants and prime implicates from a given formula.
     """
 
-    def __init__(self, formula, use_mhs_only=False, verbose=False):
+    def __init__(self, formula, use_mhs_only=False, use_gde=True, verbose=False):
         """Main initializer.
         Use instances of this class to determine all prime implicants and implicates of 
         the given formula.
@@ -89,6 +89,7 @@ class PrimeCompilator:
         self.verbose = verbose
         self.formula = formula
         self.use_mhs_only = use_mhs_only
+        self.use_gde = use_gde
         
         self.non_boolean_mapping = dict()
 
@@ -276,9 +277,8 @@ class PrimeCompilator:
         -------
         (prime implicants, prime implicates)
         """
-
         # Calculate the prime implicants and implicates
-        prime_implicants, prime_implicates = self.__compile_alternative() if self.use_mhs_only else self.__compile()
+        prime_implicants, prime_implicates = self.__compile_mhs_only() if self.use_mhs_only else self.__compile()
 
         # Convert into Prime Structure
         self.prime_implicants = [PrimeStructure(Structure.implicant, implicant) for implicant in prime_implicants]
@@ -325,7 +325,7 @@ class PrimeCompilator:
         return cants, cates
 
 
-    def __compile_alternative(self):
+    def __compile_mhs_only(self):
         
         prime_implicants = []
         prime_implicates = []
@@ -340,10 +340,13 @@ class PrimeCompilator:
         sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=True)
 
         # Calculate prime implicates by finding all minimal hitting sets
-        tree = minihit.RcTree(sets)
-        tree.solve(prune=True, sort=False)
-        hitting_sets = list(tree.generate_minimal_hitting_sets())
-
+        if self.use_gde:
+            hitting_sets = self.__hitting_sets_gde(sets)
+        else:
+            tree = minihit.RcTree(sets)
+            tree.solve(prune=True, sort=False)
+            hitting_sets = list(tree.generate_minimal_hitting_sets())
+        
         # Remove all clauses that are trivially true 
         # (containing both positive and negative literals of the same atom)
         hitting_sets = self.__remove_trivial_clauses(hitting_sets)
@@ -411,7 +414,7 @@ class PrimeCompilator:
             Returns two lists of `PrimeStructure`. 
             The first one contains all prime implicants and the second one all prime implicates.
         """
-
+        
         prime_implicants = []
         prime_implicates = []
 
@@ -533,3 +536,28 @@ class PrimeCompilator:
             assignment.append((name, truth_value))
 
         return assignment
+
+    
+    def __hitting_sets_gde(self, sets):
+        hitting_sets = [set()]
+        for current_set in sets:
+            new_hitting_sets = list(hitting_sets)
+            for hitting_set in hitting_sets:
+                # Check if hitting_set hits current_set
+                if hitting_set.intersection(current_set) == set():
+                    new_hitting_sets.remove(hitting_set)
+                    # no hit
+                    for element in current_set:
+                        candidate = hitting_set.union({element})
+                        
+                        is_valid = True
+                        for hs in new_hitting_sets:
+                            if hs.issubset(candidate):
+                                is_valid = False
+                                break
+                        if is_valid:
+                            new_hitting_sets.append(candidate)
+            
+            hitting_sets = list(new_hitting_sets)
+        
+        return hitting_sets
