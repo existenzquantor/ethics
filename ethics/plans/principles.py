@@ -92,14 +92,6 @@ class AvoidAvoidableHarm(Principle):
         Keyword arguments:
         situation -- The situation
         """
-        """
-        hc = self.model.getHarmfulConsequences()
-        hf = self.model.getGenerallyAvoidableHarmfulFacts()
-        for h in hc:
-            if h in hf:
-                return False
-        return True
-        """
         self.__build_formula()
         return self.model.models(self.formulae[0])
             
@@ -195,13 +187,6 @@ class Utilitarianism(Principle):
                 
         Keyword arguments:
         situation -- The situation
-        """
-        """
-        u = self.model.getFinalUtility()
-        for a in self.model.alethicAlternatives:
-            if a.getFinalUtility() > u:
-                return False
-        return True
         """
         if len(self.model.alethicAlternatives) == 0:
             self.model.alethicAlternatives.append(self.model)

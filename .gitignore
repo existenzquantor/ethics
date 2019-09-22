@@ -3,3 +3,6 @@ sandbox
 build
 dist
 *.egg-info
+.vscode
+*.pyc
+*.sh

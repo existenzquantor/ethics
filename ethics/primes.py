@@ -17,7 +17,7 @@ class PrimeStructure:
 
     def __init__(self, structure_type, structure):
         """Main initializer.
-        
+
         Parameters
         ----------
         structure_type : Structure
@@ -29,10 +29,10 @@ class PrimeStructure:
 
         self.structure_type = structure_type
         self.structure = structure
-        
+
         # Sort to make it easier to compare when printed
         self.structure.sort(key=lambda tuple: tuple[0])
-                    
+
     def __str__(self):
         return "[" + self.structure_type.name + ", ".join([str(Atom(atom)) if truth else str(Not(Atom(atom))) for (atom, truth) in self.structure]) + "]"
 
@@ -53,7 +53,7 @@ class PrimeStructure:
         for i in range(0, len(self.structure)):
             if self.structure[i][0] != other.structure[i][0] or self.structure[i][1] != other.structure[i][1]:
                 return False
-        
+
         return True
 
 
@@ -67,14 +67,14 @@ class PrimeCompilator:
 
     def __init__(self, formula, use_mhs_only=False, use_gde=True, verbose=False):
         """Main initializer.
-        Use instances of this class to determine all prime implicants and implicates of 
+        Use instances of this class to determine all prime implicants and implicates of
         the given formula.
-        
+
         Parameters
         ----------
         formula : Formula
             The formula whose primes should be compiled.
-            You can pass a formula containing non-boolean functions as they will automatically 
+            You can pass a formula containing non-boolean functions as they will automatically
             be replaced with boolean atoms (see `self.__prepare_formula(sub_formula)`).
 
             Avoid using atoms with a name like "Cx", where x is a number. Those are reserved for non-boolean mappings.
@@ -90,7 +90,7 @@ class PrimeCompilator:
         self.formula = formula
         self.use_mhs_only = use_mhs_only
         self.use_gde = use_gde
-        
+
         self.non_boolean_mapping = dict()
 
         # Turn the formula into one only consisting of AND, OR, NOT, ATOM
@@ -100,16 +100,16 @@ class PrimeCompilator:
         # Find the atoms of the formula (sorted for use in BinPy library later)
         self.atoms = sorted(self.__find_atoms(), reverse=True)
 
-        # If the negation of the formula has fewer models, 
-        # use the negation instead and negate the resulting prime implicants 
+        # If the negation of the formula has fewer models,
+        # use the negation instead and negate the resulting prime implicants
         # and implicates
         self.using_negation = False
         possible_assignments = 2**(len(self.atoms))
         if len(self.__find_all_models(formula)) > (possible_assignments / 2):
-            
+
             if self.verbose:
                 print("Using negated formula to speed up the algorithm")
-            
+
             self.using_negation = True
             self.formula = self.formula.getNegation()
 
@@ -129,9 +129,9 @@ class PrimeCompilator:
 
     def __prepare_formula(self, sub_formula=None):
         """Recursively replaces any occurences of `Impl` and `BiImpl` with their corresponding equivalences using only `And`, `Or` and `Not`.
-        This method also removes all non-boolean functions with new atoms that act as representatives of the respective function. 
+        This method also removes all non-boolean functions with new atoms that act as representatives of the respective function.
         The mapping from atoms to non-boolean function is saved in `self.non_boolean_mapping`.
-        
+
         Parameters
         ----------
         sub_formula : Formula, optional
@@ -211,12 +211,12 @@ class PrimeCompilator:
 
     def __find_all_models(self, formula, complete_models=True):
         """Finds and returns all models of the given formula using pyeda's binary decision diagrams.
-        
+
         Parameters
         ----------
         formula : Formula
             The formula whose models you want to find.
-        
+
         Returns
         -------
         [dict(atom_name: truth_value)]
@@ -241,17 +241,17 @@ class PrimeCompilator:
             for full_model in used_models:
                 models.append(dict(full_model))
 
-        return models        
+        return models
 
 
     def __calculate_full_models_from_partial_model(self, model):
         """Takes a partial model and returns every possible complete model that the partial model implies.
-        
+
         Parameters
         ----------
         model : [(atom_name, truth_value)]
             The partial model.
-        
+
         Returns
         -------
         [[(atom_name, truth_value)]]
@@ -283,13 +283,13 @@ class PrimeCompilator:
         # Convert into Prime Structure
         self.prime_implicants = [PrimeStructure(Structure.implicant, implicant) for implicant in prime_implicants]
         self.prime_implicates = [PrimeStructure(Structure.implicate, implicate) for implicate in prime_implicates]
- 
+
         # Remove duplicates
         self.prime_implicants = list(dict.fromkeys(self.prime_implicants))
         self.prime_implicates = list(dict.fromkeys(self.prime_implicates))
 
         map_back = dict((value, key) for key, value in self.non_boolean_mapping.items())
-            
+
         cants = []
         for p in self.prime_implicants:
             cant = []
@@ -305,7 +305,7 @@ class PrimeCompilator:
                     else:
                         cant.append(myEval(s[0]))
             cants.append(cant)
-            
+
         cates = []
         for p in self.prime_implicates:
             cate = []
@@ -326,7 +326,7 @@ class PrimeCompilator:
 
 
     def __compile_mhs_only(self):
-        
+
         prime_implicants = []
         prime_implicates = []
 
@@ -346,8 +346,8 @@ class PrimeCompilator:
             tree = minihit.RcTree(sets)
             tree.solve(prune=True, sort=False)
             hitting_sets = list(tree.generate_minimal_hitting_sets())
-        
-        # Remove all clauses that are trivially true 
+
+        # Remove all clauses that are trivially true
         # (containing both positive and negative literals of the same atom)
         hitting_sets = self.__remove_trivial_clauses(hitting_sets)
 
@@ -375,16 +375,16 @@ class PrimeCompilator:
 
         return prime_implicants, prime_implicates
 
-    
+
     def __remove_trivial_clauses(self, sets):
         """Removes all sets that contain both positive and negative literals
         of the same atom.
-        
+
         Parameters
         ----------
         sets : [set()]
             A list containing all the sets.
-        
+
         Returns
         -------
         [set()]
@@ -398,23 +398,23 @@ class PrimeCompilator:
                     found_atoms = set()
                     break
                 found_atoms.add(literal[1:])
-            
+
             if len(found_atoms) > 0:
                 filtered_sets.append(current_set)
 
         return filtered_sets
 
-    
+
     def __compile(self):
         """Internal compilation method that determines all prime implicants and implicates.
-        
+
         Returns
         -------
         [PrimeStructure], [PrimeStructure]
-            Returns two lists of `PrimeStructure`. 
+            Returns two lists of `PrimeStructure`.
             The first one contains all prime implicants and the second one all prime implicates.
         """
-        
+
         prime_implicants = []
         prime_implicates = []
 
@@ -456,11 +456,11 @@ class PrimeCompilator:
 
     def __structure_from_binPy_formula(self, formula):
         """Converts the result of bynPy to a list of assignments.
-        
+
         Parameters
         ----------
         formula : binPy formula
-        
+
         Returns
         -------
         [[(atom_name, truth_value)]]
@@ -482,20 +482,20 @@ class PrimeCompilator:
                 else:
                     prime_implicant.append((assignment, True))
             prime_implicants.append(prime_implicant)
-        
+
         return prime_implicants
-        
+
 
     def __create_sets_for_hitting_sets_using_prime_implicants(self, prime_implicants, use_sets=False):
         """Takes the given prime_implicants and turns them into sets readable by minihit.
-        
+
         Parameters
         ----------
         prime_implicants : [[(atom_name, truth_value)]]
             The prime implicants.
         use_sets : bool, optional
             Creates the sets using python sets if set to True (and lists if set to False). Default: False
-        
+
         Returns
         -------
         [[str]] or [{str}]
@@ -515,18 +515,18 @@ class PrimeCompilator:
 
     def __convert_hitting_set_into_assignment(self, hitting_set):
         """Converts a hitting set returned by minihit to an assignment.
-        
+
         Parameters
         ----------
         hitting_set : [str]
             The hitting set returned by minihit.
-        
+
         Returns
         -------
         [(atom_name, truth_value)]
             The corresponding assignment.
         """
-        
+
         assignment = []
         for variable in hitting_set:
             prefix = str(variable)[0]
@@ -537,7 +537,7 @@ class PrimeCompilator:
 
         return assignment
 
-    
+
     def __hitting_sets_gde(self, sets):
         hitting_sets = [set()]
         for current_set in sets:
@@ -549,7 +549,7 @@ class PrimeCompilator:
                     # no hit
                     for element in current_set:
                         candidate = hitting_set.union({element})
-                        
+
                         is_valid = True
                         for hs in new_hitting_sets:
                             if hs.issubset(candidate):
@@ -557,7 +557,7 @@ class PrimeCompilator:
                                 break
                         if is_valid:
                             new_hitting_sets.append(candidate)
-            
+
             hitting_sets = list(new_hitting_sets)
-        
+
         return hitting_sets
