@@ -28,6 +28,17 @@ class Action:
     def __str__(self):
         """String representation of an action"""
         return self.name
+
+    def has_effect_somewhere(self, effect):
+        for e in self.eff:
+            if set(effect.keys()) <= set(e["effect"].keys()):
+                count = 0
+                for ek in effect.keys():
+                    if e["effect"][ek] == effect[ek]:
+                        count = count + 1
+                if count == len(effect.keys()):
+                    return True
+        return False
         
 class Event:
     """Representation of an event"""
@@ -164,12 +175,15 @@ class Situation:
         avoidable = []
         sit = self.clone_situation()
         for h in sit.getHarmfulFacts():
-            nh = sit.__get_negation(h)
-            sit.goal = nh
-            planner = Planner(self)
-            plan = planner.generatePlan()
-            if plan != False:
-                avoidable += [h]
+            if not self.models(Finally(self.__dict_to_literal(h))):
+                avoidable.append(h)
+            else:
+                nh = sit.__get_negation(h)
+                sit.goal = nh
+                planner = Planner(self)
+                plan = planner.generatePlan()
+                if plan != False:
+                    avoidable.append(h)
         return avoidable
     
     def getAllConsequences(self):
@@ -208,7 +222,12 @@ class Situation:
     def __is_instrumental(self, effect):
         """Determine if an effect is instrumental, i.e., if blocking this effect somewhere during plan execution will render the goal unachieved."""
         for p in self.__get_sub_plans(len(self.plan.endoActions)):
-            if self.__is_instrumental_at(effect, p):
+            testit = True
+            for i in range(len(p)):
+                if p[i] == 1 and not self.plan.endoActions[i].has_effect_somewhere(effect):
+                    testit = False
+                    break
+            if testit and self.__is_instrumental_at(effect, p):
                 return True
         return False
         
