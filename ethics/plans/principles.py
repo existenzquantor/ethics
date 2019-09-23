@@ -17,10 +17,10 @@ class Principle:
         pass
 
     def explain(self, *args):
-        reasons = generateReasons(self.model, self, args)
+        reasons = generate_reasons(self.model, self, args)
         suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
         nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
-        inus = identifyINUSReasons(reasons)
+        inus = generate_inus_reasons(reasons)
         if len(reasons) > 0:
             return {"permissible": reasons[0]["perm"], "principle": self.label, "sufficient": suff, "necessary": nec, "inus": inus}
         return []    
@@ -47,8 +47,8 @@ class GoalDeontology(Principle):
         super().__init__(model)
     
     def __build_formula(self):
-        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Goal(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Goal(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Goal(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Goal(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
 
     def permissible(self):
         """The situation is permissible iff no action in the plan is intrinsically bad.
@@ -65,8 +65,8 @@ class AvoidAnyHarm(Principle):
         super().__init__(model)
     
     def __build_formula(self):
-        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Finally(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Finally(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Finally(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Finally(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
     
     def permissible(self):
         """The situation is permissible iff there are no harmful consequences in the final state.
@@ -83,8 +83,8 @@ class AvoidAvoidableHarm(Principle):
         super().__init__(model)
 
     def __build_formula(self):
-        self.formulae = [Formula.makeConjunction([Impl(And(Bad(Atom(c)), Finally(Atom(c))), Not(Avoidable(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(And(Bad(Not(Atom(c))), Finally(Not(Atom(c)))), Not(Avoidable(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae = [Formula.makeConjunction([Impl(And(Bad(Atom(c)), Finally(Atom(c))), Not(Avoidable(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(And(Bad(Not(Atom(c))), Finally(Not(Atom(c)))), Not(Avoidable(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
 
     def permissible(self):
         """The situation is permissible iff all harmful consequences in the final state could not have been avoided by any plan.
@@ -102,8 +102,8 @@ class DoNoHarm(Principle):
         super().__init__(model)
         
     def __build_formula(self):
-        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Caused(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Caused(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Caused(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Caused(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
         
     def permissible(self):
         """The situation is permissible iff if there is harm in the final state then it's not caused by the agent's actions.
@@ -120,8 +120,8 @@ class DoNoInstrumentalHarm(Principle):
         super().__init__(model)
 
     def __build_formula(self):
-        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Instrumental(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Instrumental(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Instrumental(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Instrumental(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
                             
     def permissible(self):
         """The situation is permissible iff if there is harm in the final state then it's not contributing to the agent's goal, i.e., is just a side effect.
@@ -199,12 +199,12 @@ class DoubleEffectPrinciple(Principle):
 
     def __build_formula(self):
         self.formulae = [Formula.makeConjunction([Not(Bad(Atom(a.name))) for a in self.model.plan.endoActions])]         
-        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Goal(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Goal(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
-        self.formulae += [Formula.makeDisjunction([And(Good(Atom(c)), Goal(Atom(c))) for c in self.model.getAllConsequences()] + \
-                            [And(Good(Not(Atom(c))), Goal(Not(Atom(c)))) for c in self.model.getAllConsequences()])]
-        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Instrumental(Atom(c)))) for c in self.model.getAllConsequences()] + \
-                            [Impl(Bad(Not(Atom(c))), Not(Instrumental(Not(Atom(c))))) for c in self.model.getAllConsequences()])]
+        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Goal(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Goal(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
+        self.formulae += [Formula.makeDisjunction([And(Good(Atom(c)), Goal(Atom(c))) for c in self.model.get_all_consequences()] + \
+                            [And(Good(Not(Atom(c))), Goal(Not(Atom(c)))) for c in self.model.get_all_consequences()])]
+        self.formulae += [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Instrumental(Atom(c)))) for c in self.model.get_all_consequences()] + \
+                            [Impl(Bad(Not(Atom(c))), Not(Instrumental(Not(Atom(c))))) for c in self.model.get_all_consequences()])]
         self.formulae += [Gt(U(Formula.makeConjunction(self.model.get_all_consequences_lits())),0)]
 
     def permissible(self):

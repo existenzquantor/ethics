@@ -7,7 +7,7 @@ import itertools
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import myEval, minimalSets, timeit
+from ethics.tools import myEval, minimalsets, timeit
 
 class Action:
     """Representation of an endogeneous action"""
@@ -147,9 +147,9 @@ class Situation:
             n += len(e.times)
         return n
     
-    def getHarmfulConsequences(self):
+    def get_harmful_consequences(self):
         """Retrieve all consequences of the action plan, which have negative utility."""
-        allCons = self.getAllConsequences()
+        allCons = self.get_all_consequences()
         harmful = []
         for u in self.utilities:
             if u["utility"] < 0:
@@ -157,7 +157,7 @@ class Situation:
                     harmful += [u["fact"]]  
         return harmful  
 
-    def getHarmfulFacts(self):
+    def get_harmful_facts(self):
         """Retrieve all harmful facts"""
         harmful = []
         for u in self.utilities:
@@ -170,27 +170,27 @@ class Situation:
         v = list(fact.values())[0]
         return {list(fact.keys())[0]:not v}
     
-    def getGenerallyAvoidableHarmfulFacts(self):
+    def get_avoidable_harmful_facts(self):
         """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be true."""
         avoidable = []
         sit = self.clone_situation()
-        for h in sit.getHarmfulFacts():
+        for h in sit.get_harmful_facts():
             if not self.models(Finally(self.__dict_to_literal(h))):
                 avoidable.append(h)
             else:
                 nh = sit.__get_negation(h)
                 sit.goal = nh
                 planner = Planner(self)
-                plan = planner.generatePlan()
+                plan = planner.generate_plan()
                 if plan != False:
                     avoidable.append(h)
         return avoidable
     
-    def getAllConsequences(self):
+    def get_all_consequences(self):
         """Retrieve all consequences of the action plan, i.e., the final state."""
         return self.simulate()
 
-    def getUtility(self, fact):
+    def get_utility(self, fact):
         """Retrieve the utility of a particular fact.
         
         Keyword arguments:
@@ -201,7 +201,7 @@ class Situation:
                 return u["utility"]
         return 0
 
-    def getFinalUtility(self):
+    def get_final_utility(self):
         """Retrieve aggregated utility of the final state."""
         utility = 0
         sn = self.simulate()
@@ -294,7 +294,7 @@ class Situation:
         return False
                     
     
-    def getMinSufficient(self, effect):
+    def get_minimal_sufficient_subplan(self, effect):
         """Search for minimal sets of actions sufficient for the effect to finally occur.
         
         Keyword arguments:
@@ -306,7 +306,7 @@ class Situation:
             for p in self.__get_sub_plans():
                 if self.__is_sufficient(p, effect):
                     cand.append(p)
-            return minimalSets(cand)
+            return minimalsets(cand)
         return None
         
     def __is_necessary(self, skip, effect):
@@ -324,7 +324,7 @@ class Situation:
         return False
    
    
-    def getMinNecessary(self, effect):
+    def get_minimal_necessary_subplan(self, effect):
         """Search for minimal sets of actions sufficient for the effect to finally occur.
         
         Keyword arguments:
@@ -336,7 +336,7 @@ class Situation:
             for p in self.__get_sub_plans():
                 if self.__is_necessary(p, effect):
                     cand.append(p)
-            return minimalSets(cand)
+            return minimalsets(cand)
         return None
         
     def evaluate(self, principle, *args):
@@ -509,7 +509,7 @@ class Situation:
         return lits
 
     def get_all_consequences_lits(self):
-        return self.__dict_to_literals(self.getAllConsequences())
+        return self.__dict_to_literals(self.get_all_consequences())
         
 
     def __evaluate_term(self, term):
@@ -531,7 +531,7 @@ class Situation:
             return 0
         if isinstance(formula, And):
             return self.__sum_up(formula.f1) + self.__sum_up(formula.f2)
-        return self.getUtility(self.__literal_to_dict(formula))
+        return self.get_utility(self.__literal_to_dict(formula))
 
     def models(self, formula):
         if isinstance(formula, Not):
@@ -548,21 +548,21 @@ class Situation:
             if self.__is_action(formula.f1):
                 return formula.f1 in [a.name for a in self.actions if a.intrinsicvalue == "bad"]
             else:
-                return self.getUtility(self.__literal_to_dict(formula.f1)) < 0
+                return self.get_utility(self.__literal_to_dict(formula.f1)) < 0
         if isinstance(formula, Good):
             if self.__is_action(formula.f1):
                 return formula.f1 in [a.name for a in self.actions if a.intrinsicvalue == "good"]
             else:
-                return self.getUtility(self.__literal_to_dict(formula.f1)) > 0
+                return self.get_utility(self.__literal_to_dict(formula.f1)) > 0
         if isinstance(formula, Neutral):
             if self.__is_action(formula.f1):
                 return formula.f1 in [a.name for a in self.actions if a.intrinsicvalue == "neutral"]
             else:
-                return self.getUtility(self.__literal_to_dict(formula.f1)) == 0
+                return self.get_utility(self.__literal_to_dict(formula.f1)) == 0
         if isinstance(formula, Caused):
             return self.__caused(self.__literal_to_dict(formula.f1))
         if isinstance(formula, Finally):
-            return self.__is_satisfied(self.__literal_to_dict(formula.f1), self.getAllConsequences())
+            return self.__is_satisfied(self.__literal_to_dict(formula.f1), self.get_all_consequences())
         if isinstance(formula, Means):
             return self.__treats_as_means(formula.f1, 1)
         if isinstance(formula, Means2):
@@ -572,7 +572,7 @@ class Situation:
         if isinstance(formula, Instrumental):
             return self.__is_instrumental(self.__literal_to_dict(formula.f1))
         if isinstance(formula, Avoidable):
-            return self.__literal_to_dict(formula.f1) in self.getGenerallyAvoidableHarmfulFacts()
+            return self.__literal_to_dict(formula.f1) in self.get_avoidable_harmful_facts()
         if isinstance(formula, Goal):
             d = self.__literal_to_dict(formula.f1) 
             k = list(d.keys())[0]
@@ -591,7 +591,7 @@ class Planner:
     def __init__(self, situation):
         self.situation = situation
 
-    def generatePlan(self, frontier = None, k = 10, principle = None):
+    def generate_plan(self, frontier = None, k = 10, principle = None):
         """A very simple action planner.
         
         Keyword arguments:
@@ -613,7 +613,7 @@ class Planner:
             if s != False:
                 return s
             frontier += [newplancand]
-        return self.generatePlan(frontier[1:], k - 1, principle)
+        return self.generate_plan(frontier[1:], k - 1, principle)
 
     def __plan_found(self, newplancand, principle):
         """Check if a new plan has been found. Used by generatePlan.
@@ -630,7 +630,7 @@ class Planner:
                 return newsit
         return False
 
-    def generateCreativeAlternative(self, principle):
+    def generate_creative_alternative(self, principle):
         """Generates a permissible alternative to the current situation.
            
            Keyword arguments:
@@ -638,12 +638,12 @@ class Planner:
         """
         for c in self.situation.creativeAlternatives:
             planner = Planner(c)
-            c.plan = (planner.generatePlan(principle = principle)).plan
+            c.plan = (planner.generate_plan(principle = principle)).plan
             if c.plan != False:
                 return c
         return False
 
-    def makeMoralSuggestion(self, principle, *args):
+    def make_moral_suggestion(self, principle, *args):
         """A procedure to come up with a suggestion as to how
            to respond to a presented solution to a moral dilemma.
            Case 1: The presented solution is permissible according to
@@ -661,11 +661,11 @@ class Planner:
         if principle(self.situation, args).permissible():
             return self.situation
         # Maybe just the plan is bad and we can find a better one
-        p = self.generatePlan(principle = principle)
+        p = self.generate_plan(principle = principle)
         if p != False:
             sit = self.situation.clone_situation()
             sit.plan = p.plan
             if principle(args).permissible(sit):
                 return sit
         # Otherwise, let's be creative
-        return self.generateCreativeAlternative(principle)
+        return self.generate_creative_alternative(principle)

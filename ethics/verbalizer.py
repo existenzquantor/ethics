@@ -1,28 +1,28 @@
 from ethics.language import *
 
-def reasonToNL(reason):
+def reason_to_nl(reason):
     if isinstance(reason, str):
         return reason
     if isinstance(reason, Not):
-        return "it is not the case that "+reasonToNL(reason.f1)
+        return "it is not the case that "+reason_to_nl(reason.f1)
     if isinstance(reason, Causes):
-        return reasonToNL(reason.f1)+" directly causes "+ reasonToNL(reason.f2)
+        return reason_to_nl(reason.f1)+" directly causes "+ reason_to_nl(reason.f2)
     if isinstance(reason, And):
-        return reasonToNL(reason.f1)+" and "+reasonToNL(reason.f2)
+        return reason_to_nl(reason.f1)+" and "+reason_to_nl(reason.f2)
     if isinstance(reason, Or):
-        return reasonToNL(reason.f1)+" or "+reasonToNL(reason.f2)
+        return reason_to_nl(reason.f1)+" or "+reason_to_nl(reason.f2)
     if isinstance(reason, Gt):
         if reason.f1 == 0:
-            return reasonToNL(reason.f2.t1)+" is bad "
+            return reason_to_nl(reason.f2.t1)+" is bad "
         if reason.f2 == 0:
-            return reasonToNL(reason.f1.t1)+" is good "
+            return reason_to_nl(reason.f1.t1)+" is good "
 
 def verbalize(reason):
     nlp_reason = ""
     for r in reason:
         if len(nlp_reason) > 0:
             nlp_reason = nlp_reason.strip()+". Moreover, "
-        nlp_reason += reasonToNL(r).capitalize()           
+        nlp_reason += reason_to_nl(r).capitalize()           
     return nlp_reason.strip()+"."
 
 

@@ -8,7 +8,7 @@ sit = Situation("cases/plans/flowers.yaml")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
-print("Final State: "+ str(sit.getAllConsequences()))
+print("Final State: "+ str(sit.get_all_consequences()))
 
 perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
@@ -29,7 +29,7 @@ perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
 planner = Planner(sit)
-p = planner.generatePlan()
+p = planner.generate_plan()
 if p:
     print("Planned: ", p.plan)
 else:
@@ -41,7 +41,7 @@ sit = Situation("cases/plans/trolley-50.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
-print("Final State: "+ str(sit.getAllConsequences()))
+print("Final State: "+ str(sit.get_all_consequences()))
 
 
 perm = sit.evaluate(Deontology)
@@ -63,7 +63,7 @@ perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
 planner = Planner(sit)
-p = planner.generatePlan(principle = DoNoHarm)
+p = planner.generate_plan(principle = DoNoHarm)
 if p:
     print("Planned: ", p.plan)
 else:
@@ -76,7 +76,7 @@ sit = Situation("cases/plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
-print("Final State: "+ str(sit.getAllConsequences()))
+print("Final State: "+ str(sit.get_all_consequences()))
 
 
 perm = sit.evaluate(Deontology)
@@ -98,7 +98,7 @@ perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
 planner = Planner(sit)
-p = planner.generatePlan()
+p = planner.generate_plan()
 if p:
     print("Planned: ", p.plan)
 else:
@@ -111,7 +111,7 @@ sit = Situation("cases/plans/coal-dilemma.json")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
-print("Final State: "+ str(sit.getAllConsequences()))
+print("Final State: "+ str(sit.get_all_consequences()))
 
 
 perm = sit.evaluate(Deontology)
@@ -122,8 +122,6 @@ print("Kantian 1: ", perm)
 
 perm = sit.evaluate(KantianHumanity, 2)
 print("Kantian 2: ", perm)
-explain = sit.explain(KantianHumanity, 2)
-print(explain)
 
 perm = sit.evaluate(DoNoHarm)
 print("DoNoHarm: ", perm)
@@ -138,14 +136,14 @@ perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
 planner = Planner(sit)
-p = planner.generatePlan(principle = AvoidAnyHarm)
+p = planner.generate_plan(principle = AvoidAnyHarm)
 if p:
     print("Planned: ", p.plan)
 else:
     print("No Plan found")
 
 sit.creativeAlternatives += [Situation("cases/plans/coal-dilemma-creative1.json")]
-a = planner.makeMoralSuggestion(AvoidAvoidableHarm)
+a = planner.make_moral_suggestion(AvoidAvoidableHarm)
 print(a, a.plan)
 
 
@@ -157,7 +155,7 @@ sit = Situation("cases/plans/flowers.yaml")
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))
-print("Final State: "+ str(sit.getAllConsequences()))
+print("Final State: "+ str(sit.get_all_consequences()))
 
 perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
@@ -195,9 +193,8 @@ print("AvoidAvoidableHarm Explanation:", sit.explain(AvoidAvoidableHarm))
 
 
 planner = Planner(sit)
-p = planner.generatePlan()
+p = planner.generate_plan()
 if p:
     print("Planned: ", p.plan)
 else:
     print("No Plan found")
-

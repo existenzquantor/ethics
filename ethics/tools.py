@@ -57,8 +57,6 @@ def mapBackToFormulae(l, m): # l: model, m: map
 
 
 def convert_formula_to_pyeda(formula):
-    if isinstance(formula, Atom):
-        return pyeda.inter.expr("v"+bytearray(str(formula).encode()).hex())
     if isinstance(formula, Not):
         return pyeda.inter.Not(convert_formula_to_pyeda(formula.f1))
     if isinstance(formula, And):
@@ -83,6 +81,15 @@ def convert_pyeda_model_to_hera(model):
             m.append(Not(convert_pyeda_atom_to_hera(v)))
     return m
 
+def convert_hera_model_to_pyeda(model):
+    m = dict()
+    for l in model:
+        if isinstance(l, Not):
+            m[str(l.f1)] = 0
+        else:
+            m[str(l)] = 1
+    return m
+
 def powerset(s):
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
     
@@ -97,7 +104,7 @@ def sub(c, d):
         return True
     return False
     
-def minimalSets(cand):
+def minimalsets(cand):
     mins = []
     for c in cand:
         found = False

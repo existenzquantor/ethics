@@ -1,7 +1,7 @@
 from ethics.cam.semantics import *
 from ethics.language import *
 from ethics.tools import *
-from ethics.explanations import generateReasons, identifyINUSReasons
+from ethics.explanations import generate_reasons, generate_inus_reasons
 from ethics.argumentation import ArgModel, ArgGraph, ArgSolver
 
 class Principle(object):
@@ -27,10 +27,10 @@ class Principle(object):
         pass
 
     def explain(self):
-        reasons = generateReasons(self.model, self)
+        reasons = generate_reasons(self.model, self)
         suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
         nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
-        inus = identifyINUSReasons(reasons)
+        inus = generate_inus_reasons(reasons)
         if len(reasons) > 0:
             return {"permissible": reasons[0]["perm"], "principle": self.label, "sufficient": suff, "necessary": nec, "inus": inus}
         return []

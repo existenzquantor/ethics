@@ -1,7 +1,7 @@
 from ethics.language import *
 from ethics.primes import *
 
-def generateReasons(model, principle, *args):
+def generate_reasons(model, principle, *args):
     perm = principle.permissible()
 
     # Compute prime implicants and prime implicates
@@ -34,7 +34,7 @@ def generateReasons(model, principle, *args):
     return result
 
 
-def identifyINUSReasons(reasons):
+def generate_inus_reasons(reasons):
     suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
     nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
     inus = []

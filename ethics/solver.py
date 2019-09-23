@@ -1,7 +1,7 @@
 from ethics.language import *
 from ethics.tools import *
     
-def theorySAT(cand_model):
+def theory_sat(cand_model):
     """ A Solver for Simple Causal Agency Logic
     
     Keyword arguments:
@@ -105,31 +105,32 @@ def theorySAT(cand_model):
     
     return True
     
-def smtAllModels(formula):
+def smt_get_model(formula, model):
+    all_models = smt_all_models(formula)
+    for m in all_models:
+        if model.models(Formula.makeConjunction(m)):
+            return m
+    return False
+
+def smt_all_models(formula):
+    if(isinstance(formula, list)):
+        formula = Formula.makeConjunction(formula)
     formula = subToAtoms(formula)
-    s = BDDSolver() #TableauxSolver()
+    s = BDDSolver()
     s.append_formula(formula)
     models = []
     for mod in s.enum_models():
-        #f = mapBackToFormulae(mod, m)
-        #print("mod", mod)
-        if theorySAT(mod):
+        if theory_sat(mod):
             models.append(mod)
-        #print("models", len(models))
-    #s.delete()
     return models
 
-def satisfiable(formula, model = False):
+def satisfiable(formula, report_model = False):
     if(isinstance(formula, list)):
         formula = Formula.makeConjunction(formula)
-    
-    formula = subToAtoms(formula)
-    s = BDDSolver() #TableauxSolver()
-    s.append_formula(formula)
-    
-    if model:
-        return s.get_model()
-    return s.satisfiable()
+    models = smt_all_models(formula)
+    if report_model and len(models) > 0:
+        return models[0]
+    return len(models) > 0
 
 def entails(formula1, formula2):
     return not satisfiable(And(formula1, Not(formula2).nnf()))
