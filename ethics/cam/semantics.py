@@ -227,15 +227,15 @@ class CausalModel(CausalNetwork):
             except:
                 self.events = []
             try:
-                mechanisms = {str(k): myEval(v) for k, v in self.model["mechanisms"].items()}
+                mechanisms = {str(k): my_eval(v) for k, v in self.model["mechanisms"].items()}
             except:
                 mechanisms = dict()
             try:
-                self.intentions = {str(k): list(map(myEval, v)) for k, v in self.model["intentions"].items()}
+                self.intentions = {str(k): list(map(my_eval, v)) for k, v in self.model["intentions"].items()}
             except:
                 self.intentions = dict()
             try:
-                self.goals = {str(k): list(map(myEval, v)) for k, v in self.model["goals"].items()}
+                self.goals = {str(k): list(map(my_eval, v)) for k, v in self.model["goals"].items()}
             except:
                 self.goals = dict()
             try:

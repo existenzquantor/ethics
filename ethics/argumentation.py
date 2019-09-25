@@ -134,15 +134,15 @@ class ArgModel:
         myStack = list()
         for p in pol:
             if p in ["Top", "Bottom"]:
-                myStack.append(myEval(p + "()"))
+                myStack.append(my_eval(p + "()"))
             elif p in ["Good", "Bad", "Neutral", "Not", "Atom"]:
-                myStack.append(myEval(p + "(" + repr(myStack.pop()) + ")"))
+                myStack.append(my_eval(p + "(" + repr(myStack.pop()) + ")"))
             elif p in ["And", "Because", "Same", "Or", "Impl", "BiImpl", "Causes", "Intervene"]:
-                myStack.append(myEval(p + "(" + repr(myStack.pop()) + ", " + repr(myStack.pop()) + ")"))
+                myStack.append(my_eval(p + "(" + repr(myStack.pop()) + ", " + repr(myStack.pop()) + ")"))
             elif p in ["Forall", "Exists"]:
                 first = myStack.pop()
                 second = myStack.pop()
-                myStack.append(myEval(p + "(" + repr(first) + ", " + repr(second) + ")"))
+                myStack.append(my_eval(p + "(" + repr(first) + ", " + repr(second) + ")"))
                 #omitted: first.variable = True
             elif(p[0:4] == 'Act[' and len(p.split('/')) == 2):
                     myStack.append(Atom(p[0: -1]+"/]"))

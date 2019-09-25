@@ -296,14 +296,14 @@ class PrimeCompilator:
             for s in p.structure:
                 if s[0] in map_back:
                     if s[1] == 0:
-                        cant.append(Not(myEval(map_back[s[0]])))
+                        cant.append(Not(my_eval(map_back[s[0]])))
                     else:
-                        cant.append(myEval(map_back[s[0]]))
+                        cant.append(my_eval(map_back[s[0]]))
                 else:
                     if s[1] == 0:
-                        cant.append(Not(myEval(s[0])))
+                        cant.append(Not(my_eval(s[0])))
                     else:
-                        cant.append(myEval(s[0]))
+                        cant.append(my_eval(s[0]))
             cants.append(cant)
 
         cates = []
@@ -312,14 +312,14 @@ class PrimeCompilator:
             for s in p.structure:
                 if s[0] in map_back:
                     if s[1] == 0:
-                        cate.append(Not(myEval(map_back[s[0]])))
+                        cate.append(Not(my_eval(map_back[s[0]])))
                     else:
-                        cate.append(myEval(map_back[s[0]]))
+                        cate.append(my_eval(map_back[s[0]]))
                 else:
                     if s[1] == 0:
-                        cate.append(Not(myEval(s[0])))
+                        cate.append(Not(my_eval(s[0])))
                     else:
-                        cate.append(myEval(s[0]))
+                        cate.append(my_eval(s[0]))
             cates.append(cate)
 
         return cants, cates

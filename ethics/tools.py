@@ -15,15 +15,15 @@ def makeSetOfEpistemicAlternatives(*models):
         m.probability = 1/len(models)
 
 
-def myEval(content):
+def my_eval(content):
     try:
-        f = subToAtoms(eval(content))
+        f = sub_to_atoms(eval(content))
         return f
     except:
         return Atom(content)
 
 
-def subToAtoms(f):
+def sub_to_atoms(f):
     if isinstance(f, str) and not isinstance(f, Atom) and not isinstance(f, bool) and not isinstance(f, Bool):
         return Atom(f)
     if isinstance(f, bool) and not isinstance(f, Bool):
@@ -31,16 +31,16 @@ def subToAtoms(f):
     if isinstance(f, Bool):
         return f
     if isinstance(f, OnePlaced):
-        return type(f)(subToAtoms(f.f1))
+        return type(f)(sub_to_atoms(f.f1))
     if isinstance(f, TwoPlaced):
-        f1 = subToAtoms(f.f1)
-        f2 = subToAtoms(f.f2)
+        f1 = sub_to_atoms(f.f1)
+        f2 = sub_to_atoms(f.f2)
         return type(f)(f1,f2)
     if isinstance(f, OnePlacedTerm):
-        return type(f)(subToAtoms(f.t1))
+        return type(f)(sub_to_atoms(f.t1))
     if isinstance(f, TwoPlacedTerm):
-        f1 = subToAtoms(f.t1)
-        f2 = subToAtoms(f.t2)
+        f1 = sub_to_atoms(f.t1)
+        f2 = sub_to_atoms(f.t2)
         return type(f)(f1,f2)
     return f
 
@@ -51,13 +51,13 @@ def mapBackToFormulae(l, m): # l: model, m: map
         found = False
         for mm in m:
             if m[mm] == ll:
-                erg.append(myEval(mm).nnf())
+                erg.append(my_eval(mm).nnf())
                 found = True
                 break
         if(found == False):
             for mm in m:
                 if m[mm] + ll == 0:
-                    erg.append(myEval(mm).getNegation().nnf())
+                    erg.append(my_eval(mm).getNegation().nnf())
     return erg
 
 
@@ -73,10 +73,10 @@ def convert_formula_to_pyeda(formula):
     if isinstance(formula, BiImpl):
         return pyeda.inter.Equal(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2))
     return pyeda.inter.expr("v"+bytearray(str(formula).encode()).hex())
-    
+
 
 def convert_pyeda_atom_to_hera(atom):
-    return myEval(bytearray.fromhex(str(atom)[1:]).decode())
+    return my_eval(bytearray.fromhex(str(atom)[1:]).decode())
 
 
 def convert_pyeda_model_to_hera(model):

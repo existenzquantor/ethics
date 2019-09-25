@@ -7,7 +7,7 @@ import itertools
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import myEval, minimalsets, timeit
+from ethics.tools import my_eval, minimalsets, timeit
 
 class Action:
     """Representation of an endogeneous action"""
@@ -497,7 +497,7 @@ class Situation:
     def __dict_to_literal(self, d):
         k = list(d.keys())[0]
         v = list(d.values())[0]
-        l = myEval(k)
+        l = my_eval(k)
         if v:
             return l
         return Not(l)

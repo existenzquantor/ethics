@@ -115,7 +115,7 @@ def smt_get_model(formula, model):
 def smt_all_models(formula):
     if(isinstance(formula, list)):
         formula = Formula.makeConjunction(formula)
-    formula = subToAtoms(formula)
+    formula = sub_to_atoms(formula)
     s = BDDSolver()
     s.append_formula(formula)
     models = []
