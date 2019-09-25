@@ -539,6 +539,7 @@ class PrimeCompilator:
 
 
     def __hitting_sets_gde(self, sets):
+        sets = sorted(sets, key=len)
         hitting_sets = [set()]
         for current_set in sets:
             new_hitting_sets = list(hitting_sets)
