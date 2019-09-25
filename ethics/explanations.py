@@ -1,9 +1,5 @@
-from ethics.language import *
-from ethics.solver import *
-
-
-def find_all_models(formula):
-    return list(map(set, smt_all_models(formula)))
+from ethics.language import Formula, Not
+from ethics.solver import smt_all_models
 
 
 def hitting_sets_gde(sets):
@@ -31,6 +27,7 @@ def hitting_sets_gde(sets):
 
     return hitting_sets
 
+
 def remove_trivial_clauses(clauses):
     r = []
     for c in clauses:
@@ -39,8 +36,9 @@ def remove_trivial_clauses(clauses):
             r.append(c)
     return r
 
+
 def compute_primes(formula):
-    models = find_all_models(formula)
+    models = smt_all_models(formula)
     prime_implicates = remove_trivial_clauses(hitting_sets_gde(models))
     prime_implicants = remove_trivial_clauses(hitting_sets_gde(prime_implicates))
     return prime_implicants, prime_implicates
@@ -56,7 +54,7 @@ def generate_reasons(model, principle, *args):
         cants, cates = compute_primes(Not(principle.buildConjunction()).nnf())
 
     # Sufficient reasons from prime implicants
-    suff = [Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))]
+    suff = {Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))}
 
     # Necessary reasons from prime implicates
     necc = set()
@@ -67,7 +65,6 @@ def generate_reasons(model, principle, *args):
                 necc_reason.append(c)
         if len(necc_reason) > 0:
             necc.add(Formula.makeDisjunction(necc_reason))
-    necc = list(necc)
 
     # Preparing output
     result = []
@@ -80,15 +77,13 @@ def generate_reasons(model, principle, *args):
 
 
 def generate_inus_reasons(reasons):
-    suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
-    nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
-    inus = []
+    suff = {r["reason"] for r in reasons if r["type"] == "sufficient"}
+    nec = {r["reason"] for r in reasons if r["type"] == "necessary"}
+    inus = set()
     for rn in nec:
         rn_check = rn.getClause()
         for rs in suff:
             if set(rn_check) <= set(rs.getConj()):
-                inus.append(Formula.makeDisjunction(rn_check))
+                inus.add(Formula.makeDisjunction(rn_check))
                 break
     return inus
-
-

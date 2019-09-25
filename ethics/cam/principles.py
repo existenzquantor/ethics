@@ -16,6 +16,7 @@ class Principle(object):
         self.symbolformula = dict()
         self.counter = 0
         self.label = ""
+        self.is_permissible = None
         
     def buildConjunction(self):
         return Formula.makeConjunction(self.formulae)
@@ -28,12 +29,12 @@ class Principle(object):
 
     def explain(self):
         reasons = generate_reasons(self.model, self)
-        suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
-        nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
+        suff = {r["reason"] for r in reasons if r["type"] == "sufficient"}
+        nec = {r["reason"] for r in reasons if r["type"] == "necessary"}
         inus = generate_inus_reasons(reasons)
         if len(reasons) > 0:
             return {"permissible": reasons[0]["perm"], "principle": self.label, "sufficient": suff, "necessary": nec, "inus": inus}
-        return []
+        return {"permissible": self.permissible(), "principle": self.label, "sufficient": set(), "necessary": set(), "inus": set()}
 
 class DoubleEffectPrinciple(Principle):
     """
@@ -106,8 +107,11 @@ class DoubleEffectPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return False not in self.result
+        self.is_permissible = False not in self.result
+        return self.is_permissible
 
 
 class UtilitarianPrinciple(Principle):
@@ -139,11 +143,14 @@ class UtilitarianPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         if len(self.model.alternatives) == 0:
             self.model.alternatives.append(self.model)
         self._check()
         f =  self.formulae[0]
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class DoNoHarmPrinciple(Principle):
@@ -163,9 +170,12 @@ class DoNoHarmPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.cons = self.model.get_actual_consequences()
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class DoNoInstrumentalHarmPrinciple(Principle):
@@ -184,11 +194,13 @@ class DoNoInstrumentalHarmPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.cons = self.model.get_actual_consequences()
         self._check()
-        return self.result == [True]
-
-
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
+        
 
 class DoNoInstrumentalHarmPrincipleWithoutIntentions(Principle):
     """
@@ -213,9 +225,12 @@ class DoNoInstrumentalHarmPrincipleWithoutIntentions(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.cons = self.model.get_actual_consequences()
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class MinimizeHarmPrinciple(Principle):
@@ -243,8 +258,11 @@ class MinimizeHarmPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class MinimaxHarmPrinciple(Principle):
@@ -284,8 +302,11 @@ class MinimaxHarmPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class DeontologicalPrinciple(Principle):
@@ -304,8 +325,11 @@ class DeontologicalPrinciple(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
         
         
 class ActionFocusedDeontologicalPrinciple(DeontologicalPrinciple):
@@ -334,8 +358,11 @@ class IntentionFocusedDeontologicalPrinciple(DeontologicalPrinciple):
         return self.result
     
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
  
 class GoalFocusedDeontologicalPrinciple(DeontologicalPrinciple):
     """
@@ -353,8 +380,11 @@ class GoalFocusedDeontologicalPrinciple(DeontologicalPrinciple):
         return self.result
     
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
         
 class KantianHumanityPrincipleReading1(Principle):
     """
@@ -375,8 +405,11 @@ class KantianHumanityPrincipleReading1(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
         
 
 class KantianHumanityPrinciple(KantianHumanityPrincipleReading1):
@@ -408,8 +441,11 @@ class KantianHumanityPrincipleReading2(Principle):
         return self.result
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
     
         
 class ParetoPrinciple(Principle):
@@ -517,8 +553,11 @@ class ParetoPrinciple(Principle):
                 
 
     def permissible(self):
+        if self.is_permissible is not None:
+            return self.is_permissible
         self._check()
-        return self.result == [True]
+        self.is_permissible = self.result == [True]
+        return self.is_permissible
 
 
 class DiscoursePrinciple(Principle):
@@ -538,7 +577,10 @@ class DiscoursePrinciple(Principle):
             print("Model ERROR, model type was: " + repr(type(model)))
 
     def permissible(self):
-        return self.dialog.satisfiesDiscoursePrinciple(ArgSolver.toConjunction(self.dialog.proposition))
+        if self.is_permissible is not None:
+            return self.is_permissible
+        self.is_permissible = self.dialog.satisfiesDiscoursePrinciple(ArgSolver.toConjunction(self.dialog.proposition))
+        return self.is_permissible
 
 class UniversalityPrinciple(Principle):
 
@@ -557,5 +599,8 @@ class UniversalityPrinciple(Principle):
             print("Model ERROR, model type was: " + repr(type(model)))
 
     def permissible(self):
-        return self.dialog.satisfiesUniversalityPrinciple(ArgSolver.toConjunction(self.dialog.proposition))
+        if self.is_permissible is not None:
+            return self.is_permissible
+        self.is_permissible = self.dialog.satisfiesUniversalityPrinciple(ArgSolver.toConjunction(self.dialog.proposition))
+        return self.is_permissible
 

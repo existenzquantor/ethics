@@ -9,6 +9,7 @@ class Principle:
         self.formulae = []
         self.model = model
         self.label = self.__class__.__name__
+        self.is_permissible = None
     
     def buildConjunction(self):
         return Formula.makeConjunction(self.formulae)
@@ -18,8 +19,8 @@ class Principle:
 
     def explain(self, *args):
         reasons = generate_reasons(self.model, self, args)
-        suff = [r["reason"] for r in reasons if r["type"] == "sufficient"]
-        nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
+        suff = {r["reason"] for r in reasons if r["type"] == "sufficient"}
+        nec = {r["reason"] for r in reasons if r["type"] == "necessary"}
         inus = generate_inus_reasons(reasons)
         if len(reasons) > 0:
             return {"permissible": reasons[0]["perm"], "principle": self.label, "sufficient": suff, "necessary": nec, "inus": inus}
@@ -38,8 +39,11 @@ class Deontology(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0])
+        self.is_permissible = self.model.models(self.formulae[0])
+        return self.is_permissible
         
 
 class GoalDeontology(Principle):
@@ -56,8 +60,11 @@ class GoalDeontology(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0])
+        self.is_permissible = self.model.models(self.formulae[0])
+        return self.is_permissible
 
 
 class AvoidAnyHarm(Principle):
@@ -74,8 +81,11 @@ class AvoidAnyHarm(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0])
+        self.is_permissible = self.model.models(self.formulae[0])
+        return self.is_permissible
 
 
 class AvoidAvoidableHarm(Principle):
@@ -92,8 +102,11 @@ class AvoidAvoidableHarm(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0])
+        self.is_permissible = self.model.models(self.formulae[0])
+        return self.is_permissible
             
 
 class DoNoHarm(Principle):
@@ -111,8 +124,11 @@ class DoNoHarm(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0]) 
+        self.is_permissible = self.model.models(self.formulae[0]) 
+        return self.is_permissible
 
 
 class DoNoInstrumentalHarm(Principle):
@@ -129,8 +145,11 @@ class DoNoInstrumentalHarm(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0]) 
+        self.is_permissible = self.model.models(self.formulae[0]) 
+        return self.is_permissible
 
 
 class KantianHumanity(Principle):
@@ -158,8 +177,11 @@ class KantianHumanity(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(self.formulae[0]) 
+        self.is_permissible = self.model.models(self.formulae[0]) 
+        return self.is_permissible
         
 
 
@@ -188,10 +210,13 @@ class Utilitarianism(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         if len(self.model.alethicAlternatives) == 0:
             self.model.alethicAlternatives.append(self.model)
         self.__build_formula()
-        return self.model.models(self.formulae[0]) 
+        self.is_permissible = self.model.models(self.formulae[0]) 
+        return self.is_permissible
 
 class DoubleEffectPrinciple(Principle):
     def __init__(self, model, *args):
@@ -217,5 +242,8 @@ class DoubleEffectPrinciple(Principle):
         Keyword arguments:
         situation -- The situation
         """
+        if self.is_permissible is not None:
+            return self.is_permissible
         self.__build_formula()
-        return self.model.models(Formula.makeConjunction(self.formulae)) 
+        self.is_permissible = self.model.models(Formula.makeConjunction(self.formulae)) 
+        return self.is_permissible

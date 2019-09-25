@@ -3,22 +3,26 @@ from itertools import combinations, chain
 import pyeda.inter
 import time
 
+
 def makeSetOfAlternatives(*models):
     for m in models:
         m.setAlternatives(*models)
-        
+
+
 def makeSetOfEpistemicAlternatives(*models):
     for m in models:
         m.setEpistemicAlternatives(*models)
         m.probability = 1/len(models)
-        
+
+
 def myEval(content):
     try:
         f = subToAtoms(eval(content))
         return f
     except:
         return Atom(content)
-    
+
+
 def subToAtoms(f):
     if isinstance(f, str) and not isinstance(f, Atom) and not isinstance(f, bool) and not isinstance(f, Bool):
         return Atom(f)
@@ -39,7 +43,8 @@ def subToAtoms(f):
         f2 = subToAtoms(f.t2)
         return type(f)(f1,f2)
     return f
-        
+
+
 def mapBackToFormulae(l, m): # l: model, m: map
     erg = []
     for ll in l:
@@ -69,17 +74,20 @@ def convert_formula_to_pyeda(formula):
         return pyeda.inter.Equal(convert_formula_to_pyeda(formula.f1), convert_formula_to_pyeda(formula.f2))
     return pyeda.inter.expr("v"+bytearray(str(formula).encode()).hex())
     
+
 def convert_pyeda_atom_to_hera(atom):
     return myEval(bytearray.fromhex(str(atom)[1:]).decode())
 
+
 def convert_pyeda_model_to_hera(model):
-    m = []
+    m = set()
     for v in model:
         if model[v] == 1:
-            m.append(convert_pyeda_atom_to_hera(v))
+            m.add(convert_pyeda_atom_to_hera(v))
         else:
-            m.append(Not(convert_pyeda_atom_to_hera(v)))
+            m.add(Not(convert_pyeda_atom_to_hera(v)))
     return m
+
 
 def convert_hera_model_to_pyeda(model):
     m = dict()
@@ -90,12 +98,15 @@ def convert_hera_model_to_pyeda(model):
             m[str(l)] = 1
     return m
 
+
 def powerset(s):
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
-    
+
+
 def merge_lists(lol):
     return list(chain.from_iterable(lol))
-    
+
+
 def sub(c, d):
     x = []
     for i in range(len(c)):
@@ -103,7 +114,8 @@ def sub(c, d):
     if 1 in x and -1 not in x:
         return True
     return False
-    
+
+
 def minimalsets(cand):
     mins = []
     for c in cand:
@@ -114,6 +126,7 @@ def minimalsets(cand):
         if not found:
             mins.append(c)
     return mins
+
 
 def timeit(method):
     def timed(*args, **kw):
