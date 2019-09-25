@@ -84,12 +84,9 @@ def generate_inus_reasons(reasons):
     nec = [r["reason"] for r in reasons if r["type"] == "necessary"]
     inus = []
     for rn in nec:
-        rn_check = None
         rn_check = rn.getClause()
         for rs in suff:
-            rs_check = None
-            rs_check = rs.getConj()
-            if set(rn_check) <= set(rs_check):
+            if set(rn_check) <= set(rs.getConj()):
                 inus.append(Formula.makeDisjunction(rn_check))
                 break
     return inus
