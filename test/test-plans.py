@@ -1,4 +1,4 @@
-from ethics.plans.semantics import Situation, Planner
+from ethics.plans.semantics import Situation, Planner, MoralPlanner
 from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
 
 print("*"*50)
@@ -62,10 +62,10 @@ print("Utilitarianism: ", perm)
 perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
-planner = Planner(sit)
-p = planner.generate_plan(principle = DoNoHarm)
+planner = MoralPlanner(sit, DoNoHarm)
+p = planner.generate_plan()
 if p:
-    print("Planned: ", p.plan)
+    print("Plannedddd: ", p.plan)
 else:
     print("No Plan found")
 
@@ -135,8 +135,8 @@ print("Utilitarianism: ", perm)
 perm = sit.evaluate(DoubleEffectPrinciple)
 print("DoubleEffectPrinciple: ", perm)
 
-planner = Planner(sit)
-p = planner.generate_plan(principle = AvoidAnyHarm)
+planner = MoralPlanner(sit, AvoidAnyHarm)
+p = planner.generate_plan()
 if p:
     print("Planned: ", p.plan)
 else:

@@ -591,7 +591,7 @@ class Planner:
     def __init__(self, situation):
         self.situation = situation
 
-    def generate_plan(self, frontier = None, k = 10, principle = None):
+    def generate_plan(self, frontier = None, k = 10, goal_checker = None):
         """A very simple action planner.
         
         Keyword arguments:
@@ -599,23 +599,25 @@ class Planner:
         k -- Maximum plan length, for performance reasons (Default: 10)
         principle -- Ethical principle the final plan should satisfy (Default: None)
         """
-        if k == 0:
+        if goal_checker == None:
+            goal_checker = self.plan_found
+        if k <= 0:
             return False
         if frontier == None:
             frontier = [Plan([])]
             # Maybe the empty plan already does the job
-            s = self.__plan_found(frontier[0], principle)
+            s = goal_checker(frontier[0])
             if s != False:
                 return s
         for a in self.situation.actions:
             newplancand = Plan(frontier[0].endoActions+[a])
-            s = self.__plan_found(newplancand, principle)
+            s = goal_checker(newplancand)
             if s != False:
                 return s
             frontier += [newplancand]
-        return self.generate_plan(frontier[1:], k - 1, principle)
+        return self.generate_plan(frontier[1:], k - 1, goal_checker)
 
-    def __plan_found(self, newplancand, principle):
+    def plan_found(self, newplancand):
         """Check if a new plan has been found. Used by generatePlan.
         
         Keyword arguments:
@@ -626,9 +628,26 @@ class Planner:
         newsit.plan = newplancand
         fstate = newsit.simulate()
         if self.situation.satisfies_goal(fstate):
-            if principle == None or principle(newsit).permissible():
-                return newsit
+            return newsit
         return False
+
+class MoralPlanner(Planner):
+
+    def __init__(self, situation, principle):
+        super().__init__(situation)
+        self.principle = principle
+
+    def generate_plan(self, frontier=None, k=10, goal_checker = None):
+        if goal_checker == None:
+            goal_checker = self.plan_found
+        return super().generate_plan(frontier=frontier, k=k, goal_checker=goal_checker)
+
+    def plan_found(self, newplancand):
+        newsit = super().plan_found(newplancand)
+        if newsit == False or not newsit.evaluate(self.principle):
+            return False
+        return newsit
+
 
     def generate_creative_alternative(self, principle):
         """Generates a permissible alternative to the current situation.
@@ -637,8 +656,8 @@ class Planner:
            principle -- Ethical principle the plan of the new situation should satisfy.
         """
         for c in self.situation.creativeAlternatives:
-            planner = Planner(c)
-            c.plan = (planner.generate_plan(principle = principle)).plan
+            planner = MoralPlanner(c, principle)
+            c.plan = (planner.generate_plan()).plan
             if c.plan != False:
                 return c
         return False
@@ -661,7 +680,7 @@ class Planner:
         if principle(self.situation, args).permissible():
             return self.situation
         # Maybe just the plan is bad and we can find a better one
-        p = self.generate_plan(principle = principle)
+        p = self.generate_plan()
         if p != False:
             sit = self.situation.clone_situation()
             sit.plan = p.plan
