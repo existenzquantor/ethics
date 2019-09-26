@@ -2,7 +2,6 @@ from ethics.language import *
 from ethics.tools import *
 from enum import Enum
 from BinPy.Algorithms import QM
-import ethics.minihit as minihit
 import pyeda.inter
 
 class Structure(Enum):
@@ -65,7 +64,7 @@ class PrimeCompilator:
     """Class that extracts all prime implicants and prime implicates from a given formula.
     """
 
-    def __init__(self, formula, use_mhs_only=False, use_gde=True, verbose=False):
+    def __init__(self, formula, use_mhs_only=False, verbose=False):
         """Main initializer.
         Use instances of this class to determine all prime implicants and implicates of
         the given formula.
@@ -89,7 +88,6 @@ class PrimeCompilator:
         self.verbose = verbose
         self.formula = formula
         self.use_mhs_only = use_mhs_only
-        self.use_gde = use_gde
 
         self.non_boolean_mapping = dict()
 
@@ -340,12 +338,7 @@ class PrimeCompilator:
         sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=True)
 
         # Calculate prime implicates by finding all minimal hitting sets
-        if self.use_gde:
-            hitting_sets = self.__hitting_sets_gde(sets)
-        else:
-            tree = minihit.RcTree(sets)
-            tree.solve(prune=True, sort=False)
-            hitting_sets = list(tree.generate_minimal_hitting_sets())
+        hitting_sets = self.__hitting_sets_gde(sets)
 
         # Remove all clauses that are trivially true
         # (containing both positive and negative literals of the same atom)
@@ -358,9 +351,7 @@ class PrimeCompilator:
 
         # Now take the hitting sets (prime implicates) and find again all minimal hitting sets
         # Those then are all prime implicants
-        tree = minihit.RcTree(hitting_sets)
-        tree.solve(prune=True, sort=False)
-        hitting_sets = list(tree.generate_minimal_hitting_sets())
+        hitting_sets = self.__hitting_sets_gde(hitting_sets)
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
@@ -432,11 +423,9 @@ class PrimeCompilator:
             prime_implicants.append(prime_implicant)
 
         # Find all minimal hitting sets of the prime implicants to get all the prime implicates
-        hitting_sets = self.__create_sets_for_hitting_sets_using_prime_implicants(prime_implicants, use_sets=True)
+        sets = self.__create_sets_for_hitting_sets_using_prime_implicants(prime_implicants, use_sets=True)
 
-        tree = minihit.RcTree(hitting_sets)
-        tree.solve(prune=True, sort=False)
-        hitting_sets = list(tree.generate_minimal_hitting_sets())
+        hitting_sets = self.__hitting_sets_gde(sets)
 
         for hitting_set in hitting_sets:
             prime_implicate = self.__convert_hitting_set_into_assignment(list(hitting_set))
@@ -487,7 +476,7 @@ class PrimeCompilator:
 
 
     def __create_sets_for_hitting_sets_using_prime_implicants(self, prime_implicants, use_sets=False):
-        """Takes the given prime_implicants and turns them into sets readable by minihit.
+        """Takes the given prime_implicants and turns them into sets.
 
         Parameters
         ----------
@@ -514,12 +503,12 @@ class PrimeCompilator:
 
 
     def __convert_hitting_set_into_assignment(self, hitting_set):
-        """Converts a hitting set returned by minihit to an assignment.
+        """Converts a hitting set to an assignment.
 
         Parameters
         ----------
         hitting_set : [str]
-            The hitting set returned by minihit.
+            The hitting set.
 
         Returns
         -------
