@@ -1,5 +1,5 @@
 from ethics.language import Formula, Not
-from ethics.solver import smt_all_models
+from ethics.solver import satisfiable, smt_all_models
 
 
 def hitting_sets_gde(sets):
@@ -31,16 +31,21 @@ def hitting_sets_gde(sets):
 def remove_trivial_clauses(clauses):
     r = []
     for c in clauses:
-        neg_c = {n.getNegation() for n in c}
-        if len(c & neg_c) == 0:
+        if satisfiable(Not(Formula.makeDisjunction(c))):
             r.append(c)
     return r
 
+def remove_unsatisfiable_terms(terms):
+    r = []
+    for t in terms:
+        if satisfiable(Formula.makeConjunction(t)):
+            r.append(t)
+    return r
 
 def compute_primes(formula):
     models = smt_all_models(formula)
     prime_implicates = remove_trivial_clauses(hitting_sets_gde(models))
-    prime_implicants = remove_trivial_clauses(hitting_sets_gde(prime_implicates))
+    prime_implicants = remove_unsatisfiable_terms(hitting_sets_gde(prime_implicates))
     return prime_implicants, prime_implicates
 
 
