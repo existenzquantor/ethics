@@ -9,6 +9,28 @@ from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
 from ethics.tools import my_eval, minimalsets, timeit
 
+class Plan:
+    """Representation of an action plan"""
+    
+    def __init__(self, endoPlan):
+        """Constructor of an action plan
+        
+        Keyword arguments:
+        endoPlan -- List of (endogeneous) actions
+        """
+        self.endoActions = endoPlan
+        
+    def __str__(self):
+        """String representation of an action plan"""
+        s = "["
+        for a in self.endoActions:
+            s += str(a) + ","
+        return s+"]"
+
+    def __repr__(self):
+        """Representation of an action object"""
+        return self.__str__()
+
 class Action:
     """Representation of an endogeneous action"""
     def __init__(self, name, pre, eff, intrinsicvalue):
@@ -58,28 +80,6 @@ class Event:
         if times == None:
             times = []
         self.times = times
-        
-class Plan:
-    """Representation of an action plan"""
-    
-    def __init__(self, endoPlan):
-        """Constructor of an action plan
-        
-        Keyword arguments:
-        endoPlan -- List of (endogeneous) actions
-        """
-        self.endoActions = endoPlan
-        
-    def __str__(self):
-        """String representation of an action plan"""
-        s = "["
-        for a in self.endoActions:
-            s += str(a) + ","
-        return s+"]"
-
-    def __repr__(self):
-        """Representation of an action object"""
-        return self.__str__()
 
 class Situation:
     """Representation of a situation"""
@@ -206,7 +206,7 @@ class Situation:
         utility = 0
         sn = self.simulate()
         for k, v in sn.items():
-            utility += self.getUtility({k:v})
+            utility += self.get_utility({k:v})
         return utility
     
     def __is_instrumental_at(self, effect, positions):
@@ -597,7 +597,7 @@ class Planner:
         Keyword arguments:
         frontier -- The frontier of the current search (Default: None)
         k -- Maximum plan length, for performance reasons (Default: 10)
-        principle -- Ethical principle the final plan should satisfy (Default: None)
+        goal_checker -- Function to map situation to true iff situation is a goal (Default: None)
         """
         if goal_checker == None:
             goal_checker = self.plan_found
