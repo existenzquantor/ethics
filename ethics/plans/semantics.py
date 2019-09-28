@@ -442,7 +442,7 @@ class Situation:
         """     
         if n == None:
             n = len(self.plan.endoActions)
-        return itertools.product([1, 0], repeat=n)
+        return sorted(itertools.product([1, 0], repeat=n), key=sum, reverse=True)
 
     def __get_sub_events(self, n = None):
         """Computes all bit strings of length n. These are intended to be used as representing for each of the n events, whether or not it should be considered.
@@ -452,7 +452,7 @@ class Situation:
         """
         if n == None:
             n = self.__get_number_of_events()
-        return itertools.product([0, 1], repeat=n)
+        return sorted(itertools.product([0, 1], repeat=n), key=sum, reverse=False)
 
     def simulate(self, skipEndo = None, skipEvents = None, blockEffect = None, blockPositions = None):
         """ Simulate a plan in a situation
