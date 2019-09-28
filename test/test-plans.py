@@ -144,7 +144,7 @@ else:
 
 sit.creativeAlternatives += [Situation("cases/plans/coal-dilemma-creative1.json")]
 a = planner.make_moral_suggestion(AvoidAvoidableHarm)
-print(a, a.plan)
+print(a, a.plan if a != False else False)
 
 
 

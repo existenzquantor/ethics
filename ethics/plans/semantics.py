@@ -657,8 +657,9 @@ class MoralPlanner(Planner):
         """
         for c in self.situation.creativeAlternatives:
             planner = MoralPlanner(c, principle)
-            c.plan = (planner.generate_plan()).plan
-            if c.plan != False:
+            p = planner.generate_plan()
+            if p != False:
+                c.plan = p.plan
                 return c
         return False
 
