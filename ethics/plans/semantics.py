@@ -7,7 +7,7 @@ import itertools
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import my_eval, minimalsets, timeit
+from ethics.tools import my_eval, minimal_plans, timeit
 
 class Plan:
     """Representation of an action plan"""
@@ -15,32 +15,44 @@ class Plan:
     def __init__(self, endoPlan):
         """Constructor of an action plan
         
-        Keyword arguments:
-        endoPlan -- List of (endogeneous) actions
+        :param endoPlan: List of (endogeneous) actions
+        :type endoPlan: list
         """
         self.endoActions = endoPlan
         
     def __str__(self):
-        """String representation of an action plan"""
+        """String representation of an action plan
+        
+        :return: String representation
+        :rtype: str
+        """
         s = "["
         for a in self.endoActions:
             s += str(a) + ","
         return s+"]"
 
     def __repr__(self):
-        """Representation of an action object"""
+        """Representation of an action object
+        
+        :return: String representation
+        :rtype: str
+        """
         return self.__str__()
 
 class Action:
     """Representation of an endogeneous action"""
+
     def __init__(self, name, pre, eff, intrinsicvalue):
-        """Constructor of an action
+        """Constructor of an action.
         
-        Keyword arguments:
-        name -- Label of the action
-        pre -- Preconditions of the action
-        eff -- (Conditional) Effects of the action
-        intrinsicvalue -- Intrinsic moral value of the action as required by deontological principles
+        :param name: Label of the action
+        :type name: str
+        :param pre: Preconditions of the action
+        :type pre: dict
+        :param eff: (Conditional) Effects of the action
+        :type eff: dict
+        :param intrinsicvalue: Intrinsic moral value of the action as required by deontological principles (good, bad, neutral)
+        :type intrinsicvalue: str
         """
         self.name = name
         self.pre = pre
@@ -48,10 +60,21 @@ class Action:
         self.intrinsicvalue = intrinsicvalue
         
     def __str__(self):
-        """String representation of an action"""
+        """String representation of an action
+        
+        :return: String representation
+        :rtype: str
+        """
         return self.name
 
     def has_effect_somewhere(self, effect):
+        """Checks if a given effect is potentially an effect of the action.
+        
+        :param effect: The effect.
+        :type effect: dict
+        :return: True or False
+        :rtype: bool
+        """
         for e in self.eff:
             if set(effect.keys()) <= set(e["effect"].keys()):
                 count = 0
@@ -68,11 +91,14 @@ class Event:
     def __init__(self, name, pre, eff, times = None):
         """Constructor of an event
         
-        Keyword arguments:
-        name -- Label of the event
-        pre -- Preconditions of the event
-        eff -- (Conditional) Effects of the event
-        times -- Time points at which the event will (try to) fire
+        :param name: Label of the event
+        :type name: str
+        :param pre: Preconditions of the event
+        :type pre: dict
+        :param eff: (Conditional) Effects of the event
+        :type eff: dict
+        :param times: Time points at which the event will (try to) fire, defaults to None
+        :type times: list, optional
         """
         self.name = name
         self.pre = pre
@@ -84,13 +110,13 @@ class Event:
 class Situation:
     """Representation of a situation"""
     
-    def __init__(self, json = None):
-        """Constructor of a situation.
+    def __init__(self, inputfile = None):
+        """Constructor of a situation
         
-        Keyword arguments:
-        json -- JSON file containing the description of the situation
+        :param inputfile: Path to the JSON/YAML description of the situation, defaults to None
+        :type inputfile: str, optional
         """
-        if json == None:
+        if inputfile == None:
             self.actions = None
             self.events = None
             self.init = None
@@ -98,7 +124,7 @@ class Situation:
             self.affects = None
             self.utilities = None
         else:
-            self.__parse_model(json)
+            self.__parse_model(inputfile)
 
         self.alethicAlternatives = []
         self.epistemicAlternatives = []
@@ -107,18 +133,22 @@ class Situation:
         self.eventcounter = 0
 
     def clone_situation(self):
-        """Build a new situation which equals the current situation."""
-        return Situation(self.jsonfile)
- 
-    def __parse_model(self, jsonfile):
-        """Build a situation from a JSON file. Used by the constructor.
+        """Build a new situation which equals the current situation.
         
-        Keyword arguments:
-        jsonfile -- The JSON file to be loaded.
+        :return: New situation object (cloned)
+        :rtype: Situation
         """
-        self.jsonfile = jsonfile
-        with io.open(jsonfile) as data_file:
-            if jsonfile.split(".")[-1] == "yaml":
+        return Situation(self.inputfile)
+ 
+    def __parse_model(self, inputfile):
+        """Build a situation from a JSON/YAML file. Used by the constructor.
+        
+        :param inputfile: Path to the JSON/YAML file to be loaded.
+        :type inputfile: str
+        """
+        self.inputfile = inputfile
+        with io.open(inputfile) as data_file:
+            if inputfile.split(".")[-1] == "yaml":
                 data = yaml.load(data_file,  Loader=yaml.FullLoader)
             else:
                 data = json.load(data_file)
@@ -142,13 +172,22 @@ class Situation:
             self.utilities = data["utilities"]
 
     def __get_number_of_events(self):
+        """Return number of event tokens in the situation.
+        
+        :return: Number of event tokens
+        :rtype: int
+        """
         n = 0
         for e in self.events:
             n += len(e.times)
         return n
     
     def get_harmful_consequences(self):
-        """Retrieve all consequences of the action plan, which have negative utility."""
+        """Retrieve all consequences of the action plan, which have negative utility.
+        
+        :return: List of harmful consequences true in the final state
+        :rtype: list
+        """
         allCons = self.get_all_consequences()
         harmful = []
         for u in self.utilities:
@@ -158,20 +197,30 @@ class Situation:
         return harmful  
 
     def get_harmful_facts(self):
-        """Retrieve all harmful facts"""
-        harmful = []
-        for u in self.utilities:
-            if u["utility"] < 0:
-                harmful += [u["fact"]]
-        return harmful
+        """Retrieve all harmful facts
+        
+        :return: All harmful facts in the domain.
+        :rtype: list
+        """
+        return [u["fact"] for u in self.utilities if u["utility"] < 0]
 
     def __get_negation(self, fact):
-        """Get the Negation of the fact"""
-        v = list(fact.values())[0]
-        return {list(fact.keys())[0]:not v}
+        """Get the Negation of the fact
+        
+        :param fact: the fact
+        :type fact: dict
+        :return: the negated fact
+        :rtype: dict
+        """
+        k, v = list(fact.items())[0]
+        return {k: not v}
     
     def get_avoidable_harmful_facts(self):
-        """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be true."""
+        """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be finally true.
+        
+        :return: Avoidable facts
+        :rtype: list
+        """
         avoidable = []
         sit = self.clone_situation()
         for h in sit.get_harmful_facts():
@@ -187,14 +236,20 @@ class Situation:
         return avoidable
     
     def get_all_consequences(self):
-        """Retrieve all consequences of the action plan, i.e., the final state."""
+        """Retrieve all consequences of the action plan, i.e., the final state.
+        
+        :return: List of all true facts in the final state.
+        :rtype: list
+        """
         return self.simulate()
 
     def get_utility(self, fact):
         """Retrieve the utility of a particular fact.
         
-        Keyword arguments:
-        fact -- The fact of interest
+        :param fact: The fact
+        :type fact: dict
+        :return: The fact's utility
+        :rtype: int
         """
         for u in self.utilities:
             if fact == u["fact"]:
@@ -202,7 +257,11 @@ class Situation:
         return 0
 
     def get_final_utility(self):
-        """Retrieve aggregated utility of the final state."""
+        """Retrieve aggregated utility of the final state.
+        
+        :return: Utility of the final state
+        :rtype: int
+        """
         utility = 0
         sn = self.simulate()
         for k, v in sn.items():
@@ -212,15 +271,24 @@ class Situation:
     def __is_instrumental_at(self, effect, positions):
         """Determine if the goal is reached also if some effect is blocked at particular positions of the execution.
         
-        Keyword arguments:
-        effect -- The effect to block (a fact)
-        positions -- An array of bits representing for each endogeneous action in the plan if the introduction of the effect shall be blocked or not.
+        :param effect: The effect to block (a fact)
+        :type effect: dict
+        :param positions: A tuple of bits representing for each endogeneous action in the plan if the introduction of the effect shall be blocked or not.
+        :type positions: tuple
+        :return: True or False
+        :rtype: bool
         """
         sn = self.simulate(blockEffect = effect, blockPositions = positions)
         return not self.satisfies_goal(sn)    
 
     def __is_instrumental(self, effect):
-        """Determine if an effect is instrumental, i.e., if blocking this effect somewhere during plan execution will render the goal unachieved."""
+        """Determine if an effect is instrumental, i.e., if blocking this effect somewhere during plan execution will render the goal unachieved.
+        
+        :param effect: The effect to be checked for instrumentality
+        :type effect: dict
+        :return: True or False
+        :rtype: bool
+        """
         for p in self.__get_sub_plans(len(self.plan.endoActions)):
             testit = True
             for i in range(len(p)):
@@ -234,8 +302,10 @@ class Situation:
     def __treats_as_end(self, p):
         """A moral patient p is treated as an end iff it is positively and not negatively affected by some goal.
         
-        Keyword arguments:
-        p -- The moral patient
+        :param p: The patient to be checked for being treated as an end
+        :type p: str
+        :return: True or False
+        :rtype: bool
         """
         for e in self.affects[p]["neg"]:
             if self.__is_satisfied(e, self.goal):
@@ -248,8 +318,12 @@ class Situation:
     def __treats_as_means(self, p, reading = 1):
         """A moral patient p is treated as a means iff p is affected by some instrumental effect.
         
-        Keyword arguments:
-        p -- The moral patient
+        :param p: The patient to be checked for being treated as a means
+        :type p: str
+        :param reading: Reading of the categorical imperative (1 or 2), defaults to 1
+        :type reading: int, optional
+        :return: True or False
+        :rtype: bool
         """
         for e in self.affects[p]["pos"] + self.affects[p]["neg"]:
             if reading == 1 and self.__is_instrumental(e):
@@ -261,8 +335,10 @@ class Situation:
     def __caused(self, effect):
         """Check if some given effect is caused by the agent's actions.
         
-        Keyword arguments:
-        effect -- The effect
+        :param effect: The effect to be checked for being caused
+        :type effect: dict
+        :return: True or False
+        :rtype: bool
         """
         sn = self.simulate()
         if not self.__is_satisfied(effect, sn):
@@ -279,14 +355,12 @@ class Situation:
     def __is_sufficient(self, skip, effect):
         """Check if some actions are sufficient for the effect to finally occur.
         
-        Parameters:
-        ----------
-            skip (list): actions to skip
-            effect (dict): the effect
-
-        Returns:
-        -------
-            bool: sufficiency
+        :param skip: actions to skip
+        :type skip: tuple
+        :param effect: The effect
+        :type effect: dict
+        :return: True if remaining actions are sufficient for the effect to finally hold, otherwise False
+        :rtype: bool
         """
         sn = self.simulate(skipEndo=[not b for b in skip])
         if self.__is_satisfied(effect, sn):
@@ -297,8 +371,10 @@ class Situation:
     def get_minimal_sufficient_subplan(self, effect):
         """Search for minimal sets of actions sufficient for the effect to finally occur.
         
-        Keyword arguments:
-        effect -- The effect
+        :param effect: The effect
+        :type effect: dict
+        :return: List of actions sufficient for the effect
+        :rtype: list
         """
         sn = self.simulate()
         if self.__is_satisfied(effect, sn):
@@ -306,15 +382,18 @@ class Situation:
             for p in self.__get_sub_plans():
                 if self.__is_sufficient(p, effect):
                     cand.append(p)
-            return minimalsets(cand)
+            return minimal_plans(cand)
         return None
         
     def __is_necessary(self, skip, effect):
         """Check if some actions are necessary for the effect to finally occur.
         
-        Keyword arguments:
-        skip -- actions to skip
-        effect -- The effect
+        :param skip: actions to skip
+        :type skip: tuple
+        :param effect: The effect
+        :type effect: dict
+        :return: True if actions are necessary to bring about the effect, otherwise false
+        :rtype: bool
         """
         sn = self.simulate()
         if self.__is_satisfied(effect, sn):
@@ -327,8 +406,10 @@ class Situation:
     def get_minimal_necessary_subplan(self, effect):
         """Search for minimal sets of actions sufficient for the effect to finally occur.
         
-        Keyword arguments:
-        effect -- The effect
+        :param effect: The effect
+        :type effect: dict
+        :return: List of actions necessary to bring about the effect.
+        :rtype: list
         """
         sn = self.simulate()
         if self.__is_satisfied(effect, sn):
@@ -336,14 +417,16 @@ class Situation:
             for p in self.__get_sub_plans():
                 if self.__is_necessary(p, effect):
                     cand.append(p)
-            return minimalsets(cand)
+            return minimal_plans(cand)
         return None
         
     def evaluate(self, principle, *args):
         """Check if the situation is permissible according to a given ethical principle.
         
-        Keyword arguments:
-        principle -- The ethical principle
+        :param principle: The ethical principle
+        :type principle: Principle
+        :return: True if principle permits the situation, otherwise False
+        :rtype: bool
         """
         try:
             p = principle(self, args)
@@ -352,6 +435,13 @@ class Situation:
         return p.permissible()
 
     def explain(self, principle, *args):
+        """Explain why the ethical principle permits the situation.
+        
+        :param principle: Ethical principle
+        :type principle: Principle
+        :return: An explanation consisting of sufficient, necessary, and inus reasons
+        :rtype: dict
+        """
         try:
             p = principle(self, args)
         except:
@@ -361,19 +451,26 @@ class Situation:
     def __is_applicable(self, action, state):
         """Check if an action is applicable in a given state.
         
-        Keyword arguments:
-        action -- The action
-        state -- The state
+        :param action: The action to apply
+        :type action: Action
+        :param state: The state to apply the action in
+        :type state: dict
+        :return: True if applicable, otherwise False
+        :rtype: bool
         """
         return self.__is_satisfied(action.pre, state)
         
     def __apply(self, action, state, blockEffect = None):
         """Apply an action to a state. Possibly block some of the action's effect.
         
-        Keyword arguments:
-        action -- The action to apply
-        state -- The state to apply the action to
-        blockEffect -- An effect to be blocked as an effect of the action (Default: None).
+        :param action: The action to apply
+        :type action: Action
+        :param state: The state to apply the action to
+        :type state: List
+        :param blockEffect: An effect to be blocked as an effect of the action, defaults to None
+        :type blockEffect: dict, optional
+        :return: New state
+        :rtype: dict
         """
         if blockEffect == None:
             blockEffect = {}
@@ -388,12 +485,17 @@ class Situation:
 
     def __apply_all_events(self, state, events, time, skip):
         """Simulatneously, apply all applicable events to a state.
-           
-        Keyword arguments:
-        state -- The current state to apply all events to
-        events -- List of all events
-        time -- Point in time
-        skip -- Bit string representing which of the events to be skipped.
+        
+        :param state: The current state to apply all events to
+        :type state: dict
+        :param events: List of all events
+        :type events: list
+        :param time: Point in time
+        :type time: int
+        :param skip: Bit string representing which of the events to be skipped
+        :type skip: tuple
+        :return: New state
+        :rtype: dict
         """
         eventlist = [e for e in events if (time in e.times and self.__is_applicable(e, state))]
         si = copy.deepcopy(state)
@@ -409,9 +511,12 @@ class Situation:
     def __is_satisfied(self, partial, state):
         """Check if some partial state is satisfied in some full state.
         
-        Keyword arguments:
-        partial -- Partial state (e.g., a condition)
-        state -- Full state
+        :param partial: Partial state (e.g., a condition)
+        :type partial: dict
+        :param state: Full state
+        :type state: dict
+        :return: True or False
+        :rtype: bool
         """
         for k in partial.keys():
             if k not in state or partial[k] != state[k]:
@@ -421,8 +526,10 @@ class Situation:
     def satisfies_goal(self, state):
         """Check if a state is a goal state.
         
-        Keyword arguments:
-        state -- state to check for goal state
+        :param state: state to check for goal state
+        :type state: dict
+        :return: True or False
+        :rtype: bool
         """
         return self.__is_satisfied(self.goal, state)
            
@@ -435,34 +542,42 @@ class Situation:
         return m
         
     def __get_sub_plans(self, n = None):  
-        """Computes all bit strings of length n. These are intended to be used as representing for each of the n steps in the plan, whether or not it is included in a subplan.
+        """Computes all bit strings (as tuples) of length n. These are intended to be used as representing for each of the n steps in the plan, whether or not it is included in a subplan.
         
-        Keyword arguments:
-        n -- Length of the bit string (Default: None). If None, then n is set to the length of the complete plan.
-        """     
+        :param n: Length of the bit string (Default: None). If None, then n is set to the length of the complete plan, defaults to None
+        :type n: int, optional
+        :return: List of tuples
+        :rtype: list
+        """ 
         if n == None:
             n = len(self.plan.endoActions)
         return sorted(itertools.product([1, 0], repeat=n), key=sum, reverse=True)
 
     def __get_sub_events(self, n = None):
-        """Computes all bit strings of length n. These are intended to be used as representing for each of the n events, whether or not it should be considered.
+        """Computes all bit strings (as tuples) of length n. These are intended to be used as representing for each of the n events, whether or not it should be considered.
         
-        Keyword arguments:
-        n -- Length of the bit string (Default: None). If None, then n is set to the number of events.
+        :param n: Length of the bit string, if None, then n is set to the number of events, defaults to None
+        :type n: int, optional
+        :return: List of tuples
+        :rtype: list
         """
         if n == None:
             n = self.__get_number_of_events()
         return sorted(itertools.product([0, 1], repeat=n), key=sum, reverse=False)
 
     def simulate(self, skipEndo = None, skipEvents = None, blockEffect = None, blockPositions = None):
-        """ Simulate a plan in a situation
+        """Simulates a plan in a situation, possible skipping events and blocking actions' effects.
         
-        Keyword arguments:
-        init -- The initial State
-        skipEndo -- A list of bits representing for each endogeneous action in the plan whether or not to execute it.
-        skipEvents -- A list of bits representing for each events whether or not to execute it.
-        blockEffect -- An effect to counterfactually not been added to a successor state at actions specified in blockPositions.
-        blockPositions -- Positions in the plan where the blockEffect should be blocked (given as a list of bits, one for each endogeneous action in the plan).
+        :param skipEndo: A list of bits representing for each endogeneous action in the plan whether or not to execute it, defaults to None
+        :type skipEndo: list, optional
+        :param skipEvents: A list of bits representing for each events whether or not to execute it, defaults to None
+        :type skipEvents: list, optional
+        :param blockEffect: An effect to counterfactually not been added to a successor state at actions specified in blockPositions, defaults to None
+        :type blockEffect: dict, optional
+        :param blockPositions: Positions in the plan where the blockEffect should be blocked (given as a list of bits, one for each endogeneous action in the plan), defaults to None
+        :type blockPositions: list, optional
+        :return: Final state
+        :rtype: dict
         """
         self.eventcounter = 0
         init = copy.deepcopy(self.init)
@@ -486,33 +601,68 @@ class Situation:
         return cur
     
     def __is_action(self, a):
+        """Checks if parameter is an action variable.
+        
+        :param a: Some input
+        :type a: Any
+        :return: True or False
+        :rtype: bool
+        """
         return a in [a.name for a in self.actions]
     
     def __literal_to_dict(self, l):
+        """Converts a HERA literal to a fact
+        
+        :param l: HERA literal
+        :type l: Formula
+        :return: Fact
+        :rtype: dict
+        """
         l = l.nnf()
         if isinstance(l, Not):
             return {str(l.f1): False}
         return {str(l.f1): True}
 
     def __dict_to_literal(self, d):
-        k = list(d.keys())[0]
-        v = list(d.values())[0]
+        """Converts a fact to a HERA literal.
+        
+        :param d: Fact
+        :type d: dict
+        :return: HERA literal
+        :rtype: Formula
+        """
+        k, v = list(d.items())[0]
         l = my_eval(k)
         if v:
             return l
         return Not(l)
 
     def __dict_to_literals(self, d):
-        lits = []
-        for x in d:
-            lits.append(self.__dict_to_literal({x:d[x]}))
-        return lits
+        """Converts a partial state to a list of HERA literals.
+        
+        :param d: partial state
+        :type d: dict
+        :return: List of HERA literals
+        :rtype: list
+        """
+        return [self.__dict_to_literal({x:d[x]}) for x in d]
 
     def get_all_consequences_lits(self):
+        """Retrieve all consequences that hold in the final state.
+        
+        :return: The list of HERA literals that finally hold.
+        :rtype: list
+        """
         return self.__dict_to_literals(self.get_all_consequences())
         
-
     def __evaluate_term(self, term):
+        """Evaluate an arithmetic term.
+        
+        :param term: The term to be evaluated
+        :type term: Term
+        :return: Result of the computation
+        :rtype: int
+        """
         if isinstance(term, int):
             return term
         if isinstance(term, Minus):
@@ -525,6 +675,13 @@ class Situation:
             return self.__sum_up(term.t1)
             
     def __sum_up(self, formula):
+        """Sums up the utilities of a conjunction of literals.
+        
+        :param formula: Conjunction of literals.
+        :type formula: Formula
+        :return: Overall utility
+        :rtype: int
+        """
         if formula is None:
             return 0
         if isinstance(formula, bool):
@@ -534,6 +691,13 @@ class Situation:
         return self.get_utility(self.__literal_to_dict(formula))
 
     def models(self, formula):
+        """Checks if a given formula is satisfied in the situation.
+        
+        :param formula: The formula to be checked.
+        :type formula: Formula
+        :return: True or False
+        :rtype: bool
+        """
         if isinstance(formula, Not):
             return not self.models(formula.f1)
         if isinstance(formula, Or):
@@ -589,15 +753,24 @@ class Planner:
     """ A very simplistic planner """
 
     def __init__(self, situation):
+        """Constructor
+        
+        :param situation: Description of the situation
+        :type situation: Situation
+        """
         self.situation = situation
 
     def generate_plan(self, frontier = None, k = 10, goal_checker = None):
         """A very simple action planner.
         
-        Keyword arguments:
-        frontier -- The frontier of the current search (Default: None)
-        k -- Maximum plan length, for performance reasons (Default: 10)
-        goal_checker -- Function to map situation to true iff situation is a goal (Default: None)
+        :param frontier: The frontier of the current search (default is None)
+        :type frontier: list
+        :param k: Maximum plan length, for performance reasons (default is 10)
+        :type k: int
+        :param goal_checker: Function to map situation to true iff situation is a goal (default is None)
+        :type goal_checker: function
+        :returns: A plan that reaches the goal
+        :rtype: Plan
         """
         if goal_checker == None:
             goal_checker = self.plan_found
@@ -620,11 +793,12 @@ class Planner:
     def plan_found(self, newplancand):
         """Check if a new plan has been found. Used by generatePlan.
         
-        Keyword arguments:
-        newplancand -- New candidate plan to be checked
-        principle -- Ethical principle to evaluate the plan
+        :param newplancand: New candidate plan to be checked
+        :type newplancand: Plan
+        :return: Situation if plan has been found, otherwise False
+        :rtype: Situation or bool
         """
-        newsit = Situation(self.situation.jsonfile)
+        newsit = Situation(self.situation.inputfile)
         newsit.plan = newplancand
         fstate = newsit.simulate()
         if self.situation.satisfies_goal(fstate):
@@ -634,15 +808,40 @@ class Planner:
 class MoralPlanner(Planner):
 
     def __init__(self, situation, principle):
+        """Constructor
+        
+        :param situation: Description of the situation
+        :type situation: Situation
+        :param principle: Ethical principle
+        :type principle: Principle
+        """
         super().__init__(situation)
         self.principle = principle
 
     def generate_plan(self, frontier=None, k=10, goal_checker = None):
+        """Generates a new plan.
+        
+        :param frontier: Current frontiert, defaults to None
+        :type frontier: list of Plan, optional
+        :param k: Search depth, defaults to 10
+        :type k: int, optional
+        :param goal_checker: Checks if plan satisfies goal, defaults to None
+        :type goal_checker: Function, optional
+        :return: Plan or False if no plan can be found
+        :rtype: Plan or bool
+        """
         if goal_checker == None:
             goal_checker = self.plan_found
         return super().generate_plan(frontier=frontier, k=k, goal_checker=goal_checker)
 
     def plan_found(self, newplancand):
+        """Checks if Situation satisfies the goal
+        
+        :param newplancand: New plan candidate
+        :type newplancand: Plan
+        :return: Situation if plan achieves goal, otherwise False
+        :rtype: Situation or bool
+        """
         newsit = super().plan_found(newplancand)
         if newsit == False or not newsit.evaluate(self.principle):
             return False
@@ -651,9 +850,11 @@ class MoralPlanner(Planner):
 
     def generate_creative_alternative(self, principle):
         """Generates a permissible alternative to the current situation.
-           
-           Keyword arguments:
-           principle -- Ethical principle the plan of the new situation should satisfy.
+        
+        :param principle: Ethical principle the plan of the new situation should satisfy.
+        :type principle: Principle
+        :return: Situation which the principle permits
+        :rtype: Situation
         """
         for c in self.situation.creativeAlternatives:
             planner = MoralPlanner(c, principle)
@@ -666,16 +867,18 @@ class MoralPlanner(Planner):
     def make_moral_suggestion(self, principle, *args):
         """A procedure to come up with a suggestion as to how
            to respond to a presented solution to a moral dilemma.
-           Case 1: The presented solution is permissible according to
+           * Case 1: The presented solution is permissible according to
                    the ethical principle. Then everything is fine.
-           Case 2: Case 1 does not hold. Therefore, a better plan is
+           * Case 2: Case 1 does not hold. Therefore, a better plan is
                    searched for.
-           Case 3: Case 1 does not hold and the search in Case 2 is
+           * Case 3: Case 1 does not hold and the search in Case 2 is
                    unsuccessful. A counterfactual alternative situation is 
                    constructed which meets the requirements of the ethical principle.
-           
-           Keyword arguments:
-           principle -- The ethical principle to use to judge the situation
+        
+        :param principle: The ethical principle to use to judge the situation
+        :type principle: Principle
+        :return: The solution
+        :rtype: Situation
         """
         # Maybe the situation is alright as is
         if principle(self.situation, args).permissible():

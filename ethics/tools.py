@@ -116,7 +116,7 @@ def sub(c, d):
     return False
 
 
-def minimalsets(cand):
+def minimal_plans(cand):
     mins = []
     for c in cand:
         found = False
