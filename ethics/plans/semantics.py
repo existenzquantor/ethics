@@ -754,7 +754,7 @@ class Planner:
         :return: Situation if plan has been found, otherwise False
         :rtype: Situation or bool
         """
-        newsit = Situation(self.situation.inputfile)
+        newsit = self.situation.clone_situation()
         newsit.plan = newplancand
         fstate = newsit.simulate()
         if self.situation.satisfies_goal(fstate):
