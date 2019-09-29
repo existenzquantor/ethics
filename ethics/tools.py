@@ -107,27 +107,6 @@ def merge_lists(lol):
     return list(chain.from_iterable(lol))
 
 
-def sub(c, d):
-    x = []
-    for i in range(len(c)):
-        x.append(c[i] - d[i])
-    if 1 in x and -1 not in x:
-        return True
-    return False
-
-
-def minimal_plans(cand):
-    mins = []
-    for c in cand:
-        found = False
-        for d in cand:
-            if sub(c, d): # detect non-minimal
-                found = True
-        if not found:
-            mins.append(c)
-    return mins
-
-
 def timeit(method):
     def timed(*args, **kw):
         ts = time.time()

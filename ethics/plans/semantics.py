@@ -6,7 +6,7 @@ import copy
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import my_eval, minimal_plans, timeit, powerset
+from ethics.tools import my_eval, powerset
 from ethics.plans.concepts import Plan, Action, EmptyAction, Event
 from ethics.plans.planner import Planner
 
