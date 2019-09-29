@@ -549,6 +549,11 @@ class Situation:
         return m
 
     def simulate(self):
+        """Simulated the plan (and the events) in the given situation and returns the final state.
+        
+        :return: Final state
+        :rtype: dict
+        """
         state = copy.deepcopy(self.init)
         for t in range(len(self.plan.endoActions)):
             state = self.__apply(self.plan.endoActions[t], state)
