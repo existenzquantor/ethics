@@ -1,5 +1,7 @@
-from ethics.plans.semantics import Situation, Planner, MoralPlanner
+from ethics.plans.semantics import Situation
+from ethics.plans.planner import Planner, MoralPlanner
 from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
+
 
 print("*"*50)
 print("JSON")
