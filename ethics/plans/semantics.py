@@ -739,9 +739,7 @@ class Situation:
             return self.__literal_to_dict(formula.f1) in self.get_avoidable_harmful_facts()
         if isinstance(formula, Goal):
             d = self.__literal_to_dict(formula.f1) 
-            k = list(d.keys())[0]
-            v = list(d.values())[0]
-            return k in self.goal and self.goal[k] == v
+            return set(d.items()) <= set(self.goal.items())
         if isinstance(formula, Eq):
             return self.__evaluate_term(formula.f1) == self.__evaluate_term(formula.f2)
         if isinstance(formula, Gt):
