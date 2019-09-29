@@ -366,8 +366,7 @@ class Situation:
         if self.__is_satisfied(effect, sn):
             return True
         return False
-                    
-    
+
     def get_minimal_sufficient_subplan(self, effect):
         """Search for minimal sets of actions sufficient for the effect to finally occur.
         
@@ -844,7 +843,6 @@ class MoralPlanner(Planner):
         if newsit == False or not newsit.evaluate(self.principle):
             return False
         return newsit
-
 
     def generate_creative_alternative(self, principle):
         """Generates a permissible alternative to the current situation.
