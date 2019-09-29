@@ -304,16 +304,18 @@ class Situation:
         """
         return [u["fact"] for u in self.utilities if u["utility"] < 0]
 
-    def __get_negation(self, fact):
-        """Get the Negation of the fact
+    def __get_negation(self, partial):
+        """Get the Negation of a partial state
         
-        :param fact: the fact
+        :param fact: the partial state
         :type fact: dict
-        :return: the negated fact
+        :return: the negated partial state
         :rtype: dict
         """
-        k, v = list(fact.items())[0]
-        return {k: not v}
+        r = dict()
+        for k, v in partial.items():
+            r[k] = not v
+        return r
     
     def get_avoidable_harmful_facts(self):
         """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be finally true.
