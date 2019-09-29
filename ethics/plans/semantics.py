@@ -7,7 +7,7 @@ import itertools
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
                             Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import my_eval, minimal_plans, timeit
+from ethics.tools import my_eval, minimal_plans, timeit, powerset
 
 class Plan:
     """Representation of an action plan"""
@@ -19,7 +19,75 @@ class Plan:
         :type endoPlan: list
         """
         self.endoActions = endoPlan
+    
+    def __substitute_empty_actions(self, positions):
+        """Substitute actions in the plan by the empty action at the given positions.
         
+        :param positions: The positions as bit arry, 1-bit = substitute, 0-bit = original action
+        :type positions: tuple
+        :return: New plan with substitutions
+        :rtype: Plan
+        """
+        p = copy.deepcopy(self)
+        for i in range(len(positions)):
+            if positions[i]:
+                p.endoActions[i] = EmptyAction()
+        return p
+
+    def compute_all_epsilon_alternatives(self):
+        """Retrieves all alternatives to the plan where each alternative is another way to substitute some actions
+            by the empty action epsilon.
+
+            :return: Iterator over epsilon alternative
+            :rtype: Iterator
+        """
+        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
+            if sum(b) > 0:
+                yield self.__substitute_empty_actions(b)
+
+    def __delete_effect_from_actions(self, effect, positions):
+        """Deletes the given effect from all actions where the corresponding bit in list positions is 1.
+        
+        :param effect: The effect to be deleted
+        :type effect: dict
+        :param positions: Positions at which to delete the effect
+        :type positions: tiple
+        :return: New plan where the effects are deleted from the specified actions
+        :rtype: Plan
+        """
+        p = copy.deepcopy(self)
+        for i in range(len(positions)):
+            if positions[i] and p.endoActions[i].has_effect_somewhere(effect):
+                p.endoActions[i] = p.endoActions[i].delete_effect(effect)
+        return p
+
+    def __all_manipulated_actions_have_effect_somewhere(self, effect, positions):
+        """Checks if all actions considered for effect deletion indeed have the effect
+        
+        :param effect: The effect
+        :type effect: dict
+        :param positions: Bit tuple indicating the actions to consider
+        :type positions: tuple
+        :return: True or False
+        :rtype: bool
+        """
+        for i in range(len(positions)):
+            if positions[i] and not self.endoActions[i].has_effect_somewhere(effect):
+                return False
+        return True
+
+    def compute_all_effect_alternatives(self, effect):
+        """Computes all plans where the effect is deleted from some actions
+        
+        :param effect: The effect to be deleted
+        :type effect: dict
+        :return: Iterator over alternatives
+        :rtype: Iterator
+        """
+        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
+            if sum(b) > 0 and self.__all_manipulated_actions_have_effect_somewhere(effect, b):
+                yield self.__delete_effect_from_actions(effect, b)
+
     def __str__(self):
         """String representation of an action plan
         
@@ -50,7 +118,7 @@ class Action:
         :param pre: Preconditions of the action
         :type pre: dict
         :param eff: (Conditional) Effects of the action
-        :type eff: dict
+        :type eff: list
         :param intrinsicvalue: Intrinsic moral value of the action as required by deontological principles (good, bad, neutral)
         :type intrinsicvalue: str
         """
@@ -84,11 +152,38 @@ class Action:
                 if count == len(effect.keys()):
                     return True
         return False
+
+    def delete_effect(self, effect):
+        """Delete an effect from all effects.
         
+        :param effect: The effect to be deleted.
+        :type effect: dict
+        :return: New action with deleted effect
+        :rtype: Action
+        """
+        k, v = list(effect.items())[0]
+        a = self.clone_action()
+        for e in a.eff:
+            if k in e["effect"] and v == e["effect"][k]:
+                del e["effect"][k]
+        return a
+
+    def clone_action(self):
+        return copy.deepcopy(self)
+
+class EmptyAction(Action):
+    """Empty Action"""
+
+    def __init__(self):
+        super().__init__("epsilon", dict(), dict(), "neutral")
+    
+    def has_effect_somewhere(self, effect):
+        return False
+
 class Event:
     """Representation of an event"""
     
-    def __init__(self, name, pre, eff, times = None):
+    def __init__(self, name, pre, eff, time):
         """Constructor of an event
         
         :param name: Label of the event
@@ -97,15 +192,13 @@ class Event:
         :type pre: dict
         :param eff: (Conditional) Effects of the event
         :type eff: dict
-        :param times: Time points at which the event will (try to) fire, defaults to None
-        :type times: list, optional
+        :param times: Time point at which the event will (try to) fire
+        :type times: int
         """
         self.name = name
         self.pre = pre
         self.eff = eff
-        if times == None:
-            times = []
-        self.times = times
+        self.time = time
 
 class Situation:
     """Representation of a situation"""
@@ -138,7 +231,7 @@ class Situation:
         :return: New situation object (cloned)
         :rtype: Situation
         """
-        return Situation(self.inputfile)
+        return copy.deepcopy(self)
  
     def __parse_model(self, inputfile):
         """Build a situation from a JSON/YAML file. Used by the constructor.
@@ -158,8 +251,9 @@ class Situation:
                 self.actions += [action]
             self.events = []
             for a in data["events"]:
-                event = Event(a["name"], a["preconditions"], a["effects"], a["timepoints"])
-                self.events += [event]
+                for t in a["timepoints"]:
+                    event = Event(a["name"], a["preconditions"], a["effects"], t)
+                    self.events += [event]
             self.affects = data["affects"]
             self.goal = data["goal"]
             self.init = data["initialState"]
@@ -177,10 +271,16 @@ class Situation:
         :return: Number of event tokens
         :rtype: int
         """
-        n = 0
-        for e in self.events:
-            n += len(e.times)
-        return n
+        return len(self.events)
+
+    def __compute_event_subsets(self):
+        """Compute all proper subsets of events.
+
+        :return: Iterator over all event subsets
+        :rtype: Iterator
+        """
+        for ep in sorted(powerset(self.events), key=len, reverse=True):
+            yield ep
     
     def get_harmful_consequences(self):
         """Retrieve all consequences of the action plan, which have negative utility.
@@ -268,19 +368,6 @@ class Situation:
             utility += self.get_utility({k:v})
         return utility
     
-    def __is_instrumental_at(self, effect, positions):
-        """Determine if the goal is reached also if some effect is blocked at particular positions of the execution.
-        
-        :param effect: The effect to block (a fact)
-        :type effect: dict
-        :param positions: A tuple of bits representing for each endogeneous action in the plan if the introduction of the effect shall be blocked or not.
-        :type positions: tuple
-        :return: True or False
-        :rtype: bool
-        """
-        sn = self.simulate(blockEffect = effect, blockPositions = positions)
-        return not self.satisfies_goal(sn)    
-
     def __is_instrumental(self, effect):
         """Determine if an effect is instrumental, i.e., if blocking this effect somewhere during plan execution will render the goal unachieved.
         
@@ -289,13 +376,12 @@ class Situation:
         :return: True or False
         :rtype: bool
         """
-        for p in self.__get_sub_plans(len(self.plan.endoActions)):
-            testit = True
-            for i in range(len(p)):
-                if p[i] == 1 and not self.plan.endoActions[i].has_effect_somewhere(effect):
-                    testit = False
-                    break
-            if testit and self.__is_instrumental_at(effect, p):
+        if not self.satisfies_goal(self.simulate()):
+            return False
+        for p in self.plan.compute_all_effect_alternatives(effect):
+            sit = self.clone_situation()
+            sit.plan = p
+            if not sit.satisfies_goal(sit.simulate()):
                 return True
         return False
         
@@ -340,84 +426,17 @@ class Situation:
         :return: True or False
         :rtype: bool
         """
-        sn = self.simulate()
-        if not self.__is_satisfied(effect, sn):
+        if not self.__is_satisfied(effect, self.simulate()):
             return False
-        for e in self.__get_sub_events():
-            sne = self.simulate(skipEvents = e)
-            if self.__is_satisfied(effect, sne):
-                for p in self.__get_sub_plans():
-                    sn = self.simulate(skipEndo = p, skipEvents = e)
-                    if not self.__is_satisfied(effect, sn):
+        sit = self.clone_situation()
+        for e in self.__compute_event_subsets():
+            sit.events = e
+            if self.__is_satisfied(effect, sit.simulate()):
+                for p in self.plan.compute_all_epsilon_alternatives():
+                    sit.plan = p
+                    if not self.__is_satisfied(effect, sit.simulate()):
                         return True
         return False
-        
-    def __is_sufficient(self, skip, effect):
-        """Check if some actions are sufficient for the effect to finally occur.
-        
-        :param skip: actions to skip
-        :type skip: tuple
-        :param effect: The effect
-        :type effect: dict
-        :return: True if remaining actions are sufficient for the effect to finally hold, otherwise False
-        :rtype: bool
-        """
-        sn = self.simulate(skipEndo=[not b for b in skip])
-        if self.__is_satisfied(effect, sn):
-            return True
-        return False
-
-    def get_minimal_sufficient_subplan(self, effect):
-        """Search for minimal sets of actions sufficient for the effect to finally occur.
-        
-        :param effect: The effect
-        :type effect: dict
-        :return: List of actions sufficient for the effect
-        :rtype: list
-        """
-        sn = self.simulate()
-        if self.__is_satisfied(effect, sn):
-            cand = []
-            for p in self.__get_sub_plans():
-                if self.__is_sufficient(p, effect):
-                    cand.append(p)
-            return minimal_plans(cand)
-        return None
-        
-    def __is_necessary(self, skip, effect):
-        """Check if some actions are necessary for the effect to finally occur.
-        
-        :param skip: actions to skip
-        :type skip: tuple
-        :param effect: The effect
-        :type effect: dict
-        :return: True if actions are necessary to bring about the effect, otherwise false
-        :rtype: bool
-        """
-        sn = self.simulate()
-        if self.__is_satisfied(effect, sn):
-            sn = self.simulate(skipEndo=skip)
-            if not self.__is_satisfied(effect, sn):
-                return True
-        return False
-   
-   
-    def get_minimal_necessary_subplan(self, effect):
-        """Search for minimal sets of actions sufficient for the effect to finally occur.
-        
-        :param effect: The effect
-        :type effect: dict
-        :return: List of actions necessary to bring about the effect.
-        :rtype: list
-        """
-        sn = self.simulate()
-        if self.__is_satisfied(effect, sn):
-            cand = []
-            for p in self.__get_sub_plans():
-                if self.__is_necessary(p, effect):
-                    cand.append(p)
-            return minimal_plans(cand)
-        return None
         
     def evaluate(self, principle, *args):
         """Check if the situation is permissible according to a given ethical principle.
@@ -459,52 +478,41 @@ class Situation:
         """
         return self.__is_satisfied(action.pre, state)
         
-    def __apply(self, action, state, blockEffect = None):
-        """Apply an action to a state. Possibly block some of the action's effect.
+    def __apply(self, action, state): 
+        """Apply an action to a state. 
         
         :param action: The action to apply
         :type action: Action
         :param state: The state to apply the action to
         :type state: List
-        :param blockEffect: An effect to be blocked as an effect of the action, defaults to None
-        :type blockEffect: dict, optional
         :return: New state
         :rtype: dict
-        """
-        if blockEffect == None:
-            blockEffect = {}
+        """   
         if self.__is_applicable(action, state):
             si = copy.deepcopy(state)
             for condeff in action.eff:
                 if self.__is_satisfied(condeff["condition"], si):
                     for v in condeff["effect"].keys():
-                        if not v in blockEffect or blockEffect[v] != condeff["effect"][v]:    
-                            state[v] = condeff["effect"][v]
+                        state[v] = condeff["effect"][v]
         return state
 
-    def __apply_all_events(self, state, events, time, skip):
+    def __apply_all_events(self, state, time):
         """Simulatneously, apply all applicable events to a state.
         
         :param state: The current state to apply all events to
         :type state: dict
-        :param events: List of all events
-        :type events: list
         :param time: Point in time
         :type time: int
-        :param skip: Bit string representing which of the events to be skipped
-        :type skip: tuple
         :return: New state
         :rtype: dict
         """
-        eventlist = [e for e in events if (time in e.times and self.__is_applicable(e, state))]
+        eventlist = [e for e in self.events if (time == e.time and self.__is_applicable(e, state))]
         si = copy.deepcopy(state)
         for e in eventlist:
             for condeff in e.eff:
                 if self.__is_satisfied(condeff["condition"], state):
                     for v in condeff["effect"].keys():
-                        if skip == None or skip[self.eventcounter] == 0:
-                            si[v] = condeff["effect"][v]
-            self.eventcounter += 1
+                        si[v] = condeff["effect"][v]
         return si
     
     def __is_satisfied(self, partial, state):
@@ -536,68 +544,19 @@ class Situation:
         """Compute the last event to fire. Used for the simulation to make sure, events after the last action will also be invoked."""
         m = 0
         for e in self.events:
-            if max(e.times) > m:
-                m = max(e.times)
+            if e.time > m:
+                m = e.time
         return m
-        
-    def __get_sub_plans(self, n = None):  
-        """Computes all bit strings (as tuples) of length n. These are intended to be used as representing for each of the n steps in the plan, whether or not it is included in a subplan.
-        
-        :param n: Length of the bit string (Default: None). If None, then n is set to the length of the complete plan, defaults to None
-        :type n: int, optional
-        :return: List of tuples
-        :rtype: list
-        """ 
-        if n == None:
-            n = len(self.plan.endoActions)
-        return sorted(itertools.product([1, 0], repeat=n), key=sum, reverse=True)
 
-    def __get_sub_events(self, n = None):
-        """Computes all bit strings (as tuples) of length n. These are intended to be used as representing for each of the n events, whether or not it should be considered.
-        
-        :param n: Length of the bit string, if None, then n is set to the number of events, defaults to None
-        :type n: int, optional
-        :return: List of tuples
-        :rtype: list
-        """
-        if n == None:
-            n = self.__get_number_of_events()
-        return sorted(itertools.product([0, 1], repeat=n), key=sum, reverse=False)
-
-    def simulate(self, skipEndo = None, skipEvents = None, blockEffect = None, blockPositions = None):
-        """Simulates a plan in a situation, possible skipping events and blocking actions' effects.
-        
-        :param skipEndo: A list of bits representing for each endogeneous action in the plan whether or not to execute it, defaults to None
-        :type skipEndo: list, optional
-        :param skipEvents: A list of bits representing for each events whether or not to execute it, defaults to None
-        :type skipEvents: list, optional
-        :param blockEffect: An effect to counterfactually not been added to a successor state at actions specified in blockPositions, defaults to None
-        :type blockEffect: dict, optional
-        :param blockPositions: Positions in the plan where the blockEffect should be blocked (given as a list of bits, one for each endogeneous action in the plan), defaults to None
-        :type blockPositions: list, optional
-        :return: Final state
-        :rtype: dict
-        """
-        self.eventcounter = 0
-        init = copy.deepcopy(self.init)
-        if skipEndo == None:
-            skipEndo = [0]*len(self.plan.endoActions)
-        if blockEffect == None:
-            blockEffect = {}
-        if blockPositions == None:
-            blockPositions = [0] * len(self.plan.endoActions)
-        cur = init
+    def simulate(self):
+        state = copy.deepcopy(self.init)
         for t in range(len(self.plan.endoActions)):
-            if not skipEndo[t]:
-                if blockPositions[t] == 1:
-                    cur = self.__apply(self.plan.endoActions[t], cur, blockEffect)
-                else:
-                    cur = self.__apply(self.plan.endoActions[t], cur)
-            cur = self.__apply_all_events(cur, self.events, t, skipEvents)
+            state = self.__apply(self.plan.endoActions[t], state)
+            state = self.__apply_all_events(state, t)
         if self.__last_exo() >= len(self.plan.endoActions):
             for t in range(len(self.plan.endoActions), self.__last_exo()+1):
-                cur = self.__apply_all_events(cur, self.events, t, skipEvents)
-        return cur
+                state = self.__apply_all_events(state, t)
+        return state
     
     def __is_action(self, a):
         """Checks if parameter is an action variable.
@@ -780,7 +739,7 @@ class Planner:
             if s != False:
                 return s
         for a in self.situation.actions:
-            newplancand = Plan(frontier[0].endoActions+[a])
+            newplancand = Plan(frontier[0].endoActions+[a.clone_action()])
             s = goal_checker(newplancand)
             if s != False:
                 return s
