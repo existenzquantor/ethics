@@ -1,0 +1,25 @@
+actions:
+    - name: a_vote_bush
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {a_vote_bush: true}              
+    - name: b_vote_bush
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {b_vote_bush: true}          
+    - name: wait
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {}  
+events:
+    - name: announce_winner
+      preconditions: {}
+      effects:
+        - condition: {a_vote_bush: true, b_vote_bush: true}
+          effect: {bush_wins: true}
+      timepoints: [0]
+goal: {bush_wins: true}
+initialState: {bush_wins: false, a_vote_bush: false, b_vote_bush: false}

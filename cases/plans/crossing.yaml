@@ -1,0 +1,24 @@
+actions:
+    - name: move_forward
+      preconditions: {dead: false}
+      effects:
+        - condition: {left: true}
+          effect: {left: false, on_street: true}   
+        - condition: {on_street: true}
+          effect: {on_street: false, right: true}
+        - condition: {right: true}
+          effect: {right: false, on_street: true}    
+    - name: wait
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {}  
+events:
+    - name: car_drives_by
+      preconditions: {}
+      effects:
+        - condition: {on_street: true}
+          effect: {dead: true}
+      timepoints: [1]
+goal: {right: true}
+initialState: {dead: false, left: true, on_street: false, right: false}

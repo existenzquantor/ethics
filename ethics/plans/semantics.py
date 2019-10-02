@@ -57,23 +57,38 @@ class Situation:
                 data = json.load(data_file)
             self.actions = []
             for a in data["actions"]:
-                action = Action(a["name"], a["preconditions"], a["effects"], a["intrinsicvalue"])
+                try:
+                    action = Action(a["name"], a["preconditions"], a["effects"], a["intrinsicvalue"])
+                except:
+                    action = Action(a["name"], a["preconditions"], a["effects"], "neutral")
                 self.actions += [action]
             self.events = []
             for a in data["events"]:
                 for t in a["timepoints"]:
                     event = Event(a["name"], a["preconditions"], a["effects"], t)
                     self.events += [event]
-            self.affects = data["affects"]
-            self.goal = data["goal"]
+            try:
+                self.affects = data["affects"]
+            except:
+                self.affects = dict()
+            try:
+                self.goal = data["goal"]
+            except:
+                self.goal = dict()
             self.init = data["initialState"]
             planactions = []
-            for a in data["plan"]:
-                for b in self.actions:
-                    if a == b.name:
-                        planactions += [b]
-            self.plan = Plan(planactions)
-            self.utilities = data["utilities"]
+            try:
+                for a in data["plan"]:
+                    for b in self.actions:
+                        if a == b.name:
+                            planactions += [b]
+                self.plan = Plan(planactions)
+            except:
+                self.plan = None
+            try:
+                self.utilities = data["utilities"]
+            except:
+                self.utilities = list()
 
     def __get_number_of_events(self):
         """Return number of event tokens in the situation.
