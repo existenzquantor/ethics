@@ -5,8 +5,8 @@ import copy
 
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
-                            Goal, Means, Means2, Eq, Gt, GEq, End
-from ethics.tools import my_eval, powerset
+                            Goal, Means, Means2, Eq, Gt, GEq, End, Atom
+from ethics.tools import powerset
 from ethics.plans.concepts import Plan, Action, EmptyAction, Event
 from ethics.plans.planner import Planner
 
@@ -106,20 +106,6 @@ class Situation:
         """
         for ep in sorted(powerset(self.events), key=len, reverse=True):
             yield ep
-    
-    def get_harmful_consequences(self):
-        """Retrieve all consequences of the action plan, which have negative utility.
-        
-        :return: List of harmful consequences true in the final state
-        :rtype: list
-        """
-        allCons = self.get_all_consequences()
-        harmful = []
-        for u in self.utilities:
-            if u["utility"] < 0:
-                if self.__is_satisfied(u["fact"], allCons):
-                    harmful += [u["fact"]]  
-        return harmful  
 
     def get_harmful_facts(self):
         """Retrieve all harmful facts
@@ -137,11 +123,8 @@ class Situation:
         :return: the negated partial state
         :rtype: dict
         """
-        r = dict()
-        for k, v in partial.items():
-            r[k] = not v
-        return r
-    
+        return {k:not v for k,v in partial.items()}
+        
     def get_avoidable_harmful_facts(self):
         """Retrieve all harmful facts for which there is a plan, whose execution does not result in the fact to be finally true.
         
@@ -337,10 +320,10 @@ class Situation:
         si = copy.deepcopy(state)
         for e in eventlist:
             for condeff in e.eff:
-                if self.__is_satisfied(condeff["condition"], state):
+                if self.__is_satisfied(condeff["condition"], si):
                     for v in condeff["effect"].keys():
-                        si[v] = condeff["effect"][v]
-        return si
+                        state[v] = condeff["effect"][v]
+        return state
     
     def __is_satisfied(self, partial, state):
         """Check if some partial state is satisfied in some full state.
@@ -352,10 +335,8 @@ class Situation:
         :return: True or False
         :rtype: bool
         """
-        for k in partial.keys():
-            if k not in state or partial[k] != state[k]:
-                return False
-        return True
+        return all(k in state and partial[k] == state[k] for k in partial)
+        
         
     def satisfies_goal(self, state):
         """Check if a state is a goal state.
@@ -369,7 +350,7 @@ class Situation:
            
     def __last_exo(self):
         """Compute the last event to fire. Used for the simulation to make sure, events after the last action will also be invoked."""
-        m = 0
+        m = -1
         for e in self.events:
             if e.time > m:
                 m = e.time
@@ -409,9 +390,7 @@ class Situation:
         :rtype: dict
         """
         l = l.nnf()
-        if isinstance(l, Not):
-            return {str(l.f1): False}
-        return {str(l.f1): True}
+        return {str(l.f1): not isinstance(l, Not)}
 
     def __dict_to_literal(self, d):
         """Converts a fact to a HERA literal.
@@ -422,10 +401,7 @@ class Situation:
         :rtype: Formula
         """
         k, v = list(d.items())[0]
-        l = my_eval(k)
-        if v:
-            return l
-        return Not(l)
+        return Atom(k) if v else Not(Atom(k))
 
     def __dict_to_literals(self, d):
         """Converts a partial state to a list of HERA literals.

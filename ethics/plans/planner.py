@@ -52,7 +52,7 @@ class Planner:
         newsit = self.situation.clone_situation()
         newsit.plan = newplancand
         fstate = newsit.simulate()
-        if self.situation.satisfies_goal(fstate):
+        if newsit.satisfies_goal(fstate):
             return newsit
         return False
 
