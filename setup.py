@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='ethics',
-      version='0.22.0',
+      version='0.22.1',
       description = ("A python toolbox for ethical reasoning."),
       author='Felix Lindner',
       author_email='info@hera-project.com',

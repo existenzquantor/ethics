@@ -395,7 +395,7 @@ class Situation:
         for t in range(sim_duration):
             entry = {"time": t, "actions": [], "events": [], "pre": state, "post": dict()}
             # Test action
-            if self.__effective(self.plan.endoActions[t], state):
+            if t < len(self.plan.endoActions) and self.__effective(self.plan.endoActions[t], state):
                 entry["actions"].append(self.plan.endoActions[t])
                 state = self.__apply(self.plan.endoActions[t], state)
             # Test events
