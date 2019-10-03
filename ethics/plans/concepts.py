@@ -127,6 +127,9 @@ class Action:
         """
         return self.name
 
+    def __repr__(self):
+        return self.__str__()
+
     def has_effect_somewhere(self, effect):
         """Checks if a given effect is potentially an effect of the action.
         
@@ -191,3 +194,14 @@ class Event:
         self.pre = pre
         self.eff = eff
         self.time = time
+
+    def __str__(self):
+        """String representation of an event
+        
+        :return: String representation
+        :rtype: str
+        """
+        return self.name
+
+    def __repr__(self):
+        return self.__str__()

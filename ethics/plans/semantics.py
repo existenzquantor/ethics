@@ -298,13 +298,13 @@ class Situation:
         :return: New state
         :rtype: dict
         """   
+        si = copy.deepcopy(state)
         if self.__is_applicable(action, state):
-            si = copy.deepcopy(state)
             for condeff in action.eff:
-                if self.__is_satisfied(condeff["condition"], si):
+                if self.__is_satisfied(condeff["condition"], state):
                     for v in condeff["effect"].keys():
-                        state[v] = condeff["effect"][v]
-        return state
+                        si[v] = condeff["effect"][v]
+        return si
 
     def __apply_all_events(self, state, time):
         """Simulatneously, apply all applicable events to a state.
@@ -320,10 +320,10 @@ class Situation:
         si = copy.deepcopy(state)
         for e in eventlist:
             for condeff in e.eff:
-                if self.__is_satisfied(condeff["condition"], si):
+                if self.__is_satisfied(condeff["condition"], state):
                     for v in condeff["effect"].keys():
-                        state[v] = condeff["effect"][v]
-        return state
+                        si[v] = condeff["effect"][v]
+        return si
     
     def __is_satisfied(self, partial, state):
         """Check if some partial state is satisfied in some full state.
@@ -357,7 +357,7 @@ class Situation:
         return m
 
     def simulate(self):
-        """Simulated the plan (and the events) in the given situation and returns the final state.
+        """Simulates the plan (and the events) in the given situation and returns the final state.
         
         :return: Final state
         :rtype: dict
@@ -370,7 +370,42 @@ class Situation:
             for t in range(len(self.plan.endoActions), self.__last_exo()+1):
                 state = self.__apply_all_events(state, t)
         return state
-    
+
+    def __effective(self, occurrence, state):
+        """Determines if some event/action actually affects the given state.
+        
+        :param occurrence: Action or Event
+        :type occurrence: Action of Event
+        :param state: The state
+        :type state: dict
+        :return: True or False
+        :rtype: bool
+        """
+        return self.__apply(occurrence, state) != state
+
+    def narrative(self):
+        """Returns a narrative of the actions and events that occurred in the situation.
+        
+        :return: The Narrative
+        :rtype: list of dicts
+        """
+        sim_duration = max(len(self.plan.endoActions), self.__last_exo()+1)
+        state = copy.deepcopy(self.init)
+        nar = []
+        for t in range(sim_duration):
+            entry = {"time": t, "actions": [], "events": [], "pre": state, "post": dict()}
+            # Test action
+            if self.__effective(self.plan.endoActions[t], state):
+                entry["actions"].append(self.plan.endoActions[t])
+                state = self.__apply(self.plan.endoActions[t], state)
+            # Test events
+            entry["events"] = [e for e in self.events if e.time == t and self.__effective(e, state)]
+            state = self.__apply_all_events(state, t)
+            entry["post"] = state
+            if entry["actions"] != [] or entry["events"] != []:
+                nar.append(entry)
+        return nar
+
     def __is_action(self, a):
         """Checks if parameter is an action variable.
         

@@ -19,6 +19,7 @@ events:
       effects:
         - condition: {on_street: true}
           effect: {dead: true}
-      timepoints: [1]
+      timepoints: [0]
 goal: {right: true}
+plan: [move_forward, move_forward]
 initialState: {dead: false, left: true, on_street: false, right: false}
