@@ -33,12 +33,13 @@ class Planner:
             s = goal_checker(frontier[0])
             if s != False:
                 return s
-        for a in self.situation.actions:
-            newplancand = Plan(frontier[0].endoActions+[a.clone_action()])
-            s = goal_checker(newplancand)
-            if s != False:
-                return s
-            frontier += [newplancand]
+        for i in range(len(frontier)):
+            for a in self.situation.actions:
+                newplancand = Plan(frontier[i].endoActions+[a.clone_action()])
+                s = goal_checker(newplancand)
+                if s != False:
+                    return s
+                frontier += [newplancand]
         return self.generate_plan(frontier[1:], k - 1, goal_checker)
 
     def plan_found(self, newplancand):

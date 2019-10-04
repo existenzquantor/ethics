@@ -62,6 +62,7 @@ class Situation:
                 except:
                     action = Action(a["name"], a["preconditions"], a["effects"], "neutral")
                 self.actions += [action]
+            self.events = []
             try:
                 for a in data["events"]:
                     for t in a["timepoints"]:
@@ -278,7 +279,7 @@ class Situation:
             p = principle
         return p.explain()
             
-    def __is_applicable(self, action, state):
+    def is_applicable(self, action, state):
         """Check if an action is applicable in a given state.
         
         :param action: The action to apply
@@ -301,7 +302,7 @@ class Situation:
         :rtype: dict
         """   
         si = copy.deepcopy(state)
-        if self.__is_applicable(action, state):
+        if self.is_applicable(action, state):
             for condeff in action.eff:
                 if self.__is_satisfied(condeff["condition"], state):
                     for v in condeff["effect"].keys():
@@ -318,7 +319,7 @@ class Situation:
         :return: New state
         :rtype: dict
         """
-        eventlist = [e for e in self.events if (time == e.time and self.__is_applicable(e, state))]
+        eventlist = [e for e in self.events if (time == e.time and self.is_applicable(e, state))]
         si = copy.deepcopy(state)
         for e in eventlist:
             for condeff in e.eff:

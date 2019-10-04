@@ -14,35 +14,33 @@ actions:
         - condition: {}
           effect:
             in_rob-a_kitchen: true
-            in_rob-a_living-room: false
-    - name: move_rob-b_living-room_kitchen
+            in_rob-a_living-room: false  
+    - name: make_coffee_rob-a
       preconditions: 
-        in_rob-b_living-room: true
+        in_rob-a_kitchen: true
+        carry_rob-a-coffee: false
       effects:
         - condition: {}
           effect:
-            in_rob-b_kitchen: true
-            in_rob-b_living-room: false 
-    - name: move_rob-b_kitchen_living-room
+            carry_rob-a-coffee: true
+    - name: serve_coffee_rob-a_mrssmith
       preconditions: 
-        in_rob-b_kitchen: true
+        carry_rob-a-coffee: true
+        in_rob-a_living-room: true
       effects:
         - condition: {}
-          effect: 
-            in_rob-b_kitchen: false
-            in_rob-b_living-room: true   
+          effect:
+            carry_rob-a-coffee: false
+            has_coffee_mrssmith: true
     - name: wait
       preconditions: {}
       effects:
         - condition: {}
           effect: {}
 goal: 
-    in_rob-a_living-room: true
-    in_rob-b_living-room: true
-plan: 
-    - wait
+    has_coffee_mrssmith: true
 initialState: 
     in_rob-a_kitchen: false
     in_rob-a_living-room: true
-    in_rob-b_kitchen: true
-    in_rob-b_living-room: false
+    carry_rob-a-coffee: false
+    has_coffee_mrssmith: false
