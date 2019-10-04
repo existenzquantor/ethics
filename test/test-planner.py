@@ -1,7 +1,7 @@
 from ethics.plans.semantics import Situation
 from ethics.plans.planner import Planner
 
-sit = Situation("cases/plans/crossing.yaml")
+sit = Situation("cases/plans/service-robots.yaml")
 print(sit.plan)
 n = sit.narrative()
 print(n)

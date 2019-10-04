@@ -1,0 +1,48 @@
+actions:
+    - name: move_rob-a_kitchen_living-room
+      preconditions: 
+        in_rob-a_kitchen: true
+      effects:
+        - condition: {}
+          effect:
+            in_rob-a_kitchen: false
+            in_rob-a_living-room: true 
+    - name: move_rob-a_living-room_kitchen
+      preconditions: 
+        in_rob-a_living-room: true
+      effects:
+        - condition: {}
+          effect:
+            in_rob-a_kitchen: true
+            in_rob-a_living-room: false
+    - name: move_rob-b_living-room_kitchen
+      preconditions: 
+        in_rob-b_living-room: true
+      effects:
+        - condition: {}
+          effect:
+            in_rob-b_kitchen: true
+            in_rob-b_living-room: false 
+    - name: move_rob-b_kitchen_living-room
+      preconditions: 
+        in_rob-b_kitchen: true
+      effects:
+        - condition: {}
+          effect: 
+            in_rob-b_kitchen: false
+            in_rob-b_living-room: true   
+    - name: wait
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {}
+goal: 
+    in_rob-a_living-room: true
+    in_rob-b_living-room: true
+plan: 
+    - wait
+initialState: 
+    in_rob-a_kitchen: false
+    in_rob-a_living-room: true
+    in_rob-b_kitchen: true
+    in_rob-b_living-room: false

@@ -62,11 +62,13 @@ class Situation:
                 except:
                     action = Action(a["name"], a["preconditions"], a["effects"], "neutral")
                 self.actions += [action]
-            self.events = []
-            for a in data["events"]:
-                for t in a["timepoints"]:
-                    event = Event(a["name"], a["preconditions"], a["effects"], t)
-                    self.events += [event]
+            try:
+                for a in data["events"]:
+                    for t in a["timepoints"]:
+                        event = Event(a["name"], a["preconditions"], a["effects"], t)
+                        self.events += [event]
+            except:
+                self.events = []
             try:
                 self.affects = data["affects"]
             except:
