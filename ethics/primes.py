@@ -3,6 +3,8 @@ from ethics.tools import *
 from enum import Enum
 from BinPy.Algorithms import QM
 import pyeda.inter
+from functools import reduce
+
 
 class Structure(Enum):
     """Helper structure that distinguishes between implicant and implicate."""
@@ -64,7 +66,7 @@ class PrimeCompilator:
     """Class that extracts all prime implicants and prime implicates from a given formula.
     """
 
-    def __init__(self, formula, use_mhs_only=False, verbose=False):
+    def __init__(self, formula, use_mhs_only=True, verbose=False):
         """Main initializer.
         Use instances of this class to determine all prime implicants and implicates of
         the given formula.
@@ -102,15 +104,17 @@ class PrimeCompilator:
         # use the negation instead and negate the resulting prime implicants
         # and implicates
         self.using_negation = False
-        possible_assignments = 2**(len(self.atoms))
-        if len(self.__find_all_models(formula)) > (possible_assignments / 2):
+        self.found_models = None
 
+        possible_assignments = 2**(len(self.atoms))
+        self.found_models = self.__find_all_models(self.formula, complete_models=False)
+        num_models = self.__number_of_complete_models_from_partial_models(self.found_models)
+        if num_models > (possible_assignments / 2):
+            self.found_models = None
             if self.verbose:
                 print("Using negated formula to speed up the algorithm")
 
             self.using_negation = True
-            self.formula = self.formula.getNegation()
-
 
         if len(self.non_boolean_mapping) > 0 and verbose:
             print("\n\tNon-boolean functions mapping:\n\t----------")
@@ -118,7 +122,8 @@ class PrimeCompilator:
             print()
 
         # Quine McCluskey algorithm implementation of BinPy
-        self.qm = QM(self.atoms)
+        if use_mhs_only == False:
+            self.qm = QM(self.atoms)
 
         # Lists to store the found prime implicants and implicates
         self.prime_implicants = []
@@ -207,6 +212,23 @@ class PrimeCompilator:
                 | (self.__find_atoms(sub_formula.f2)))
 
 
+    def __number_of_complete_models_from_partial_models(self, models):
+        """Calculates the number of complete models from a given set of partial models.
+        
+        Parameters
+        ----------
+        models : dict()
+            The partial models.
+        
+        Returns
+        -------
+        int
+            The number of complete models.
+        """
+        atoms = len(self.atoms)
+        return reduce(lambda a, b: a+b, [0] + [2**(atoms - len(model)) for model in models])
+
+
     def __find_all_models(self, formula, complete_models=True):
         """Finds and returns all models of the given formula using pyeda's binary decision diagrams.
 
@@ -222,8 +244,14 @@ class PrimeCompilator:
         """
         models = []
 
-        f = pyeda.inter.expr(convert_formula_to_pyeda(formula))
-        f = pyeda.inter.expr2bdd(f)
+        if self.using_negation:
+            negated = Not(formula)
+            f = pyeda.inter.expr(convert_formula_to_pyeda(negated))
+            f = pyeda.inter.expr2bdd(f)
+        else:
+            f = pyeda.inter.expr(convert_formula_to_pyeda(formula))
+            f = pyeda.inter.expr2bdd(f)
+        
         pyeda_models = list(f.satisfy_all())
 
         for model in pyeda_models:
@@ -329,7 +357,10 @@ class PrimeCompilator:
         prime_implicates = []
 
         # Find all models
-        models = self.__find_all_models(self.formula, complete_models=False)
+        if self.found_models is None:
+            models = self.__find_all_models(self.formula, complete_models=False)
+        else:
+            models = self.found_models
 
         # Convert models to lists of tuples
         models = [list(model.items()) for model in models]
@@ -338,11 +369,7 @@ class PrimeCompilator:
         sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=True)
 
         # Calculate prime implicates by finding all minimal hitting sets
-        hitting_sets = self.__hitting_sets_gde(sets)
-
-        # Remove all clauses that are trivially true
-        # (containing both positive and negative literals of the same atom)
-        hitting_sets = self.__remove_trivial_clauses(hitting_sets)
+        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets_gde(sets))
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
@@ -351,7 +378,7 @@ class PrimeCompilator:
 
         # Now take the hitting sets (prime implicates) and find again all minimal hitting sets
         # Those then are all prime implicants
-        hitting_sets = self.__hitting_sets_gde(hitting_sets)
+        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets_gde(hitting_sets))
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
@@ -531,7 +558,8 @@ class PrimeCompilator:
         sets = sorted(sets, key=len)
         hitting_sets = [set()]
         for current_set in sets:
-            new_hitting_sets = list(hitting_sets)
+            new_hitting_sets = [*hitting_sets]
+            
             for hitting_set in hitting_sets:
                 # Check if hitting_set hits current_set
                 if hitting_set.intersection(current_set) == set():
@@ -548,6 +576,6 @@ class PrimeCompilator:
                         if is_valid:
                             new_hitting_sets.append(candidate)
 
-            hitting_sets = list(new_hitting_sets)
+            hitting_sets = new_hitting_sets
 
         return hitting_sets
