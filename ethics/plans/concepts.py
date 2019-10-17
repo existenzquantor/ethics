@@ -12,7 +12,7 @@ class Plan:
         """
         self.endoActions = endoPlan
     
-    def __substitute_empty_actions(self, positions):
+    def substitute_empty_actions(self, positions):
         """Substitute actions in the plan by the empty action at the given positions.
         
         :param positions: The positions as bit arry, 1-bit = substitute, 0-bit = original action
@@ -35,9 +35,9 @@ class Plan:
         """
         for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
             if sum(b) > 0:
-                yield self.__substitute_empty_actions(b)
+                yield self.substitute_empty_actions(b)
 
-    def __delete_effect_from_actions(self, effect, positions):
+    def delete_effect_from_actions(self, effect, positions):
         """Deletes the given effect from all actions where the corresponding bit in list positions is 1.
         
         :param effect: The effect to be deleted
@@ -78,7 +78,7 @@ class Plan:
         """
         for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
             if sum(b) > 0 and self.__all_manipulated_actions_have_effect_somewhere(effect, b):
-                yield self.__delete_effect_from_actions(effect, b)
+                yield self.delete_effect_from_actions(effect, b)
 
     def __str__(self):
         """String representation of an action plan
