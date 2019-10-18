@@ -1,5 +1,5 @@
-from distutils.core import Extension
 from setuptools import setup
+from distutils.core import Extension
 setup(name='ethics',
       version='0.22.3',
       description = ("A python toolbox for ethical reasoning."),
