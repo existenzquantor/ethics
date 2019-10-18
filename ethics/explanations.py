@@ -1,8 +1,26 @@
 from ethics.language import Formula, Not
 from ethics.solver import satisfiable, smt_all_models
-
+from ethics.tools import my_eval
+import mhsModule
 
 def hitting_sets_gde(sets):
+    sets = sorted(sets, key=len)
+    sets_new = []
+    for s in sets:
+        new_set = []
+        for f in s:
+            new_set.append(str(f))
+        sets_new.append(new_set)
+    mhs = mhsModule.hitting_sets(sets_new)
+    result = []
+    for m in mhs:
+        r = []
+        for f in m:
+            r.append(my_eval(f))
+        result.append(r)
+    return result
+
+def hitting_sets_gde_old(sets):
     sets = sorted(sets, key=len)
     hitting_sets = [set()]
     for current_set in sets:
