@@ -1,9 +1,9 @@
 from ethics.language import *
 from ethics.tools import *
 from enum import Enum
-from BinPy.Algorithms import QM
 import pyeda.inter
 from functools import reduce
+import mhsModule
 
 
 class Structure(Enum):
@@ -305,7 +305,7 @@ class PrimeCompilator:
         """
         # Calculate the prime implicants and implicates
         prime_implicants, prime_implicates = self.__compile_mhs_only() if self.use_mhs_only else self.__compile()
-
+        
         # Convert into Prime Structure
         self.prime_implicants = [PrimeStructure(Structure.implicant, implicant) for implicant in prime_implicants]
         self.prime_implicates = [PrimeStructure(Structure.implicate, implicate) for implicate in prime_implicates]
@@ -366,10 +366,11 @@ class PrimeCompilator:
         models = [list(model.items()) for model in models]
 
         # Create sets from assignments
-        sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=True)
+        sets = self.__create_sets_for_hitting_sets_using_prime_implicants(models, use_sets=False)
 
         # Calculate prime implicates by finding all minimal hitting sets
-        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets_gde(sets))
+
+        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets(sets))
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
@@ -378,7 +379,7 @@ class PrimeCompilator:
 
         # Now take the hitting sets (prime implicates) and find again all minimal hitting sets
         # Those then are all prime implicants
-        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets_gde(hitting_sets))
+        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets(hitting_sets))
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
@@ -552,6 +553,10 @@ class PrimeCompilator:
             assignment.append((name, truth_value))
 
         return assignment
+
+
+    def __hitting_sets(self, sets):
+        return mhsModule.hitting_sets(sets)
 
 
     def __hitting_sets_gde(self, sets):
