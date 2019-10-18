@@ -20,30 +20,6 @@ def hitting_sets_gde(sets):
         result.append(r)
     return result
 
-def hitting_sets_gde_old(sets):
-    sets = sorted(sets, key=len)
-    hitting_sets = [set()]
-    for current_set in sets:
-        new_hitting_sets = list(hitting_sets)
-        for hitting_set in hitting_sets:
-            # Check if hitting_set hits current_set
-            if hitting_set.intersection(current_set) == set():
-                new_hitting_sets.remove(hitting_set)
-                # no hit
-                for element in current_set:
-                    candidate = hitting_set.union({element})
-
-                    is_valid = True
-                    for hs in new_hitting_sets:
-                        if hs.issubset(candidate):
-                            is_valid = False
-                            break
-                    if is_valid:
-                        new_hitting_sets.append(candidate)
-
-        hitting_sets = list(new_hitting_sets)
-
-    return hitting_sets
 
 
 def remove_trivial_clauses(clauses):
