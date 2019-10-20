@@ -24,10 +24,12 @@ Then install the Python package by running:
 python3 setup.py install
 ```
 
-If you are using a Mac and the installation fails, make sure to have xcode installed:
+If you are using a Mac and the installation fails, make sure you have xcode installed:
 ```console
 xcode-select —install
 ```
+
+Then try again.
 
 ## Moral Planning Domain Definitions
 
