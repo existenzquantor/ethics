@@ -1,6 +1,6 @@
 from setuptools import setup
 from distutils.core import Extension
-setup(name='ethics',
+setup(name='hera',
       version='0.22.3',
       description = ("A python toolbox for ethical reasoning."),
       author='Felix Lindner',
