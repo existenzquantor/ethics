@@ -14,19 +14,19 @@ This is the github repositiory of the HERA machine ethics Python library. For mo
   - [Explanations](#explanation)
 
 ## Installation
-
-The python implementation of HERA can be installed using pip. First, make sure you have Python3 installed. To install HERA, run:
+First, make sure you have Python3 installed. To install HERA, clone the repository first:
 ```console
-pip3 install ethics
-```
-If the module is already installed, you might instead want to update it running: 
-```console
-pip3 install --upgrade ethics
+git clone https://github.com/existenzquantor/ethics.git
 ```
 
-Alternatively, you can checkout this git repository and run:
+Then install the Python package by running:
 ```console
 python3 setup.py install
+```
+
+If you are using a Mac and the installation fails, make sure to have xcode installed:
+```console
+xcode-select —install
 ```
 
 ## Moral Planning Domain Definitions
