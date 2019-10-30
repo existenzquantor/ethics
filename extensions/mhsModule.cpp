@@ -1,13 +1,16 @@
 #include <Python.h>
 #include <iostream>
 #include <vector>
-#include <list>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 
+unordered_map<string, int> mapping;
+unordered_map<int, string> reverseMapping;
+
 // Helper type alias
-using setListType = list<vector<string> >;
+using setListType = vector<vector<int> >;
 
 /**
 * Checks for a non-empty set intersection.
@@ -15,11 +18,8 @@ using setListType = list<vector<string> >;
 * @param right the right set
 * @return boolean indicating if the intersection is not empty.
 */
-static bool checkHit(vector<string> left, vector<string> right) {
-  vector<string> intersection;
-
-  sort(left.begin(), left.end());
-  sort(right.begin(), right.end());
+static bool checkHit(vector<int> left, vector<int> right) {
+  vector<int> intersection;
 
   set_intersection(left.begin(), left.end(), right.begin(), right.end(), inserter(intersection, intersection.begin()));
   return intersection.size() != 0;
@@ -38,7 +38,7 @@ static PyObject* buildReturnValue(setListType sets) {
 
     for (const auto& element : set) {
       // Py_BuildValue only works with C types, so element has to be cast as c string
-      PyObject *name = Py_BuildValue("s", element.c_str());
+      PyObject *name = Py_BuildValue("s", reverseMapping[element].c_str());
       PyList_Append(hittingSet, name);
     }
 
@@ -50,25 +50,11 @@ static PyObject* buildReturnValue(setListType sets) {
 
 /**
 * Inserts the given element so that the vector stays sorted.
+* Requires the given vector to already be sorted!
 */
-void sortedInsert(vector<string> &theVector, string element) {
-  auto pos = std::find_if(theVector.begin(), theVector.end(), [&element](string vectorElement) {
-    return element < vectorElement;
-  });
-
-  theVector.emplace(pos, element);
-}
-
-
-/**
-*
-*/
-void findAndRemove(vector<string> &theVector, string element) {
-  auto pos = std::find_if(theVector.begin(), theVector.end(), [&element](string vectorElement) {
-    return element == vectorElement;
-  });
-
-  theVector.erase(pos);
+vector<int>::iterator sortedInsert(vector<int> &theVector, int element) {
+  auto position = lower_bound(theVector.begin(), theVector.end(), element);
+  return theVector.emplace(position, element);
 }
 
 /**
@@ -82,7 +68,7 @@ static setListType findHittingSets(setListType targetSets) {
   setListType hittingSets;
 
   // Add empty set as initial hitting set
-  vector<string> emptySet;
+  vector<int> emptySet;
   hittingSets.push_back(emptySet);
 
   for (const auto& targetSet : targetSets) {
@@ -92,14 +78,15 @@ static setListType findHittingSets(setListType targetSets) {
 
     setListType::iterator iterator;
     for (iterator = hittingSets.begin(); iterator != hittingSets.end(); ++iterator) {
-      vector<string> hittingSet = *iterator;
+      vector<int> hittingSet = *iterator;
 
       if (!checkHit(hittingSet, targetSet)) {
+
         // No hit
-        hittingSetsCopy.remove(hittingSet);
+        hittingSetsCopy.erase(remove(hittingSetsCopy.begin(), hittingSetsCopy.end(), hittingSet), hittingSetsCopy.end());
 
         for (const auto& element : targetSet) {
-          sortedInsert(hittingSet, element);
+          vector<int>::iterator insertedPosition = sortedInsert(hittingSet, element);
 
           bool isValid = true;
           for (const auto& hs : hittingSetsCopy) {
@@ -110,15 +97,16 @@ static setListType findHittingSets(setListType targetSets) {
           }
 
           if (isValid) {
+            // This puts a copy of hittingSet into hittingSetsCopy
             hittingSetsCopy.push_back(hittingSet);
           }
 
-          findAndRemove(hittingSet, element);
+          hittingSet.erase(insertedPosition);
         }
       }
     }
 
-    hittingSets = hittingSetsCopy;
+    hittingSets.swap(hittingSetsCopy);
   }
 
   return hittingSets;
@@ -148,6 +136,10 @@ static PyObject* hitting_sets(PyObject* self, PyObject* args) {
 
   setListType sets;
 
+  mapping.clear();
+  reverseMapping.clear();
+  int mappingCounter = 0;
+
   for (int setIndex=0; setIndex < listsCount; setIndex += 1) {
     PyObject *item = PySequence_Fast_GET_ITEM(lists, setIndex);
     PyObject *list = PySequence_Fast(item, "item must be iterable");
@@ -159,21 +151,27 @@ static PyObject* hitting_sets(PyObject* self, PyObject* args) {
     int listCount = PySequence_Fast_GET_SIZE(list);
 
     // Then add them
-    vector<string> set;
+    vector<int> set;
     set.reserve(listCount);
     for (int itemIndex=0; itemIndex < listCount; itemIndex += 1) {
+
       PyObject *item = PyUnicode_AsEncodedString(PySequence_Fast_GET_ITEM(list, itemIndex), "UTF-8", "strict");
       string value = PyBytes_AS_STRING(item);
 
-      set.push_back(value);
-    }
+      if(mapping.find(value) == mapping.end()) {
+        // mapping doesn't exist yet. Create new one
+        mapping[value] = mappingCounter;
+        reverseMapping[mappingCounter] = value;
+        mappingCounter += 1;
+      }
 
-    sort(set.begin(), set.end());
+      sortedInsert(set, mapping[value]);
+    }
 
     sets.push_back(set);
   }
 
-  //sort(sets.begin(), sets.end(), [](const set<string> &lhs, const set<string> &rhs) {
+  //sort(sets.begin(), sets.end(), [](const vector<int> &lhs, const vector<int> &rhs) {
   //   return lhs.size() < rhs.size();
   //});
 
