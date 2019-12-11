@@ -13,13 +13,13 @@ class TestPrimes(unittest.TestCase):
         sortedImplicants = []
         sortedImplicates = []
 
-        for implicant in sorted(implicants, key=lambda i: str(i)):
+        for implicant in implicants:
             sortedImplicants.append(sorted(implicant, key=lambda i: str(i)))
 
-        for implicate in sorted(implicates, key=lambda i: str(i)):
+        for implicate in implicates:
             sortedImplicates.append(sorted(implicate, key=lambda i: str(i)))
 
-        return (sortedImplicants, sortedImplicates)
+        return (sorted(sortedImplicants, key=str), sorted(sortedImplicates, key=str))
 
     def setUp(self):
         self.startTime = time.time()
@@ -39,7 +39,7 @@ class TestPrimes(unittest.TestCase):
 
         result = self.sortedResult(pc.compile())
 
-        self.assertEqual(result, ([], [])) # not satisfiable
+        self.assertEqual(result, ([], []))  # not satisfiable
 
     def test_non_boolean(self):
         pc = PrimeCompilator(Good(Atom("a")))
@@ -50,22 +50,26 @@ class TestPrimes(unittest.TestCase):
     def test_paper_formula(self):
 
         # Then again using only mhs
-        pc = PrimeCompilator(Or(And(Or(And(Atom("a"), Atom("b")), And(Atom("a"), Not(Atom("b")))), Atom("c")), And(Atom("b"), Atom("c"))))
+        pc = PrimeCompilator(Or(And(Or(And(Atom("a"), Atom("b")), And(
+            Atom("a"), Not(Atom("b")))), Atom("c")), And(Atom("b"), Atom("c"))))
 
         result = pc.compile()
 
         result = self.sortedResult(result)
-        self.assertEqual(result, ([['a', 'c'], ['b', 'c']], [['a', 'b'], ['c']]))
+        self.assertEqual(
+            result, ([[Atom('a'), Atom('c')], [Atom('b'), Atom('c')]], [[Atom('a'), Atom('b')], [Atom('c')]]))
 
     def test_paper_formula_negated(self):
 
         # Then again using only mhs
-        pc = PrimeCompilator(Or(And(Or(And(Atom("a"), Atom("b")), And(Atom("a"), Not(Atom("b")))), Atom("c")), And(Atom("b"), Atom("c"))).getNegation())
+        pc = PrimeCompilator(Or(And(Or(And(Atom("a"), Atom("b")), And(Atom("a"), Not(
+            Atom("b")))), Atom("c")), And(Atom("b"), Atom("c"))).getNegation())
 
         result = self.sortedResult(pc.compile())
         #result = (sorted(result[0], key=lambda i: str(i)), sorted(result[1], key=lambda i: str(i)))
 
-        self.assertEqual(result, ([[Not('a'), Not('b')], [Not('c')]], [[Not('a'), Not('c')], [Not('b'), Not('c')]]))
+        self.assertEqual(result, ([[Not('a'), Not('b')], [Not('c')]], [
+                         [Not('a'), Not('c')], [Not('b'), Not('c')]]))
 
     def test_biImpl(self):
         formula = BiImpl(Atom("a"), Atom("b"))

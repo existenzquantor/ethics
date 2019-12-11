@@ -1,15 +1,17 @@
+import time
 from ethics.language import *
 from ethics.tools import *
 from enum import Enum
 import pyeda.inter
 from functools import reduce
-import mhsModule
+from ethics.extensions.mhsModule import hitting_sets as mhs_old
+from ethics.extensions.mhs import mhs as mhs_new
 
 
 class PrimeCompilator:
     """A simple class compiles prime implicants and prime implicates."""
 
-    def __init__(self, formula, verbose=False):
+    def __init__(self, formula):
         """Initialize the compilator class.
 
         Parameters
@@ -21,15 +23,13 @@ class PrimeCompilator:
 
             Avoid using atoms with a name like "Cx", where x is a number.
             Those are reserved for non-boolean mappings.
-        verbose : bool, optional
-            Extended debug output, by default False
+e
 
         """
         if not isinstance(formula, Formula):
             print("Please provide a working formula")
             exit(0)
 
-        self.verbose = verbose
         self.formula = formula
 
         self.non_boolean_mapping = dict()
@@ -47,22 +47,13 @@ class PrimeCompilator:
         self.using_negation = False
         self.found_models = None
 
-        possible_assignments = 2**(len(self.atoms))
-        self.found_models = self.__all_models(self.formula)
-        num_models = self.__number_of_complete_models(self.found_models)
-        if num_models > (possible_assignments / 2):
-            self.found_models = None
-            if self.verbose:
-                print("Using negated formula to speed up the algorithm")
-
-            self.using_negation = True
-
-        if len(self.non_boolean_mapping) > 0 and verbose:
-            print("\n\tNon-boolean functions mapping:\n\t----------")
-            print("\t" + "\n\t".join(
-                [str(value) + ": " + str(key)
-                 for key, value in self.non_boolean_mapping.items()]))
-            print()
+        #possible_assignments = 2**(len(self.atoms))
+        #self.found_models = self.__all_models(self.formula)
+        #num_models = self.__number_of_complete_models(self.found_models)
+        # if num_models > (possible_assignments / 2):
+        #    self.found_models = None
+#
+        #    self.using_negation = True
 
         # Lists to store the found prime implicants and implicates
         self.prime_implicants = []
@@ -106,24 +97,24 @@ class PrimeCompilator:
                 Or(Not(sub_formula.f2), sub_formula.f1)
             )
 
-        if (isinstance(sub_formula, And) or isinstance(sub_formula, Or)):
+        if (isinstance(sub_formula, (And, Or))):
             sub_formula.f1 = self.__prepare_formula(sub_formula.f1)
             sub_formula.f2 = self.__prepare_formula(sub_formula.f2)
             return sub_formula
 
         # Otherwise it's non-boolean.
 
-        sub_formula_string = str(sub_formula)
+        sub_formula_name = str(sub_formula)
 
-        # If the exact same function  have already been replaced
+        # If the exact same function has already been replaced
         # simply use the replacement atom again to avoid duplicates.
-        if sub_formula_string in self.non_boolean_mapping:
-            return Atom(self.non_boolean_mapping[sub_formula_string])
+        if sub_formula_name in self.non_boolean_mapping:
+            return Atom(self.non_boolean_mapping[sub_formula_name])
 
-        # Otherwise create a new atom
-        name = "C" + str(len(self.non_boolean_mapping.keys()) + 1)
-        self.non_boolean_mapping[sub_formula_string] = name
-        return Atom(name)
+        # Otherwise create a new atom with a new integer
+        atom_name = "C" + str(len(self.non_boolean_mapping))
+        self.non_boolean_mapping[sub_formula_name] = atom_name
+        return Atom(atom_name)
 
     def compile(self):
         """Compile all prime implicants and prime implicates.
@@ -218,7 +209,7 @@ class PrimeCompilator:
         return reduce(lambda a, b: a+b, [0]
                       + [2**(atoms - len(model)) for model in models])
 
-    def __all_models(self, formula, complete_models=False):
+    def _all_models(self, formula):
         """Find and returns all models of the given formula.
 
         Parameters
@@ -230,92 +221,64 @@ class PrimeCompilator:
         -------
         [dict(atom_name: truth_value)]
             A list containing all models of the given formula.
-
         """
+        mapping = dict()
+        back_mapping = dict()
         models = []
 
-        if self.using_negation:
-            negated = Not(formula)
-            f = pyeda.inter.expr(convert_formula_to_pyeda(negated))
-            f = pyeda.inter.expr2bdd(f)
-        else:
-            f = pyeda.inter.expr(convert_formula_to_pyeda(formula))
-            f = pyeda.inter.expr2bdd(f)
+        f = pyeda.inter.expr(convert_formula_to_pyeda(formula))
+        f = pyeda.inter.expr2bdd(f)
 
-        pyeda_models = list(f.satisfy_all())
+        for pyeda_model in f.satisfy_all():
+            #model_dict = dict()
+            model = []
 
-        for model in pyeda_models:
-            model_dict = dict()
+            for atom, bit in pyeda_model.items():
+                atom = ('+' if bit == 1 else '-') + \
+                    bytearray.fromhex(str(atom)[1:]).decode()
 
-            for atom, bit in model.items():
-                atom = convert_pyeda_atom_to_hera(atom)
-                model_dict[str(atom)] = bit == 1
+                if atom not in mapping:
+                    int_rep = len(mapping) + 1
+                    mapping[atom] = int_rep
+                    back_mapping[int_rep] = atom
 
-            partial_model = list(model_dict.items())
-            used_models = (self.__complete_partial_model(partial_model)
-                           if complete_models else [partial_model])
+                model.append(mapping[atom])
+                #model_dict[str(atom[1:])] = bit == 1
 
-            for full_model in used_models:
-                models.append(dict(full_model))
+            #model_list = list(model_dict.items())
+            # models.append(dict(model_list))
+            models.append(model)
 
-        return models
-
-    def __complete_partial_model(self, model):
-        """Return the set of complete models the partial models imply.
-
-        Parameters
-        ----------
-        model : [(atom_name, truth_value)]
-            The partial model.
-
-        Returns
-        -------
-        [[(atom_name, truth_value)]]
-            The complete models.
-
-        """
-        atoms_in_model = [atom for atom, truth in model]
-
-        full_models = []
-        for atom in self.atoms:
-            if atom not in atoms_in_model:
-                full_models += self.__complete_partial_model(model
-                                                             + [(atom, True)])
-                full_models += self.__complete_partial_model(model
-                                                             + [(atom, False)])
-
-                return full_models
-
-        return [model]
+        return models, back_mapping
 
     def __compile(self):
         prime_implicants = []
         prime_implicates = []
 
-        # Find all models
-        if self.found_models is None:
-            models = self.__all_models(self.formula, complete_models=False)
-        else:
-            models = self.found_models
+        models, back_mapping = self._all_models(self.formula)
 
         # Convert models to lists of tuples
-        models = [list(model.items()) for model in models]
-        sets = self.__model_to_target_sets(models)
-        hitting_sets = self.__remove_trivial_clauses(self.__hitting_sets(sets))
+        #models = [list(model.items()) for model in models]
+        #sets = self.__model_to_target_sets(models)
+        hitting_sets = self.__hitting_sets(models)
+        hitting_sets = self.__remove_trivial_clauses(
+            hitting_sets, back_mapping)
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
-            prime_implicate = self.__hitting_set_to_assignment(hitting_set)
+            prime_implicate = self._hitting_set_to_assignment(
+                hitting_set, back_mapping)
             prime_implicates.append(prime_implicate)
 
         # Now take the hitting sets and find again all minimal hitting sets
         # Those then are all prime implicants
         hitting_sets = self.__hitting_sets(hitting_sets)
-        hitting_sets = self.__remove_trivial_clauses(hitting_sets)
-
+        hitting_sets = self.__remove_trivial_clauses(
+            hitting_sets, back_mapping)
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
-            prime_implicant = self.__hitting_set_to_assignment(hitting_set)
+            prime_implicant = self._hitting_set_to_assignment(
+                hitting_set, back_mapping)
             prime_implicants.append(prime_implicant)
 
         # Flip implicants and implicates if necessary
@@ -332,7 +295,7 @@ class PrimeCompilator:
 
         return prime_implicants, prime_implicates
 
-    def __remove_trivial_clauses(self, sets):
+    def __remove_trivial_clauses(self, sets, back_mapping):
         """Remove trivial clauses from the sets.
 
         A clause is trivial if it contains both positive and negative literals
@@ -352,7 +315,8 @@ class PrimeCompilator:
         filtered_sets = []
         for current_set in sets:
             found_atoms = set()
-            for literal in current_set:
+            for int_rep in current_set:
+                literal = back_mapping[int_rep]
                 if literal[1:] in found_atoms:
                     found_atoms = set()
                     break
@@ -388,7 +352,7 @@ class PrimeCompilator:
             sets.append(current_set)
         return sets
 
-    def __hitting_set_to_assignment(self, hitting_set):
+    def _hitting_set_to_assignment(self, hitting_set, back_mapping):
         """Convert a hitting set to an assignment.
 
         Parameters
@@ -403,9 +367,10 @@ class PrimeCompilator:
 
         """
         assignment = []
-        for variable in hitting_set:
-            prefix = str(variable)[0]
-            name = str(variable)[1:]
+        for int_rep in hitting_set:
+            variable = back_mapping[int_rep]
+            prefix = variable[0]
+            name = variable[1:]
 
             truth_value = True if prefix == "+" else False
             assignment.append((name, truth_value))
@@ -413,4 +378,10 @@ class PrimeCompilator:
         return assignment
 
     def __hitting_sets(self, sets):
-        return mhsModule.hitting_sets(sets)
+        sorted_sets = []
+        for a_set in sets:
+            sorted_sets.append(sorted(a_set))
+        sorted_sets = sorted(sorted_sets)
+
+        mhs = mhs_new(sorted_sets)
+        return mhs
