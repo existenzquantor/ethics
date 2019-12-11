@@ -2,7 +2,7 @@ from ethics.cam.semantics import *
 from ethics.language import *
 from ethics.tools import *
 from ethics.explanations import generate_reasons, generate_inus_reasons
-from ethics.argumentation import ArgModel, ArgGraph, ArgSolver
+#from ethics.argumentation import ArgModel, ArgGraph, ArgSolver
 
 class Principle(object):
     """
@@ -559,7 +559,7 @@ class ParetoPrinciple(Principle):
         self.is_permissible = self.result == [True]
         return self.is_permissible
 
-
+"""
 class DiscoursePrinciple(Principle):
 
     def __init__(self, model):
@@ -603,4 +603,4 @@ class UniversalityPrinciple(Principle):
             return self.is_permissible
         self.is_permissible = self.dialog.satisfiesUniversalityPrinciple(ArgSolver.toConjunction(self.dialog.proposition))
         return self.is_permissible
-
+"""
