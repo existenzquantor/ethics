@@ -1,0 +1,26 @@
+actions:
+    - name: lie_to_frank
+      intrinsicvalue: bad
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {frank_motivated: true}              
+events:
+    - name: franks_action
+      preconditions: {}
+      effects:
+        - condition: {frank_motivated: true}
+          effect: {frank_does_workout: true}
+        - condition: {frank_does_workout: true}
+          effect: {frank_healthy: true}
+      timepoints: [0,1]     
+utilities:
+    - fact: {frank_healthy: true}
+      utility: 1
+affects:
+    frank: 
+      pos: [{frank_healthy: true}]
+      neg: [{frank_healthy: false}]
+plan: [lie_to_frank]
+goal: {frank_healthy: true}
+initialState: {frank_motivated: false, frank_does_workout: false, frank_healthy: false}
