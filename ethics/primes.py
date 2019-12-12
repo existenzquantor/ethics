@@ -23,7 +23,6 @@ class PrimeCompilator:
 
             Avoid using atoms with a name like "Cx", where x is a number.
             Those are reserved for non-boolean mappings.
-e
 
         """
         if not isinstance(formula, Formula):

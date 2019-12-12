@@ -1,3 +1,4 @@
+from ethics.plans.concepts import Plan
 from ethics.plans.semantics import Situation
 from ethics.plans.planner import Planner, MoralPlanner
 from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
@@ -7,6 +8,9 @@ print("*"*50)
 print("JSON")
 print("*"*50)
 sit = Situation("cases/plans/robot_and_frank.yaml")
+sit_alt = Situation("cases/plans/robot_and_frank.yaml")
+sit_alt.plan = Plan([]) # Compare to empty plan
+sit.alethicAlternatives.append(sit_alt)
 
 print("Intial State: "+ str(sit.init))
 print("Plan: "+ str(sit.plan))

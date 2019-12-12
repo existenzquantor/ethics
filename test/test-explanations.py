@@ -3,8 +3,8 @@ from ethics.cam.principles import DeontologicalPrinciple, UtilitarianPrinciple, 
 from ethics.language import *
 
 
-trolley1 = CausalModel("./cases/cam/trolley-dilemma.json", {"pull":0, "refrain":1})
-trolley2 = CausalModel("./cases/cam/trolley-dilemma.json", {"pull":1, "refrain":0})
+trolley1 = CausalModel("../cases/cam/trolley-dilemma.json", {"pull":0, "refrain":1})
+trolley2 = CausalModel("../cases/cam/trolley-dilemma.json", {"pull":1, "refrain":0})
 
 trolley1.alternatives.append(trolley2)
 trolley2.alternatives.append(trolley1)
