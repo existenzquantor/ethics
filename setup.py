@@ -1,7 +1,8 @@
 from setuptools import setup
 from setuptools.command.install import install
 from distutils.core import Extension
-import zipfile
+#import zipfile
+import tarfile
 import requests
 import subprocess
 import os
@@ -32,10 +33,10 @@ EXT_FILES_PATH = os.path.join(CURR_DIR, "ethics", "extensions")
 
 # ====== CUDD ======
 # URL to a CUDD mirror on github
-CUDD_URL = "https://github.com/ivmai/cudd/archive/release.zip"
+CUDD_URL = "https://sourceforge.net/projects/cudd-mirror/files/cudd-3.0.0.tar.gz/download"
 
 # Path to the directory that will contain the cudd C library
-CUDD_DIR = os.path.join(CURR_DIR, "cudd-release/")
+CUDD_DIR = os.path.join(CURR_DIR, "cudd-3.0.0/")
 
 # The include directories needed to use CUDD
 CUDD_INCLUDE = [os.path.join(CUDD_DIR, dir_name) for dir_name in
@@ -82,12 +83,11 @@ class InstallWrapper(install):
             file.write(response.content)
 
         # Unzip Cudd
-        with zipfile.ZipFile(cudd_zip_path, 'r') as zip_file:
-            zip_file.extractall(CURR_DIR)
+        with tarfile.open(cudd_zip_path) as tar_file:
+            tar_file.extractall()
 
         os.remove(cudd_zip_path)
 
-        self._set_execute_rights()
         print("Done")
 
     def _configure_cudd(self):
@@ -98,7 +98,6 @@ class InstallWrapper(install):
         subprocess.run(['./configure', 'CFLAGS=-fPIC -std=c99'], cwd=CUDD_DIR)
 
         # Now give the created makefile execute permissions
-        self._set_execute_rights()
         print("Done")
 
     def _make_cudd(self):
@@ -106,12 +105,6 @@ class InstallWrapper(install):
         print("Making CUDD ... ", end='')
         subprocess.run(['make', '-j4'], cwd=CUDD_DIR)
         print("Done")
-
-    def _set_execute_rights(self):
-        """Fix the permissions messed up by the zipfile module."""
-        for root, _, files in os.walk(CUDD_DIR):
-            for file in files:
-                os.chmod(os.path.join(root, file), 0o775)
 
 
 MHS_EXTENSION = Extension(name="ethics.extensions.mhs",

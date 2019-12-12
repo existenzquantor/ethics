@@ -85,7 +85,13 @@ cdef DdNode* hash_table_search(HashTable *table, DdNode *key_node):
     return NULL
 
 
+
 cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):
+    """Implementation of Knuth's algorithm as explained in 
+    The Art of Computer Programming Volume 4A, Combinatorical Algorithms Part 1.
+    This version also incorportates a modification proposed by Takeo Imai (2015):
+    https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_action_common_download&item_id=145832&item_no=1&attribute_id=1&file_no=1
+    """
     cdef DdNode *r
     cdef DdNode *r_low
     cdef DdNode *r_high
