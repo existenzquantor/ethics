@@ -2,6 +2,8 @@ __pycache__
 sandbox
 build
 dist
+cudd-*
+.DS_Store
 *.egg-info
 .vscode
 *.pyc
