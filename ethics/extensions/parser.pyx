@@ -3,6 +3,8 @@ from ethics.extensions.c_cudd cimport *
 from libc.stdlib cimport malloc, free
 from libc.stdio cimport printf
 from libc.limits cimport INT_MAX
+from ethics.language import *
+from libc.stdint cimport uintptr_t, uint64_t
 
 cdef print_c_family(int** family, int length):
     cdef int set_index = 0
@@ -17,6 +19,62 @@ cdef print_c_family(int** family, int length):
             element_index += 1
         printf("\b\b] ")
         set_index += 1
+
+
+cdef DdNode* parse_formula(DdManager *bdd, object formula, object var_cache):
+    cdef DdNode *top_node = _parse_formula(bdd, formula, var_cache)
+    return top_node
+
+cdef DdNode* _parse_formula(DdManager *bdd, object formula, object var_cache):
+    cdef DdNode *left_function
+    cdef DdNode *right_function
+    cdef DdNode *new_function
+    
+    if isinstance(formula, Atom):
+        left_function = Cudd_bddIthVar(bdd, var_cache[formula.f1])
+        return left_function
+
+    if isinstance(formula, Not):
+        left_function = _parse_formula(bdd, formula.f1, var_cache)
+        #Cudd_Ref(left_function)
+        # Negate the function
+        new_function = Cudd_Not(left_function)
+
+        Cudd_Ref(new_function)
+
+        if not isinstance(formula.f1, Atom):
+            Cudd_RecursiveDeref(bdd, left_function)
+
+        return new_function
+
+    if isinstance(formula, TwoPlaced):
+        left_function = _parse_formula(bdd, formula.f1, var_cache)
+        #Cudd_Ref(left_function)
+
+        right_function = _parse_formula(bdd, formula.f2, var_cache)
+        #Cudd_Ref(right_function)
+
+        if isinstance(formula, And):
+            new_function = Cudd_bddAnd(bdd, left_function, right_function)
+        elif isinstance(formula, Or):
+            new_function = Cudd_bddOr(bdd, left_function, right_function)
+        elif isinstance(formula, Impl):
+            new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
+        elif isinstance(formula, BiImpl):
+            new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))
+
+        Cudd_Ref(new_function)
+
+        if not isinstance(formula.f1, Atom):
+            Cudd_RecursiveDeref(bdd, left_function)
+
+        if not isinstance(formula.f2, Atom):
+            Cudd_RecursiveDeref(bdd, right_function)
+
+        return new_function
+    
+    return NULL
+
 
 cdef DdNode* parse_family(DdManager *zdd, object family):
     cdef int** c_family = _create_c_family(family)

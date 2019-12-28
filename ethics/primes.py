@@ -6,6 +6,7 @@ import pyeda.inter
 from functools import reduce
 from ethics.extensions.mhsModule import hitting_sets as mhs_old
 from ethics.extensions.mhs import mhs as mhs_new
+from ethics.extensions.sat import sat as sat
 
 
 class PrimeCompilator:
@@ -32,6 +33,10 @@ class PrimeCompilator:
         self.formula = formula
 
         self.non_boolean_mapping = dict()
+        self.non_boolean_back_mapping = dict()
+
+        # Maps the atoms created for non-boolean functions to their original formula
+        self.atom_formula_mapping = dict()
 
         # Turn the formula into one only consisting of AND, OR, NOT, ATOM
         # and replace non-boolean functions with atoms
@@ -46,9 +51,9 @@ class PrimeCompilator:
         self.using_negation = False
         self.found_models = None
 
-        #possible_assignments = 2**(len(self.atoms))
-        #self.found_models = self.__all_models(self.formula)
-        #num_models = self.__number_of_complete_models(self.found_models)
+        # possible_assignments = 2**(len(self.atoms))
+        # self.found_models = self.__all_models(self.formula)
+        # num_models = self.__number_of_complete_models(self.found_models)
         # if num_models > (possible_assignments / 2):
         #    self.found_models = None
 #
@@ -79,6 +84,7 @@ class PrimeCompilator:
             return
 
         if isinstance(sub_formula, Atom):
+            self.atom_formula_mapping[sub_formula.f1] = sub_formula
             return sub_formula
 
         if isinstance(sub_formula, Not):
@@ -102,7 +108,6 @@ class PrimeCompilator:
             return sub_formula
 
         # Otherwise it's non-boolean.
-
         sub_formula_name = str(sub_formula)
 
         # If the exact same function has already been replaced
@@ -113,6 +118,8 @@ class PrimeCompilator:
         # Otherwise create a new atom with a new integer
         atom_name = "C" + str(len(self.non_boolean_mapping))
         self.non_boolean_mapping[sub_formula_name] = atom_name
+        self.non_boolean_back_mapping[atom_name] = sub_formula_name
+        self.atom_formula_mapping[atom_name] = sub_formula
         return Atom(atom_name)
 
     def compile(self):
@@ -124,40 +131,26 @@ class PrimeCompilator:
 
         """
         self.prime_implicants, self.prime_implicates = self.__compile()
-
-        map_back = dict((value, key)
-                        for key, value in self.non_boolean_mapping.items())
+        map_back = self.non_boolean_back_mapping
 
         cants = []
         for p in self.prime_implicants:
             cant = []
             for s in p:
-                if s[0] in map_back:
-                    if s[1] == 0:
-                        cant.append(Not(my_eval(map_back[s[0]])))
-                    else:
-                        cant.append(my_eval(map_back[s[0]]))
+                if s[1] == 0:
+                    cant.append(Not(self.atom_formula_mapping[s[0]]))
                 else:
-                    if s[1] == 0:
-                        cant.append(Not(my_eval(s[0])))
-                    else:
-                        cant.append(my_eval(s[0]))
+                    cant.append(self.atom_formula_mapping[s[0]])
             cants.append(cant)
 
         cates = []
         for p in self.prime_implicates:
             cate = []
             for s in p:
-                if s[0] in map_back:
-                    if s[1] == 0:
-                        cate.append(Not(my_eval(map_back[s[0]])))
-                    else:
-                        cate.append(my_eval(map_back[s[0]]))
+                if s[1] == 0:
+                    cate.append(Not(self.atom_formula_mapping[s[0]]))
                 else:
-                    if s[1] == 0:
-                        cate.append(Not(my_eval(s[0])))
-                    else:
-                        cate.append(my_eval(s[0]))
+                    cate.append(self.atom_formula_mapping[s[0]])
             cates.append(cate)
 
         return cants, cates
@@ -225,16 +218,13 @@ class PrimeCompilator:
         back_mapping = dict()
         models = []
 
-        f = pyeda.inter.expr(convert_formula_to_pyeda(formula))
-        f = pyeda.inter.expr2bdd(f)
-
-        for pyeda_model in f.satisfy_all():
-            #model_dict = dict()
+        new_models = sat(self.formula, self.atoms)
+        for generated_model in new_models:
+                    # model_dict = dict()
             model = []
 
-            for atom, bit in pyeda_model.items():
-                atom = ('+' if bit == 1 else '-') + \
-                    bytearray.fromhex(str(atom)[1:]).decode()
+            for atom, truth in generated_model.items():
+                atom = ('+' if truth else '-') + atom
 
                 if atom not in mapping:
                     int_rep = len(mapping) + 1
@@ -242,9 +232,9 @@ class PrimeCompilator:
                     back_mapping[int_rep] = atom
 
                 model.append(mapping[atom])
-                #model_dict[str(atom[1:])] = bit == 1
+                # model_dict[str(atom[1:])] = bit == 1
 
-            #model_list = list(model_dict.items())
+            # model_list = list(model_dict.items())
             # models.append(dict(model_list))
             models.append(model)
 
@@ -257,8 +247,8 @@ class PrimeCompilator:
         models, back_mapping = self._all_models(self.formula)
 
         # Convert models to lists of tuples
-        #models = [list(model.items()) for model in models]
-        #sets = self.__model_to_target_sets(models)
+        # models = [list(model.items()) for model in models]
+        # sets = self.__model_to_target_sets(models)
         hitting_sets = self.__hitting_sets(models)
         hitting_sets = self.__remove_trivial_clauses(
             hitting_sets, back_mapping)
@@ -302,7 +292,7 @@ class PrimeCompilator:
 
         Parameters
         ----------
-        sets : [set()]
+        sets: [set()]
             A list containing all the sets.
 
         Returns
@@ -331,9 +321,9 @@ class PrimeCompilator:
 
         Parameters
         ----------
-        prime_implicants : [[(atom_name, truth_value)]]
+        prime_implicants: [[(atom_name, truth_value)]]
             The prime implicants.
-        use_sets : bool, optional
+        use_sets: bool, optional
             Creates the sets using python sets if set to True
             (and lists if set to False). Default: False
 
@@ -356,7 +346,7 @@ class PrimeCompilator:
 
         Parameters
         ----------
-        hitting_set : [str]
+        hitting_set: [str]
             The hitting set.
 
         Returns

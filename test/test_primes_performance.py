@@ -16,7 +16,7 @@ class TestPrimesPerformance(unittest.TestCase):
     def test_DoubleEffectPrinciple_performance(self):
         endo_actions = ["a" + str(i) for i in range(6)]
         consequences = {"c1": True, "c2": False,
-                        "c3": True, "c4": False}
+                        "c3": True, "c4": False, "c5": True}
         consequence_literals = [Atom(name) if truth_value else Not(
             Atom(name)) for name, truth_value in consequences.items()]
 
@@ -48,8 +48,8 @@ class TestPrimesPerformance(unittest.TestCase):
         compilator.compile()
 
     def test_DoNolHarm_performance(self):
-        consequences = {"c1": True, "c2": False, "c3": True,
-                        "c4": False, "c5": False, "c6": False}
+        consequences = {"co1": True, "co2": False, "co3": True,
+                        "co4": False, "co5": False, "co6": False}
 
         formulae = [Formula.makeConjunction([Impl(Bad(Atom(c)), Not(Caused(Atom(c)))) for c in consequences] +
                                             [Impl(Bad(Not(Atom(c))), Not(Caused(Not(Atom(c))))) for c in consequences])]
@@ -60,8 +60,8 @@ class TestPrimesPerformance(unittest.TestCase):
         compilator.compile()
 
     def test_AvoidAvoidableHarm_performance(self):
-        consequences = {"c1": True, "c2": False,
-                        "c3": True, "c4": False, "c5": True}
+        consequences = {"co1": True, "co2": False,
+                        "co3": True, "co4": False, "co5": True}
 
         formulae = [Formula.makeConjunction([Impl(And(Bad(Atom(c)), Finally(Atom(c))), Not(Avoidable(Atom(c)))) for c in consequences] +
                                             [Impl(And(Bad(Not(Atom(c))), Finally(Not(Atom(c)))), Not(Avoidable(Not(Atom(c))))) for c in consequences])]

@@ -4,8 +4,8 @@
 {
     "distutils": {
         "depends": [
-            "/Users/dennis/Code/ethics/cudd-release/cudd/cudd.h",
-            "/Users/dennis/Code/ethics/cudd-release/cudd/cuddInt.h"
+            "/Users/dennis/Code/ethics/cudd-3.0.0/cudd/cudd.h",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/cudd/cuddInt.h"
         ],
         "extra_compile_args": [
             "-fPIC",
@@ -21,18 +21,18 @@
             "-O3"
         ],
         "include_dirs": [
-            "/Users/dennis/Code/ethics/cudd-release/.",
-            "/Users/dennis/Code/ethics/cudd-release/cudd",
-            "/Users/dennis/Code/ethics/cudd-release/epd",
-            "/Users/dennis/Code/ethics/cudd-release/mtr",
-            "/Users/dennis/Code/ethics/cudd-release/st",
-            "/Users/dennis/Code/ethics/cudd-release/util"
+            "/Users/dennis/Code/ethics/cudd-3.0.0/.",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/cudd",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/epd",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/mtr",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/st",
+            "/Users/dennis/Code/ethics/cudd-3.0.0/util"
         ],
         "libraries": [
             "cudd"
         ],
         "library_dirs": [
-            "/Users/dennis/Code/ethics/cudd-release/cudd/.libs"
+            "/Users/dennis/Code/ethics/cudd-3.0.0/cudd/.libs"
         ],
         "name": "ethics.extensions.mhs",
         "sources": [
@@ -856,8 +856,8 @@ static const char *__pyx_f[] = {
   "ethics/extensions/mhs.pyx",
 };
 
-/* "ethics/extensions/mhs.pyx":10
- * #cdef HASH_TABLE_SIZE = 500000
+/* "ethics/extensions/mhs.pyx":9
+ * 
  * cdef uint64_t HASH_TABLE_SIZE = 500000 # 2^40
  * ctypedef unsigned int UInt             # <<<<<<<<<<<<<<
  * 
@@ -869,7 +869,7 @@ typedef unsigned int __pyx_t_6ethics_10extensions_3mhs_UInt;
 struct __pyx_t_6ethics_10extensions_3mhs_HashItem;
 struct __pyx_t_6ethics_10extensions_3mhs_HashTable;
 
-/* "ethics/extensions/mhs.pyx":12
+/* "ethics/extensions/mhs.pyx":11
  * ctypedef unsigned int UInt
  * 
  * cdef struct HashItem:             # <<<<<<<<<<<<<<
@@ -882,7 +882,7 @@ struct __pyx_t_6ethics_10extensions_3mhs_HashItem {
   struct __pyx_t_6ethics_10extensions_3mhs_HashItem *next;
 };
 
-/* "ethics/extensions/mhs.pyx":17
+/* "ethics/extensions/mhs.pyx":16
  *     HashItem *next
  * 
  * cdef struct HashTable:             # <<<<<<<<<<<<<<
@@ -1191,7 +1191,7 @@ static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
 /* Late includes */
 
-/* "ethics/extensions/mhs.pyx":21
+/* "ethics/extensions/mhs.pyx":20
  *     HashItem **buckets
  * 
  * cdef int hash(uintptr_t x):             # <<<<<<<<<<<<<<
@@ -1204,7 +1204,7 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("hash", 0);
 
-  /* "ethics/extensions/mhs.pyx":22
+  /* "ethics/extensions/mhs.pyx":21
  * 
  * cdef int hash(uintptr_t x):
  *     x = ((x >> 16) ^ x) * 0x45d9f3b             # <<<<<<<<<<<<<<
@@ -1213,7 +1213,7 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
  */
   __pyx_v_x = (((__pyx_v_x >> 16) ^ __pyx_v_x) * 0x45d9f3b);
 
-  /* "ethics/extensions/mhs.pyx":23
+  /* "ethics/extensions/mhs.pyx":22
  * cdef int hash(uintptr_t x):
  *     x = ((x >> 16) ^ x) * 0x45d9f3b
  *     x = ((x >> 16) ^ x) * 0x45d9f3b             # <<<<<<<<<<<<<<
@@ -1222,7 +1222,7 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
  */
   __pyx_v_x = (((__pyx_v_x >> 16) ^ __pyx_v_x) * 0x45d9f3b);
 
-  /* "ethics/extensions/mhs.pyx":24
+  /* "ethics/extensions/mhs.pyx":23
  *     x = ((x >> 16) ^ x) * 0x45d9f3b
  *     x = ((x >> 16) ^ x) * 0x45d9f3b
  *     x = (x >> 16) ^ x             # <<<<<<<<<<<<<<
@@ -1231,7 +1231,7 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
  */
   __pyx_v_x = ((__pyx_v_x >> 16) ^ __pyx_v_x);
 
-  /* "ethics/extensions/mhs.pyx":25
+  /* "ethics/extensions/mhs.pyx":24
  *     x = ((x >> 16) ^ x) * 0x45d9f3b
  *     x = (x >> 16) ^ x
  *     return <int> (x % HASH_TABLE_SIZE)             # <<<<<<<<<<<<<<
@@ -1240,12 +1240,12 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
  */
   if (unlikely(__pyx_v_6ethics_10extensions_3mhs_HASH_TABLE_SIZE == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "integer division or modulo by zero");
-    __PYX_ERR(0, 25, __pyx_L1_error)
+    __PYX_ERR(0, 24, __pyx_L1_error)
   }
   __pyx_r = ((int)(__pyx_v_x % __pyx_v_6ethics_10extensions_3mhs_HASH_TABLE_SIZE));
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":21
+  /* "ethics/extensions/mhs.pyx":20
  *     HashItem **buckets
  * 
  * cdef int hash(uintptr_t x):             # <<<<<<<<<<<<<<
@@ -1262,7 +1262,7 @@ static int __pyx_f_6ethics_10extensions_3mhs_hash(uintptr_t __pyx_v_x) {
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":27
+/* "ethics/extensions/mhs.pyx":26
  *     return <int> (x % HASH_TABLE_SIZE)
  * 
  * cdef void hash_table_delete_item(HashItem *item):             # <<<<<<<<<<<<<<
@@ -1274,7 +1274,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete_item(struct __py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("hash_table_delete_item", 0);
 
-  /* "ethics/extensions/mhs.pyx":28
+  /* "ethics/extensions/mhs.pyx":27
  * 
  * cdef void hash_table_delete_item(HashItem *item):
  *     free(item)             # <<<<<<<<<<<<<<
@@ -1283,7 +1283,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete_item(struct __py
  */
   free(__pyx_v_item);
 
-  /* "ethics/extensions/mhs.pyx":27
+  /* "ethics/extensions/mhs.pyx":26
  *     return <int> (x % HASH_TABLE_SIZE)
  * 
  * cdef void hash_table_delete_item(HashItem *item):             # <<<<<<<<<<<<<<
@@ -1295,7 +1295,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete_item(struct __py
   __Pyx_RefNannyFinishContext();
 }
 
-/* "ethics/extensions/mhs.pyx":30
+/* "ethics/extensions/mhs.pyx":29
  *     free(item)
  * 
  * cdef void hash_table_delete(HashTable *table):             # <<<<<<<<<<<<<<
@@ -1313,7 +1313,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
   int __pyx_t_4;
   __Pyx_RefNannySetupContext("hash_table_delete", 0);
 
-  /* "ethics/extensions/mhs.pyx":32
+  /* "ethics/extensions/mhs.pyx":31
  * cdef void hash_table_delete(HashTable *table):
  *     cdef HashItem *item
  *     cdef uint64_t index = 0             # <<<<<<<<<<<<<<
@@ -1322,7 +1322,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
  */
   __pyx_v_index = 0;
 
-  /* "ethics/extensions/mhs.pyx":33
+  /* "ethics/extensions/mhs.pyx":32
  *     cdef HashItem *item
  *     cdef uint64_t index = 0
  *     for index in range(table.numBuckets):             # <<<<<<<<<<<<<<
@@ -1334,7 +1334,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_index = __pyx_t_3;
 
-    /* "ethics/extensions/mhs.pyx":34
+    /* "ethics/extensions/mhs.pyx":33
  *     cdef uint64_t index = 0
  *     for index in range(table.numBuckets):
  *         item = table.buckets[index]             # <<<<<<<<<<<<<<
@@ -1343,7 +1343,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
  */
     __pyx_v_item = (__pyx_v_table->buckets[__pyx_v_index]);
 
-    /* "ethics/extensions/mhs.pyx":35
+    /* "ethics/extensions/mhs.pyx":34
  *     for index in range(table.numBuckets):
  *         item = table.buckets[index]
  *         if item != NULL:             # <<<<<<<<<<<<<<
@@ -1353,7 +1353,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
     __pyx_t_4 = ((__pyx_v_item != NULL) != 0);
     if (__pyx_t_4) {
 
-      /* "ethics/extensions/mhs.pyx":36
+      /* "ethics/extensions/mhs.pyx":35
  *         item = table.buckets[index]
  *         if item != NULL:
  *             hash_table_delete_item(item)             # <<<<<<<<<<<<<<
@@ -1362,7 +1362,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
  */
       __pyx_f_6ethics_10extensions_3mhs_hash_table_delete_item(__pyx_v_item);
 
-      /* "ethics/extensions/mhs.pyx":35
+      /* "ethics/extensions/mhs.pyx":34
  *     for index in range(table.numBuckets):
  *         item = table.buckets[index]
  *         if item != NULL:             # <<<<<<<<<<<<<<
@@ -1372,7 +1372,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
     }
   }
 
-  /* "ethics/extensions/mhs.pyx":38
+  /* "ethics/extensions/mhs.pyx":37
  *             hash_table_delete_item(item)
  * 
  *     free(table.buckets)             # <<<<<<<<<<<<<<
@@ -1381,7 +1381,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
  */
   free(__pyx_v_table->buckets);
 
-  /* "ethics/extensions/mhs.pyx":39
+  /* "ethics/extensions/mhs.pyx":38
  * 
  *     free(table.buckets)
  *     free(table)             # <<<<<<<<<<<<<<
@@ -1390,7 +1390,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
  */
   free(__pyx_v_table);
 
-  /* "ethics/extensions/mhs.pyx":30
+  /* "ethics/extensions/mhs.pyx":29
  *     free(item)
  * 
  * cdef void hash_table_delete(HashTable *table):             # <<<<<<<<<<<<<<
@@ -1402,7 +1402,7 @@ static void __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(struct __pyx_t_6
   __Pyx_RefNannyFinishContext();
 }
 
-/* "ethics/extensions/mhs.pyx":42
+/* "ethics/extensions/mhs.pyx":41
  * 
  * 
  * cdef HashItem* hash_table_new_item(uintptr_t key, DdNode *value):             # <<<<<<<<<<<<<<
@@ -1416,7 +1416,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("hash_table_new_item", 0);
 
-  /* "ethics/extensions/mhs.pyx":43
+  /* "ethics/extensions/mhs.pyx":42
  * 
  * cdef HashItem* hash_table_new_item(uintptr_t key, DdNode *value):
  *     cdef HashItem *item = <HashItem*> malloc(sizeof(HashItem))             # <<<<<<<<<<<<<<
@@ -1425,7 +1425,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
  */
   __pyx_v_item = ((struct __pyx_t_6ethics_10extensions_3mhs_HashItem *)malloc((sizeof(struct __pyx_t_6ethics_10extensions_3mhs_HashItem))));
 
-  /* "ethics/extensions/mhs.pyx":44
+  /* "ethics/extensions/mhs.pyx":43
  * cdef HashItem* hash_table_new_item(uintptr_t key, DdNode *value):
  *     cdef HashItem *item = <HashItem*> malloc(sizeof(HashItem))
  *     item.key = key             # <<<<<<<<<<<<<<
@@ -1434,7 +1434,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
  */
   __pyx_v_item->key = __pyx_v_key;
 
-  /* "ethics/extensions/mhs.pyx":45
+  /* "ethics/extensions/mhs.pyx":44
  *     cdef HashItem *item = <HashItem*> malloc(sizeof(HashItem))
  *     item.key = key
  *     item.value = value             # <<<<<<<<<<<<<<
@@ -1443,7 +1443,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
  */
   __pyx_v_item->value = __pyx_v_value;
 
-  /* "ethics/extensions/mhs.pyx":46
+  /* "ethics/extensions/mhs.pyx":45
  *     item.key = key
  *     item.value = value
  *     item.next = NULL             # <<<<<<<<<<<<<<
@@ -1452,7 +1452,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
  */
   __pyx_v_item->next = NULL;
 
-  /* "ethics/extensions/mhs.pyx":47
+  /* "ethics/extensions/mhs.pyx":46
  *     item.value = value
  *     item.next = NULL
  *     return item             # <<<<<<<<<<<<<<
@@ -1462,7 +1462,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
   __pyx_r = __pyx_v_item;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":42
+  /* "ethics/extensions/mhs.pyx":41
  * 
  * 
  * cdef HashItem* hash_table_new_item(uintptr_t key, DdNode *value):             # <<<<<<<<<<<<<<
@@ -1476,7 +1476,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_f_6ethics_10exte
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":49
+/* "ethics/extensions/mhs.pyx":48
  *     return item
  * 
  * cdef HashTable* create_hash_table():             # <<<<<<<<<<<<<<
@@ -1490,7 +1490,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("create_hash_table", 0);
 
-  /* "ethics/extensions/mhs.pyx":50
+  /* "ethics/extensions/mhs.pyx":49
  * 
  * cdef HashTable* create_hash_table():
  *     cdef HashTable *table = <HashTable*> malloc(sizeof(HashTable))             # <<<<<<<<<<<<<<
@@ -1499,7 +1499,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
  */
   __pyx_v_table = ((struct __pyx_t_6ethics_10extensions_3mhs_HashTable *)malloc((sizeof(struct __pyx_t_6ethics_10extensions_3mhs_HashTable))));
 
-  /* "ethics/extensions/mhs.pyx":51
+  /* "ethics/extensions/mhs.pyx":50
  * cdef HashTable* create_hash_table():
  *     cdef HashTable *table = <HashTable*> malloc(sizeof(HashTable))
  *     table.numBuckets = HASH_TABLE_SIZE             # <<<<<<<<<<<<<<
@@ -1508,7 +1508,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
  */
   __pyx_v_table->numBuckets = __pyx_v_6ethics_10extensions_3mhs_HASH_TABLE_SIZE;
 
-  /* "ethics/extensions/mhs.pyx":52
+  /* "ethics/extensions/mhs.pyx":51
  *     cdef HashTable *table = <HashTable*> malloc(sizeof(HashTable))
  *     table.numBuckets = HASH_TABLE_SIZE
  *     table.buckets = <HashItem**>calloc(<size_t>table.numBuckets, sizeof(HashItem*))             # <<<<<<<<<<<<<<
@@ -1517,7 +1517,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
  */
   __pyx_v_table->buckets = ((struct __pyx_t_6ethics_10extensions_3mhs_HashItem **)calloc(((size_t)__pyx_v_table->numBuckets), (sizeof(struct __pyx_t_6ethics_10extensions_3mhs_HashItem *))));
 
-  /* "ethics/extensions/mhs.pyx":53
+  /* "ethics/extensions/mhs.pyx":52
  *     table.numBuckets = HASH_TABLE_SIZE
  *     table.buckets = <HashItem**>calloc(<size_t>table.numBuckets, sizeof(HashItem*))
  *     return table             # <<<<<<<<<<<<<<
@@ -1527,7 +1527,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
   __pyx_r = __pyx_v_table;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":49
+  /* "ethics/extensions/mhs.pyx":48
  *     return item
  * 
  * cdef HashTable* create_hash_table():             # <<<<<<<<<<<<<<
@@ -1541,7 +1541,7 @@ static struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_f_6ethics_10ext
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":55
+/* "ethics/extensions/mhs.pyx":54
  *     return table
  * 
  * cdef hash_table_insert(HashTable *table, DdNode *key_node, DdNode *value):             # <<<<<<<<<<<<<<
@@ -1560,7 +1560,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
   struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_t_2;
   __Pyx_RefNannySetupContext("hash_table_insert", 0);
 
-  /* "ethics/extensions/mhs.pyx":56
+  /* "ethics/extensions/mhs.pyx":55
  * 
  * cdef hash_table_insert(HashTable *table, DdNode *key_node, DdNode *value):
  *     cdef uintptr_t key = <uintptr_t>key_node             # <<<<<<<<<<<<<<
@@ -1569,7 +1569,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
  */
   __pyx_v_key = ((uintptr_t)__pyx_v_key_node);
 
-  /* "ethics/extensions/mhs.pyx":57
+  /* "ethics/extensions/mhs.pyx":56
  * cdef hash_table_insert(HashTable *table, DdNode *key_node, DdNode *value):
  *     cdef uintptr_t key = <uintptr_t>key_node
  *     cdef HashItem *new_item = hash_table_new_item(key, value)             # <<<<<<<<<<<<<<
@@ -1578,7 +1578,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
  */
   __pyx_v_new_item = __pyx_f_6ethics_10extensions_3mhs_hash_table_new_item(__pyx_v_key, __pyx_v_value);
 
-  /* "ethics/extensions/mhs.pyx":59
+  /* "ethics/extensions/mhs.pyx":58
  *     cdef HashItem *new_item = hash_table_new_item(key, value)
  *     cdef HashItem *current_item
  *     cdef int index = hash(key)             # <<<<<<<<<<<<<<
@@ -1587,7 +1587,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
  */
   __pyx_v_index = __pyx_f_6ethics_10extensions_3mhs_hash(__pyx_v_key);
 
-  /* "ethics/extensions/mhs.pyx":60
+  /* "ethics/extensions/mhs.pyx":59
  *     cdef HashItem *current_item
  *     cdef int index = hash(key)
  *     if table.buckets[index] == NULL:             # <<<<<<<<<<<<<<
@@ -1597,7 +1597,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
   __pyx_t_1 = (((__pyx_v_table->buckets[__pyx_v_index]) == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":62
+    /* "ethics/extensions/mhs.pyx":61
  *     if table.buckets[index] == NULL:
  *         # Set this bucket to be the new hash item
  *         table.buckets[index] = new_item             # <<<<<<<<<<<<<<
@@ -1606,7 +1606,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
  */
     (__pyx_v_table->buckets[__pyx_v_index]) = __pyx_v_new_item;
 
-    /* "ethics/extensions/mhs.pyx":60
+    /* "ethics/extensions/mhs.pyx":59
  *     cdef HashItem *current_item
  *     cdef int index = hash(key)
  *     if table.buckets[index] == NULL:             # <<<<<<<<<<<<<<
@@ -1616,7 +1616,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
     goto __pyx_L3;
   }
 
-  /* "ethics/extensions/mhs.pyx":64
+  /* "ethics/extensions/mhs.pyx":63
  *         table.buckets[index] = new_item
  *     else:
  *         current_item = table.buckets[index]             # <<<<<<<<<<<<<<
@@ -1626,7 +1626,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
   /*else*/ {
     __pyx_v_current_item = (__pyx_v_table->buckets[__pyx_v_index]);
 
-    /* "ethics/extensions/mhs.pyx":67
+    /* "ethics/extensions/mhs.pyx":66
  *         # Otherwise, this bucket is already occupied. Add the new item
  *         # to the end of the linked list
  *         while current_item.next != NULL:             # <<<<<<<<<<<<<<
@@ -1637,7 +1637,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
       __pyx_t_1 = ((__pyx_v_current_item->next != NULL) != 0);
       if (!__pyx_t_1) break;
 
-      /* "ethics/extensions/mhs.pyx":68
+      /* "ethics/extensions/mhs.pyx":67
  *         # to the end of the linked list
  *         while current_item.next != NULL:
  *             current_item = current_item.next             # <<<<<<<<<<<<<<
@@ -1648,7 +1648,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
       __pyx_v_current_item = __pyx_t_2;
     }
 
-    /* "ethics/extensions/mhs.pyx":69
+    /* "ethics/extensions/mhs.pyx":68
  *         while current_item.next != NULL:
  *             current_item = current_item.next
  *         current_item.next = new_item             # <<<<<<<<<<<<<<
@@ -1659,7 +1659,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
   }
   __pyx_L3:;
 
-  /* "ethics/extensions/mhs.pyx":55
+  /* "ethics/extensions/mhs.pyx":54
  *     return table
  * 
  * cdef hash_table_insert(HashTable *table, DdNode *key_node, DdNode *value):             # <<<<<<<<<<<<<<
@@ -1674,7 +1674,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_hash_table_insert(struct __py
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":71
+/* "ethics/extensions/mhs.pyx":70
  *         current_item.next = new_item
  * 
  * cdef DdNode* hash_table_search(HashTable *table, DdNode *key_node):             # <<<<<<<<<<<<<<
@@ -1692,7 +1692,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
   struct __pyx_t_6ethics_10extensions_3mhs_HashItem *__pyx_t_2;
   __Pyx_RefNannySetupContext("hash_table_search", 0);
 
-  /* "ethics/extensions/mhs.pyx":73
+  /* "ethics/extensions/mhs.pyx":72
  * cdef DdNode* hash_table_search(HashTable *table, DdNode *key_node):
  *     cdef HashItem *current_item
  *     cdef uintptr_t key = <uintptr_t>key_node             # <<<<<<<<<<<<<<
@@ -1701,7 +1701,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
  */
   __pyx_v_key = ((uintptr_t)__pyx_v_key_node);
 
-  /* "ethics/extensions/mhs.pyx":74
+  /* "ethics/extensions/mhs.pyx":73
  *     cdef HashItem *current_item
  *     cdef uintptr_t key = <uintptr_t>key_node
  *     cdef int index = hash(key)             # <<<<<<<<<<<<<<
@@ -1710,7 +1710,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
  */
   __pyx_v_index = __pyx_f_6ethics_10extensions_3mhs_hash(__pyx_v_key);
 
-  /* "ethics/extensions/mhs.pyx":75
+  /* "ethics/extensions/mhs.pyx":74
  *     cdef uintptr_t key = <uintptr_t>key_node
  *     cdef int index = hash(key)
  *     if table.buckets[index] == NULL:             # <<<<<<<<<<<<<<
@@ -1720,7 +1720,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
   __pyx_t_1 = (((__pyx_v_table->buckets[__pyx_v_index]) == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":76
+    /* "ethics/extensions/mhs.pyx":75
  *     cdef int index = hash(key)
  *     if table.buckets[index] == NULL:
  *         return NULL             # <<<<<<<<<<<<<<
@@ -1730,7 +1730,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
     __pyx_r = NULL;
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":75
+    /* "ethics/extensions/mhs.pyx":74
  *     cdef uintptr_t key = <uintptr_t>key_node
  *     cdef int index = hash(key)
  *     if table.buckets[index] == NULL:             # <<<<<<<<<<<<<<
@@ -1739,7 +1739,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":78
+  /* "ethics/extensions/mhs.pyx":77
  *         return NULL
  *     else:
  *         current_item = table.buckets[index]             # <<<<<<<<<<<<<<
@@ -1749,7 +1749,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
   /*else*/ {
     __pyx_v_current_item = (__pyx_v_table->buckets[__pyx_v_index]);
 
-    /* "ethics/extensions/mhs.pyx":79
+    /* "ethics/extensions/mhs.pyx":78
  *     else:
  *         current_item = table.buckets[index]
  *         while current_item.key != key:             # <<<<<<<<<<<<<<
@@ -1760,7 +1760,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
       __pyx_t_1 = ((__pyx_v_current_item->key != __pyx_v_key) != 0);
       if (!__pyx_t_1) break;
 
-      /* "ethics/extensions/mhs.pyx":80
+      /* "ethics/extensions/mhs.pyx":79
  *         current_item = table.buckets[index]
  *         while current_item.key != key:
  *             if current_item.next == NULL:             # <<<<<<<<<<<<<<
@@ -1770,7 +1770,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
       __pyx_t_1 = ((__pyx_v_current_item->next == NULL) != 0);
       if (__pyx_t_1) {
 
-        /* "ethics/extensions/mhs.pyx":81
+        /* "ethics/extensions/mhs.pyx":80
  *         while current_item.key != key:
  *             if current_item.next == NULL:
  *                 return NULL             # <<<<<<<<<<<<<<
@@ -1780,7 +1780,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
         __pyx_r = NULL;
         goto __pyx_L0;
 
-        /* "ethics/extensions/mhs.pyx":80
+        /* "ethics/extensions/mhs.pyx":79
  *         current_item = table.buckets[index]
  *         while current_item.key != key:
  *             if current_item.next == NULL:             # <<<<<<<<<<<<<<
@@ -1789,7 +1789,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
  */
       }
 
-      /* "ethics/extensions/mhs.pyx":82
+      /* "ethics/extensions/mhs.pyx":81
  *             if current_item.next == NULL:
  *                 return NULL
  *             current_item = current_item.next             # <<<<<<<<<<<<<<
@@ -1800,7 +1800,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
       __pyx_v_current_item = __pyx_t_2;
     }
 
-    /* "ethics/extensions/mhs.pyx":83
+    /* "ethics/extensions/mhs.pyx":82
  *                 return NULL
  *             current_item = current_item.next
  *         return current_item.value             # <<<<<<<<<<<<<<
@@ -1811,7 +1811,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
     goto __pyx_L0;
   }
 
-  /* "ethics/extensions/mhs.pyx":71
+  /* "ethics/extensions/mhs.pyx":70
  *         current_item.next = new_item
  * 
  * cdef DdNode* hash_table_search(HashTable *table, DdNode *key_node):             # <<<<<<<<<<<<<<
@@ -1825,12 +1825,12 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs_hash_table_search(struct __pyx_
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":88
- * 
+/* "ethics/extensions/mhs.pyx":86
+ *     return NULL
  * 
  * cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):             # <<<<<<<<<<<<<<
- *     cdef DdNode *r
- *     cdef DdNode *r_low
+ *     """Implementation of Knuth's algorithm as explained in
+ *     The Art of Computer Programming Volume 4A, Combinatorical Algorithms Part 1.
  */
 
 static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, DdNode *__pyx_v_f, struct __pyx_t_6ethics_10extensions_3mhs_HashTable *__pyx_v_hash_table) {
@@ -1847,7 +1847,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("_mhs", 0);
 
-  /* "ethics/extensions/mhs.pyx":95
+  /* "ethics/extensions/mhs.pyx":98
  *     cdef DdNode *cached_node # The unique node if it has been cached; Retreived from the hash table
  * 
  *     if f == Cudd_ReadOne(zdd):             # <<<<<<<<<<<<<<
@@ -1857,7 +1857,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   __pyx_t_1 = ((__pyx_v_f == Cudd_ReadOne(__pyx_v_zdd)) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":96
+    /* "ethics/extensions/mhs.pyx":99
  * 
  *     if f == Cudd_ReadOne(zdd):
  *         unique_node = Cudd_ReadZero(zdd)             # <<<<<<<<<<<<<<
@@ -1866,7 +1866,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
     __pyx_v_unique_node = Cudd_ReadZero(__pyx_v_zdd);
 
-    /* "ethics/extensions/mhs.pyx":97
+    /* "ethics/extensions/mhs.pyx":100
  *     if f == Cudd_ReadOne(zdd):
  *         unique_node = Cudd_ReadZero(zdd)
  *         Cudd_Ref(unique_node)             # <<<<<<<<<<<<<<
@@ -1875,7 +1875,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
     Cudd_Ref(__pyx_v_unique_node);
 
-    /* "ethics/extensions/mhs.pyx":98
+    /* "ethics/extensions/mhs.pyx":101
  *         unique_node = Cudd_ReadZero(zdd)
  *         Cudd_Ref(unique_node)
  *         return unique_node             # <<<<<<<<<<<<<<
@@ -1885,7 +1885,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
     __pyx_r = __pyx_v_unique_node;
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":95
+    /* "ethics/extensions/mhs.pyx":98
  *     cdef DdNode *cached_node # The unique node if it has been cached; Retreived from the hash table
  * 
  *     if f == Cudd_ReadOne(zdd):             # <<<<<<<<<<<<<<
@@ -1894,7 +1894,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":99
+  /* "ethics/extensions/mhs.pyx":102
  *         Cudd_Ref(unique_node)
  *         return unique_node
  *     if f == Cudd_ReadZero(zdd):             # <<<<<<<<<<<<<<
@@ -1904,7 +1904,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   __pyx_t_1 = ((__pyx_v_f == Cudd_ReadZero(__pyx_v_zdd)) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":100
+    /* "ethics/extensions/mhs.pyx":103
  *         return unique_node
  *     if f == Cudd_ReadZero(zdd):
  *         unique_node = Cudd_ReadOne(zdd)             # <<<<<<<<<<<<<<
@@ -1913,7 +1913,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
     __pyx_v_unique_node = Cudd_ReadOne(__pyx_v_zdd);
 
-    /* "ethics/extensions/mhs.pyx":101
+    /* "ethics/extensions/mhs.pyx":104
  *     if f == Cudd_ReadZero(zdd):
  *         unique_node = Cudd_ReadOne(zdd)
  *         Cudd_Ref(unique_node)             # <<<<<<<<<<<<<<
@@ -1922,7 +1922,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
     Cudd_Ref(__pyx_v_unique_node);
 
-    /* "ethics/extensions/mhs.pyx":102
+    /* "ethics/extensions/mhs.pyx":105
  *         unique_node = Cudd_ReadOne(zdd)
  *         Cudd_Ref(unique_node)
  *         return unique_node             # <<<<<<<<<<<<<<
@@ -1932,7 +1932,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
     __pyx_r = __pyx_v_unique_node;
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":99
+    /* "ethics/extensions/mhs.pyx":102
  *         Cudd_Ref(unique_node)
  *         return unique_node
  *     if f == Cudd_ReadZero(zdd):             # <<<<<<<<<<<<<<
@@ -1941,7 +1941,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":104
+  /* "ethics/extensions/mhs.pyx":107
  *         return unique_node
  * 
  *     cached_node = hash_table_search(hash_table, f)             # <<<<<<<<<<<<<<
@@ -1950,7 +1950,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_cached_node = __pyx_f_6ethics_10extensions_3mhs_hash_table_search(__pyx_v_hash_table, __pyx_v_f);
 
-  /* "ethics/extensions/mhs.pyx":105
+  /* "ethics/extensions/mhs.pyx":108
  * 
  *     cached_node = hash_table_search(hash_table, f)
  *     if cached_node != NULL:             # <<<<<<<<<<<<<<
@@ -1960,7 +1960,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   __pyx_t_1 = ((__pyx_v_cached_node != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":106
+    /* "ethics/extensions/mhs.pyx":109
  *     cached_node = hash_table_search(hash_table, f)
  *     if cached_node != NULL:
  *         return cached_node             # <<<<<<<<<<<<<<
@@ -1970,7 +1970,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
     __pyx_r = __pyx_v_cached_node;
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":105
+    /* "ethics/extensions/mhs.pyx":108
  * 
  *     cached_node = hash_table_search(hash_table, f)
  *     if cached_node != NULL:             # <<<<<<<<<<<<<<
@@ -1979,7 +1979,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":108
+  /* "ethics/extensions/mhs.pyx":111
  *         return cached_node
  * 
  *     r = Cudd_zddUnion(zdd, Cudd_E(f), Cudd_T(f))             # <<<<<<<<<<<<<<
@@ -1988,7 +1988,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_r = Cudd_zddUnion(__pyx_v_zdd, Cudd_E(__pyx_v_f), Cudd_T(__pyx_v_f));
 
-  /* "ethics/extensions/mhs.pyx":109
+  /* "ethics/extensions/mhs.pyx":112
  * 
  *     r = Cudd_zddUnion(zdd, Cudd_E(f), Cudd_T(f))
  *     Cudd_Ref(r)             # <<<<<<<<<<<<<<
@@ -1997,7 +1997,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   Cudd_Ref(__pyx_v_r);
 
-  /* "ethics/extensions/mhs.pyx":111
+  /* "ethics/extensions/mhs.pyx":114
  *     Cudd_Ref(r)
  * 
  *     r_low = _mhs(zdd, r, hash_table)             # <<<<<<<<<<<<<<
@@ -2006,7 +2006,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_r_low = __pyx_f_6ethics_10extensions_3mhs__mhs(__pyx_v_zdd, __pyx_v_r, __pyx_v_hash_table);
 
-  /* "ethics/extensions/mhs.pyx":112
+  /* "ethics/extensions/mhs.pyx":115
  * 
  *     r_low = _mhs(zdd, r, hash_table)
  *     Cudd_Ref(r_low)             # <<<<<<<<<<<<<<
@@ -2015,7 +2015,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   Cudd_Ref(__pyx_v_r_low);
 
-  /* "ethics/extensions/mhs.pyx":114
+  /* "ethics/extensions/mhs.pyx":117
  *     Cudd_Ref(r_low)
  * 
  *     r_tmp = _mhs(zdd, Cudd_E(f), hash_table)             # <<<<<<<<<<<<<<
@@ -2024,7 +2024,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_r_tmp = __pyx_f_6ethics_10extensions_3mhs__mhs(__pyx_v_zdd, Cudd_E(__pyx_v_f), __pyx_v_hash_table);
 
-  /* "ethics/extensions/mhs.pyx":115
+  /* "ethics/extensions/mhs.pyx":118
  * 
  *     r_tmp = _mhs(zdd, Cudd_E(f), hash_table)
  *     Cudd_Ref(r_tmp)             # <<<<<<<<<<<<<<
@@ -2033,7 +2033,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   Cudd_Ref(__pyx_v_r_tmp);
 
-  /* "ethics/extensions/mhs.pyx":116
+  /* "ethics/extensions/mhs.pyx":119
  *     r_tmp = _mhs(zdd, Cudd_E(f), hash_table)
  *     Cudd_Ref(r_tmp)
  *     Cudd_RecursiveDerefZdd(zdd, r)             # <<<<<<<<<<<<<<
@@ -2042,7 +2042,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   (void)(Cudd_RecursiveDerefZdd(__pyx_v_zdd, __pyx_v_r));
 
-  /* "ethics/extensions/mhs.pyx":117
+  /* "ethics/extensions/mhs.pyx":120
  *     Cudd_Ref(r_tmp)
  *     Cudd_RecursiveDerefZdd(zdd, r)
  *     r = r_tmp             # <<<<<<<<<<<<<<
@@ -2051,7 +2051,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_r = __pyx_v_r_tmp;
 
-  /* "ethics/extensions/mhs.pyx":119
+  /* "ethics/extensions/mhs.pyx":122
  *     r = r_tmp
  * 
  *     r_high = _difference(zdd, r, r_low)             # <<<<<<<<<<<<<<
@@ -2060,45 +2060,17 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_r_high = __pyx_f_6ethics_10extensions_3mhs__difference(__pyx_v_zdd, __pyx_v_r, __pyx_v_r_low);
 
-  /* "ethics/extensions/mhs.pyx":120
+  /* "ethics/extensions/mhs.pyx":123
  * 
  *     r_high = _difference(zdd, r, r_low)
  *     Cudd_Ref(r_high)             # <<<<<<<<<<<<<<
  * 
- *     if Cudd_NodeReadIndex(f) != f.index:
+ *     cdef int f_index = Cudd_NodeReadIndex(f)
  */
   Cudd_Ref(__pyx_v_r_high);
 
-  /* "ethics/extensions/mhs.pyx":122
+  /* "ethics/extensions/mhs.pyx":125
  *     Cudd_Ref(r_high)
- * 
- *     if Cudd_NodeReadIndex(f) != f.index:             # <<<<<<<<<<<<<<
- *         printf("NOT EQUAL\n")
- * 
- */
-  __pyx_t_1 = ((Cudd_NodeReadIndex(__pyx_v_f) != __pyx_v_f->index) != 0);
-  if (__pyx_t_1) {
-
-    /* "ethics/extensions/mhs.pyx":123
- * 
- *     if Cudd_NodeReadIndex(f) != f.index:
- *         printf("NOT EQUAL\n")             # <<<<<<<<<<<<<<
- * 
- * 
- */
-    (void)(printf(((char const *)"NOT EQUAL\n")));
-
-    /* "ethics/extensions/mhs.pyx":122
- *     Cudd_Ref(r_high)
- * 
- *     if Cudd_NodeReadIndex(f) != f.index:             # <<<<<<<<<<<<<<
- *         printf("NOT EQUAL\n")
- * 
- */
-  }
-
-  /* "ethics/extensions/mhs.pyx":126
- * 
  * 
  *     cdef int f_index = Cudd_NodeReadIndex(f)             # <<<<<<<<<<<<<<
  * 
@@ -2106,7 +2078,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_f_index = Cudd_NodeReadIndex(__pyx_v_f);
 
-  /* "ethics/extensions/mhs.pyx":128
+  /* "ethics/extensions/mhs.pyx":127
  *     cdef int f_index = Cudd_NodeReadIndex(f)
  * 
  *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)             # <<<<<<<<<<<<<<
@@ -2115,7 +2087,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   __pyx_v_unique_node = cuddZddGetNode(__pyx_v_zdd, __pyx_v_f_index, __pyx_v_r_high, __pyx_v_r_low);
 
-  /* "ethics/extensions/mhs.pyx":130
+  /* "ethics/extensions/mhs.pyx":129
  *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
  * 
  *     if unique_node.ref == 0:             # <<<<<<<<<<<<<<
@@ -2125,7 +2097,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   __pyx_t_1 = ((__pyx_v_unique_node->ref == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":131
+    /* "ethics/extensions/mhs.pyx":130
  * 
  *     if unique_node.ref == 0:
  *         Cudd_Ref(unique_node)             # <<<<<<<<<<<<<<
@@ -2134,7 +2106,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
     Cudd_Ref(__pyx_v_unique_node);
 
-    /* "ethics/extensions/mhs.pyx":130
+    /* "ethics/extensions/mhs.pyx":129
  *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
  * 
  *     if unique_node.ref == 0:             # <<<<<<<<<<<<<<
@@ -2143,7 +2115,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":133
+  /* "ethics/extensions/mhs.pyx":132
  *         Cudd_Ref(unique_node)
  * 
  *     Cudd_Ref(unique_node)             # <<<<<<<<<<<<<<
@@ -2152,18 +2124,18 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
  */
   Cudd_Ref(__pyx_v_unique_node);
 
-  /* "ethics/extensions/mhs.pyx":135
+  /* "ethics/extensions/mhs.pyx":134
  *     Cudd_Ref(unique_node)
  * 
  *     hash_table_insert(hash_table, f, unique_node)             # <<<<<<<<<<<<<<
  * 
  *     return unique_node
  */
-  __pyx_t_2 = __pyx_f_6ethics_10extensions_3mhs_hash_table_insert(__pyx_v_hash_table, __pyx_v_f, __pyx_v_unique_node); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_6ethics_10extensions_3mhs_hash_table_insert(__pyx_v_hash_table, __pyx_v_f, __pyx_v_unique_node); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ethics/extensions/mhs.pyx":137
+  /* "ethics/extensions/mhs.pyx":136
  *     hash_table_insert(hash_table, f, unique_node)
  * 
  *     return unique_node             # <<<<<<<<<<<<<<
@@ -2173,12 +2145,12 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   __pyx_r = __pyx_v_unique_node;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":88
- * 
+  /* "ethics/extensions/mhs.pyx":86
+ *     return NULL
  * 
  * cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):             # <<<<<<<<<<<<<<
- *     cdef DdNode *r
- *     cdef DdNode *r_low
+ *     """Implementation of Knuth's algorithm as explained in
+ *     The Art of Computer Programming Volume 4A, Combinatorical Algorithms Part 1.
  */
 
   /* function exit code */
@@ -2191,15 +2163,16 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__mhs(DdManager *__pyx_v_zdd, Dd
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":139
+/* "ethics/extensions/mhs.pyx":138
  *     return unique_node
  * 
  * cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):             # <<<<<<<<<<<<<<
- *     if g == Cudd_ReadZero(zdd):
- *         return f
+ *     cdef DdNode *unique_node
+ * 
  */
 
 static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_zdd, DdNode *__pyx_v_f, DdNode *__pyx_v_g) {
+  DdNode *__pyx_v_unique_node;
   int __pyx_v_f_index;
   int __pyx_v_g_index;
   DdNode *__pyx_v_r_high;
@@ -2210,9 +2183,9 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("_difference", 0);
 
-  /* "ethics/extensions/mhs.pyx":140
+  /* "ethics/extensions/mhs.pyx":141
+ *     cdef DdNode *unique_node
  * 
- * cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):
  *     if g == Cudd_ReadZero(zdd):             # <<<<<<<<<<<<<<
  *         return f
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:
@@ -2220,8 +2193,8 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   __pyx_t_1 = ((__pyx_v_g == Cudd_ReadZero(__pyx_v_zdd)) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":141
- * cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):
+    /* "ethics/extensions/mhs.pyx":142
+ * 
  *     if g == Cudd_ReadZero(zdd):
  *         return f             # <<<<<<<<<<<<<<
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:
@@ -2230,16 +2203,16 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
     __pyx_r = __pyx_v_f;
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":140
+    /* "ethics/extensions/mhs.pyx":141
+ *     cdef DdNode *unique_node
  * 
- * cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):
  *     if g == Cudd_ReadZero(zdd):             # <<<<<<<<<<<<<<
  *         return f
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":142
+  /* "ethics/extensions/mhs.pyx":143
  *     if g == Cudd_ReadZero(zdd):
  *         return f
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:             # <<<<<<<<<<<<<<
@@ -2263,7 +2236,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":143
+    /* "ethics/extensions/mhs.pyx":144
  *         return f
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:
  *         return Cudd_ReadZero(zdd)             # <<<<<<<<<<<<<<
@@ -2273,7 +2246,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
     __pyx_r = Cudd_ReadZero(__pyx_v_zdd);
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":142
+    /* "ethics/extensions/mhs.pyx":143
  *     if g == Cudd_ReadZero(zdd):
  *         return f
  *     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:             # <<<<<<<<<<<<<<
@@ -2282,7 +2255,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":145
+  /* "ethics/extensions/mhs.pyx":146
  *         return Cudd_ReadZero(zdd)
  * 
  *     cdef int f_index = Cudd_NodeReadIndex(f)             # <<<<<<<<<<<<<<
@@ -2291,7 +2264,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
   __pyx_v_f_index = Cudd_NodeReadIndex(__pyx_v_f);
 
-  /* "ethics/extensions/mhs.pyx":146
+  /* "ethics/extensions/mhs.pyx":147
  * 
  *     cdef int f_index = Cudd_NodeReadIndex(f)
  *     cdef int g_index = Cudd_NodeReadIndex(g)             # <<<<<<<<<<<<<<
@@ -2300,7 +2273,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
   __pyx_v_g_index = Cudd_NodeReadIndex(__pyx_v_g);
 
-  /* "ethics/extensions/mhs.pyx":148
+  /* "ethics/extensions/mhs.pyx":149
  *     cdef int g_index = Cudd_NodeReadIndex(g)
  * 
  *     if f_index > g_index:             # <<<<<<<<<<<<<<
@@ -2310,7 +2283,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   __pyx_t_1 = ((__pyx_v_f_index > __pyx_v_g_index) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":149
+    /* "ethics/extensions/mhs.pyx":150
  * 
  *     if f_index > g_index:
  *         return _difference(zdd, f, Cudd_E(g))             # <<<<<<<<<<<<<<
@@ -2320,7 +2293,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
     __pyx_r = __pyx_f_6ethics_10extensions_3mhs__difference(__pyx_v_zdd, __pyx_v_f, Cudd_E(__pyx_v_g));
     goto __pyx_L0;
 
-    /* "ethics/extensions/mhs.pyx":148
+    /* "ethics/extensions/mhs.pyx":149
  *     cdef int g_index = Cudd_NodeReadIndex(g)
  * 
  *     if f_index > g_index:             # <<<<<<<<<<<<<<
@@ -2329,7 +2302,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
   }
 
-  /* "ethics/extensions/mhs.pyx":154
+  /* "ethics/extensions/mhs.pyx":155
  *     cdef DdNode *r_low
  * 
  *     if f_index < g_index:             # <<<<<<<<<<<<<<
@@ -2339,7 +2312,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   __pyx_t_1 = ((__pyx_v_f_index < __pyx_v_g_index) != 0);
   if (__pyx_t_1) {
 
-    /* "ethics/extensions/mhs.pyx":155
+    /* "ethics/extensions/mhs.pyx":156
  * 
  *     if f_index < g_index:
  *         r_low = _difference(zdd, Cudd_E(f), g)             # <<<<<<<<<<<<<<
@@ -2348,7 +2321,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
     __pyx_v_r_low = __pyx_f_6ethics_10extensions_3mhs__difference(__pyx_v_zdd, Cudd_E(__pyx_v_f), __pyx_v_g);
 
-    /* "ethics/extensions/mhs.pyx":156
+    /* "ethics/extensions/mhs.pyx":157
  *     if f_index < g_index:
  *         r_low = _difference(zdd, Cudd_E(f), g)
  *         r_high = Cudd_T(f)             # <<<<<<<<<<<<<<
@@ -2357,7 +2330,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
  */
     __pyx_v_r_high = Cudd_T(__pyx_v_f);
 
-    /* "ethics/extensions/mhs.pyx":154
+    /* "ethics/extensions/mhs.pyx":155
  *     cdef DdNode *r_low
  * 
  *     if f_index < g_index:             # <<<<<<<<<<<<<<
@@ -2367,7 +2340,7 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
     goto __pyx_L9;
   }
 
-  /* "ethics/extensions/mhs.pyx":158
+  /* "ethics/extensions/mhs.pyx":159
  *         r_high = Cudd_T(f)
  *     else:
  *         r_low = _difference(zdd, Cudd_E(f), Cudd_E(g))             # <<<<<<<<<<<<<<
@@ -2377,33 +2350,70 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   /*else*/ {
     __pyx_v_r_low = __pyx_f_6ethics_10extensions_3mhs__difference(__pyx_v_zdd, Cudd_E(__pyx_v_f), Cudd_E(__pyx_v_g));
 
-    /* "ethics/extensions/mhs.pyx":159
+    /* "ethics/extensions/mhs.pyx":160
  *     else:
  *         r_low = _difference(zdd, Cudd_E(f), Cudd_E(g))
  *         r_high = _difference(zdd, Cudd_T(f), Cudd_T(g))             # <<<<<<<<<<<<<<
  * 
- *     return cuddZddGetNode(zdd, f_index, r_high, r_low)
+ *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
  */
     __pyx_v_r_high = __pyx_f_6ethics_10extensions_3mhs__difference(__pyx_v_zdd, Cudd_T(__pyx_v_f), Cudd_T(__pyx_v_g));
   }
   __pyx_L9:;
 
-  /* "ethics/extensions/mhs.pyx":161
+  /* "ethics/extensions/mhs.pyx":162
  *         r_high = _difference(zdd, Cudd_T(f), Cudd_T(g))
  * 
- *     return cuddZddGetNode(zdd, f_index, r_high, r_low)             # <<<<<<<<<<<<<<
+ *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)             # <<<<<<<<<<<<<<
+ * 
+ *     if unique_node.ref == 0:
+ */
+  __pyx_v_unique_node = cuddZddGetNode(__pyx_v_zdd, __pyx_v_f_index, __pyx_v_r_high, __pyx_v_r_low);
+
+  /* "ethics/extensions/mhs.pyx":164
+ *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
+ * 
+ *     if unique_node.ref == 0:             # <<<<<<<<<<<<<<
+ *         Cudd_Ref(unique_node)
+ * 
+ */
+  __pyx_t_1 = ((__pyx_v_unique_node->ref == 0) != 0);
+  if (__pyx_t_1) {
+
+    /* "ethics/extensions/mhs.pyx":165
+ * 
+ *     if unique_node.ref == 0:
+ *         Cudd_Ref(unique_node)             # <<<<<<<<<<<<<<
+ * 
+ *     return unique_node
+ */
+    Cudd_Ref(__pyx_v_unique_node);
+
+    /* "ethics/extensions/mhs.pyx":164
+ *     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
+ * 
+ *     if unique_node.ref == 0:             # <<<<<<<<<<<<<<
+ *         Cudd_Ref(unique_node)
+ * 
+ */
+  }
+
+  /* "ethics/extensions/mhs.pyx":167
+ *         Cudd_Ref(unique_node)
+ * 
+ *     return unique_node             # <<<<<<<<<<<<<<
  * 
  * cdef object get_paths(DdManager *zdd, DdNode *top_node):
  */
-  __pyx_r = cuddZddGetNode(__pyx_v_zdd, __pyx_v_f_index, __pyx_v_r_high, __pyx_v_r_low);
+  __pyx_r = __pyx_v_unique_node;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":139
+  /* "ethics/extensions/mhs.pyx":138
  *     return unique_node
  * 
  * cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):             # <<<<<<<<<<<<<<
- *     if g == Cudd_ReadZero(zdd):
- *         return f
+ *     cdef DdNode *unique_node
+ * 
  */
 
   /* function exit code */
@@ -2412,8 +2422,8 @@ static DdNode *__pyx_f_6ethics_10extensions_3mhs__difference(DdManager *__pyx_v_
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":163
- *     return cuddZddGetNode(zdd, f_index, r_high, r_low)
+/* "ethics/extensions/mhs.pyx":169
+ *     return unique_node
  * 
  * cdef object get_paths(DdManager *zdd, DdNode *top_node):             # <<<<<<<<<<<<<<
  *     paths = []
@@ -2437,19 +2447,19 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("get_paths", 0);
 
-  /* "ethics/extensions/mhs.pyx":164
+  /* "ethics/extensions/mhs.pyx":170
  * 
  * cdef object get_paths(DdManager *zdd, DdNode *top_node):
  *     paths = []             # <<<<<<<<<<<<<<
  * 
  *     cdef int* path
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_paths = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "ethics/extensions/mhs.pyx":167
+  /* "ethics/extensions/mhs.pyx":173
  * 
  *     cdef int* path
  *     cdef int path_size = Cudd_ReadZddSize(zdd)             # <<<<<<<<<<<<<<
@@ -2458,7 +2468,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
  */
   __pyx_v_path_size = Cudd_ReadZddSize(__pyx_v_zdd);
 
-  /* "ethics/extensions/mhs.pyx":168
+  /* "ethics/extensions/mhs.pyx":174
  *     cdef int* path
  *     cdef int path_size = Cudd_ReadZddSize(zdd)
  *     cdef DdGen* generator = Cudd_zddFirstPath(zdd, top_node, &path)             # <<<<<<<<<<<<<<
@@ -2467,7 +2477,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
  */
   __pyx_v_generator = Cudd_zddFirstPath(__pyx_v_zdd, __pyx_v_top_node, (&__pyx_v_path));
 
-  /* "ethics/extensions/mhs.pyx":171
+  /* "ethics/extensions/mhs.pyx":177
  * 
  *     cdef int index
  *     while True:             # <<<<<<<<<<<<<<
@@ -2476,28 +2486,28 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
  */
   while (1) {
 
-    /* "ethics/extensions/mhs.pyx":172
+    /* "ethics/extensions/mhs.pyx":178
  *     cdef int index
  *     while True:
  *         new_path = []             # <<<<<<<<<<<<<<
  *         paths.append(new_path)
  *         for index in range(0, path_size):
  */
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_XDECREF_SET(__pyx_v_new_path, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "ethics/extensions/mhs.pyx":173
+    /* "ethics/extensions/mhs.pyx":179
  *     while True:
  *         new_path = []
  *         paths.append(new_path)             # <<<<<<<<<<<<<<
  *         for index in range(0, path_size):
  *             if path[index] == 1:
  */
-    __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_paths, __pyx_v_new_path); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_paths, __pyx_v_new_path); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 179, __pyx_L1_error)
 
-    /* "ethics/extensions/mhs.pyx":174
+    /* "ethics/extensions/mhs.pyx":180
  *         new_path = []
  *         paths.append(new_path)
  *         for index in range(0, path_size):             # <<<<<<<<<<<<<<
@@ -2509,7 +2519,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
     for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
       __pyx_v_index = __pyx_t_5;
 
-      /* "ethics/extensions/mhs.pyx":175
+      /* "ethics/extensions/mhs.pyx":181
  *         paths.append(new_path)
  *         for index in range(0, path_size):
  *             if path[index] == 1:             # <<<<<<<<<<<<<<
@@ -2519,19 +2529,19 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
       __pyx_t_6 = (((__pyx_v_path[__pyx_v_index]) == 1) != 0);
       if (__pyx_t_6) {
 
-        /* "ethics/extensions/mhs.pyx":176
+        /* "ethics/extensions/mhs.pyx":182
  *         for index in range(0, path_size):
  *             if path[index] == 1:
  *                 new_path.append(index)             # <<<<<<<<<<<<<<
  * 
  *         if not Cudd_zddNextPath(generator, &path):
  */
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_new_path, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 176, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_new_path, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "ethics/extensions/mhs.pyx":175
+        /* "ethics/extensions/mhs.pyx":181
  *         paths.append(new_path)
  *         for index in range(0, path_size):
  *             if path[index] == 1:             # <<<<<<<<<<<<<<
@@ -2541,7 +2551,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
       }
     }
 
-    /* "ethics/extensions/mhs.pyx":178
+    /* "ethics/extensions/mhs.pyx":184
  *                 new_path.append(index)
  * 
  *         if not Cudd_zddNextPath(generator, &path):             # <<<<<<<<<<<<<<
@@ -2551,16 +2561,16 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
     __pyx_t_6 = ((!(Cudd_zddNextPath(__pyx_v_generator, (&__pyx_v_path)) != 0)) != 0);
     if (__pyx_t_6) {
 
-      /* "ethics/extensions/mhs.pyx":179
+      /* "ethics/extensions/mhs.pyx":185
  * 
  *         if not Cudd_zddNextPath(generator, &path):
  *             break             # <<<<<<<<<<<<<<
  * 
- *     return paths
+ *     #Cudd_GenFree(generator)
  */
       goto __pyx_L4_break;
 
-      /* "ethics/extensions/mhs.pyx":178
+      /* "ethics/extensions/mhs.pyx":184
  *                 new_path.append(index)
  * 
  *         if not Cudd_zddNextPath(generator, &path):             # <<<<<<<<<<<<<<
@@ -2571,9 +2581,9 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
   }
   __pyx_L4_break:;
 
-  /* "ethics/extensions/mhs.pyx":181
- *             break
+  /* "ethics/extensions/mhs.pyx":188
  * 
+ *     #Cudd_GenFree(generator)
  *     return paths             # <<<<<<<<<<<<<<
  * 
  * 
@@ -2583,8 +2593,8 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
   __pyx_r = __pyx_v_paths;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":163
- *     return cuddZddGetNode(zdd, f_index, r_high, r_low)
+  /* "ethics/extensions/mhs.pyx":169
+ *     return unique_node
  * 
  * cdef object get_paths(DdManager *zdd, DdNode *top_node):             # <<<<<<<<<<<<<<
  *     paths = []
@@ -2604,7 +2614,7 @@ static PyObject *__pyx_f_6ethics_10extensions_3mhs_get_paths(DdManager *__pyx_v_
   return __pyx_r;
 }
 
-/* "ethics/extensions/mhs.pyx":184
+/* "ethics/extensions/mhs.pyx":191
  * 
  * 
  * def mhs(family):             # <<<<<<<<<<<<<<
@@ -2637,7 +2647,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("mhs", 0);
 
-  /* "ethics/extensions/mhs.pyx":185
+  /* "ethics/extensions/mhs.pyx":192
  * 
  * def mhs(family):
  *     cdef DdManager *zdd = Cudd_Init(0, 0, 0, 0, 0)             # <<<<<<<<<<<<<<
@@ -2646,7 +2656,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   __pyx_v_zdd = Cudd_Init(0, 0, 0, 0, 0);
 
-  /* "ethics/extensions/mhs.pyx":187
+  /* "ethics/extensions/mhs.pyx":194
  *     cdef DdManager *zdd = Cudd_Init(0, 0, 0, 0, 0)
  * 
  *     cdef DdNode *family_rep = parse_family(zdd, family)             # <<<<<<<<<<<<<<
@@ -2655,7 +2665,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   __pyx_v_family_rep = __pyx_f_6ethics_10extensions_6parser_parse_family(__pyx_v_zdd, __pyx_v_family);
 
-  /* "ethics/extensions/mhs.pyx":188
+  /* "ethics/extensions/mhs.pyx":195
  * 
  *     cdef DdNode *family_rep = parse_family(zdd, family)
  *     cdef HashTable *hash_table = create_hash_table()             # <<<<<<<<<<<<<<
@@ -2664,7 +2674,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   __pyx_v_hash_table = __pyx_f_6ethics_10extensions_3mhs_create_hash_table();
 
-  /* "ethics/extensions/mhs.pyx":189
+  /* "ethics/extensions/mhs.pyx":196
  *     cdef DdNode *family_rep = parse_family(zdd, family)
  *     cdef HashTable *hash_table = create_hash_table()
  *     cdef DdNode *mhs = _mhs(zdd, family_rep, hash_table)             # <<<<<<<<<<<<<<
@@ -2673,19 +2683,19 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   __pyx_v_mhs = __pyx_f_6ethics_10extensions_3mhs__mhs(__pyx_v_zdd, __pyx_v_family_rep, __pyx_v_hash_table);
 
-  /* "ethics/extensions/mhs.pyx":190
+  /* "ethics/extensions/mhs.pyx":197
  *     cdef HashTable *hash_table = create_hash_table()
  *     cdef DdNode *mhs = _mhs(zdd, family_rep, hash_table)
  *     paths = get_paths(zdd, mhs)             # <<<<<<<<<<<<<<
  * 
  *     hash_table_delete(hash_table)
  */
-  __pyx_t_1 = __pyx_f_6ethics_10extensions_3mhs_get_paths(__pyx_v_zdd, __pyx_v_mhs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6ethics_10extensions_3mhs_get_paths(__pyx_v_zdd, __pyx_v_mhs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_paths = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "ethics/extensions/mhs.pyx":192
+  /* "ethics/extensions/mhs.pyx":199
  *     paths = get_paths(zdd, mhs)
  * 
  *     hash_table_delete(hash_table)             # <<<<<<<<<<<<<<
@@ -2694,7 +2704,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   __pyx_f_6ethics_10extensions_3mhs_hash_table_delete(__pyx_v_hash_table);
 
-  /* "ethics/extensions/mhs.pyx":193
+  /* "ethics/extensions/mhs.pyx":200
  * 
  *     hash_table_delete(hash_table)
  *     Cudd_Quit(zdd)             # <<<<<<<<<<<<<<
@@ -2703,7 +2713,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
  */
   Cudd_Quit(__pyx_v_zdd);
 
-  /* "ethics/extensions/mhs.pyx":195
+  /* "ethics/extensions/mhs.pyx":202
  *     Cudd_Quit(zdd)
  * 
  *     return paths             # <<<<<<<<<<<<<<
@@ -2713,7 +2723,7 @@ static PyObject *__pyx_pf_6ethics_10extensions_3mhs_mhs(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_paths;
   goto __pyx_L0;
 
-  /* "ethics/extensions/mhs.pyx":184
+  /* "ethics/extensions/mhs.pyx":191
  * 
  * 
  * def mhs(family):             # <<<<<<<<<<<<<<
@@ -2795,7 +2805,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 32, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2805,17 +2815,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "ethics/extensions/mhs.pyx":184
+  /* "ethics/extensions/mhs.pyx":191
  * 
  * 
  * def mhs(family):             # <<<<<<<<<<<<<<
  *     cdef DdManager *zdd = Cudd_Init(0, 0, 0, 0, 0)
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(6, __pyx_n_s_family, __pyx_n_s_zdd, __pyx_n_s_family_rep, __pyx_n_s_hash_table, __pyx_n_s_mhs, __pyx_n_s_paths); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(6, __pyx_n_s_family, __pyx_n_s_zdd, __pyx_n_s_family_rep, __pyx_n_s_hash_table, __pyx_n_s_mhs, __pyx_n_s_paths); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ethics_extensions_mhs_pyx, __pyx_n_s_mhs, 184, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ethics_extensions_mhs_pyx, __pyx_n_s_mhs, 191, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -3099,25 +3109,25 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "ethics/extensions/mhs.pyx":9
+  /* "ethics/extensions/mhs.pyx":8
+ * from libc.stdint cimport uintptr_t, uint64_t
  * 
- * #cdef HASH_TABLE_SIZE = 500000
  * cdef uint64_t HASH_TABLE_SIZE = 500000 # 2^40             # <<<<<<<<<<<<<<
  * ctypedef unsigned int UInt
  * 
  */
   __pyx_v_6ethics_10extensions_3mhs_HASH_TABLE_SIZE = 0x7A120;
 
-  /* "ethics/extensions/mhs.pyx":184
+  /* "ethics/extensions/mhs.pyx":191
  * 
  * 
  * def mhs(family):             # <<<<<<<<<<<<<<
  *     cdef DdManager *zdd = Cudd_Init(0, 0, 0, 0, 0)
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6ethics_10extensions_3mhs_1mhs, NULL, __pyx_n_s_ethics_extensions_mhs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6ethics_10extensions_3mhs_1mhs, NULL, __pyx_n_s_ethics_extensions_mhs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mhs, __pyx_t_1) < 0) __PYX_ERR(0, 184, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mhs, __pyx_t_1) < 0) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "ethics/extensions/mhs.pyx":1

@@ -19,6 +19,10 @@ cdef extern from 'cuddInt.h':
         DdManager *unique, int index, DdNode *T, DdNode *E)
 
 cdef extern from 'cudd.h':
+
+    ctypedef enum Cudd_ReorderingType:
+        pass
+
     ctypedef unsigned int DdHalfWord
     cdef struct DdNode:
         DdHalfWord index
@@ -71,5 +75,20 @@ cdef extern from 'cudd.h':
     cdef DdNode * cuddZddGetNode(DdManager * zdd, int id, DdNode *T, DdNode *E)
     cdef int Cudd_zddDumpDot(DdManager *dd, int n, DdNode **f, char **inames, char **onames, FILE *fp)
     cdef DdNode *Cudd_ReadOne(DdManager *dd)
-    cdef DdNode * Cudd_ReadZero(DdManager * dd)
+    cdef DdNode *Cudd_ReadZero(DdManager * dd)
     cdef int Cudd_ReadZddSize(DdManager * dd)
+
+    # BDD Manipulation
+    cdef DdNode *Cudd_bddIthVar(DdManager * dd, int i)
+    cdef DdNode *Cudd_bddAnd(DdManager *dd, DdNode *f, DdNode *g)
+    cdef DdNode *Cudd_bddOr(DdManager *dd, DdNode *f, DdNode *g)
+    cdef DdNode *Cudd_Not(DdNode *dd)
+    cdef void Cudd_Deref(DdNode *node)
+    cdef void Cudd_RecursiveDeref(DdManager *table, DdNode *n)
+    cdef DdNode * Cudd_bddIte(DdManager *dd, DdNode *f, DdNode *g, DdNode *h)
+    cdef DdGen *Cudd_FirstCube(DdManager *dd, DdNode *f, int **cube, double *value)
+    cdef int Cudd_NextCube(DdGen *gen, int **cube, double *value)
+    cdef int Cudd_GenFree(DdGen *gen)
+    cdef int Cudd_ReadSize(DdManager *dd)
+    cdef int Cudd_IsGenEmpty(DdGen *gen)
+    cdef int Cudd_ReduceHeap(DdManager *table, Cudd_ReorderingType heuristic, int  minsize)

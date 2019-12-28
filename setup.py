@@ -1,7 +1,6 @@
 from setuptools import setup
 from setuptools.command.install import install
 from distutils.core import Extension
-#import zipfile
 import tarfile
 import requests
 import subprocess
@@ -125,6 +124,15 @@ PARSER_EXTENSION = Extension(name="ethics.extensions.parser",
                              extra_compile_args=CUDD_COMPILE_ARGUMENTS,
                              )
 
+SAT_EXTENSION = Extension(name="ethics.extensions.sat",
+                          sources=[os.path.join(
+                              EXT_FILES_PATH, 'sat' + SOURCE_EXTENSION)],
+                          libraries=CUDD_LIB,
+                          include_dirs=CUDD_INCLUDE,
+                          library_dirs=CUDD_LINKS,
+                          extra_compile_args=CUDD_COMPILE_ARGUMENTS,
+                          )
+
 OLD_MHS_EXTENSION = Extension(name='ethics.extensions.mhsModule',
                               sources=['ethics/extensions/mhsModule.cpp'],
                               extra_compile_args=['-std=c++11'],
@@ -132,8 +140,10 @@ OLD_MHS_EXTENSION = Extension(name='ethics.extensions.mhsModule',
                               )
 
 # SETUP
-EXTENSIONS = [MHS_EXTENSION, PARSER_EXTENSION, OLD_MHS_EXTENSION]
-EXT_MODULES = cythonize(EXTENSIONS) if USE_CYTHON else EXTENSIONS
+EXTENSIONS = [MHS_EXTENSION, PARSER_EXTENSION,
+              OLD_MHS_EXTENSION, SAT_EXTENSION]
+EXT_MODULES = cythonize(
+    EXTENSIONS) if CYTHON_AVAILABLE and USE_CYTHON else EXTENSIONS
 
 setup(name='ethics',
       version='0.22.3',

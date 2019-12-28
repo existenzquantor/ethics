@@ -34,12 +34,36 @@ class TestPrimes(unittest.TestCase):
         result = self.sortedResult(pc.compile())
         self.assertEqual(result, ([['a']], [['a']]))
 
+    def test_basic_negated(self):
+        pc = PrimeCompilator(Not(Atom("a")))
+
+        result = self.sortedResult(pc.compile())
+        self.assertEqual(result, ([[Not('a')]], [[Not('a')]]))
+
+    def test_basic_2(self):
+        pc = PrimeCompilator(Or("a", And("b", "c")))
+        result = self.sortedResult(pc.compile())
+        self.assertEqual(
+            result, ([["a"], ["b", "c"]], [["a", "b"], ["a", "c"]]))
+
     def test_empty(self):
         pc = PrimeCompilator(And(Atom("a"), Not(Atom('a'))))
 
         result = self.sortedResult(pc.compile())
 
         self.assertEqual(result, ([], []))  # not satisfiable
+
+    def test_conjunction(self):
+        pc = PrimeCompilator(Formula.makeConjunction(["a", "b", "c", "d"]))
+        result = self.sortedResult(pc.compile())
+        self.assertEqual(result, ([["a", "b", "c", "d"]], [
+                         ["a"], ["b"], ["c"], ["d"]]))
+
+    def test_disjunction(self):
+        pc = PrimeCompilator(Formula.makeDisjunction(["a", "b", "c", "d"]))
+        result = self.sortedResult(pc.compile())
+        self.assertEqual(
+            result, ([["a"], ["b"], ["c"], ["d"]], [["a", "b", "c", "d"]]))
 
     def test_non_boolean(self):
         pc = PrimeCompilator(Good(Atom("a")))
@@ -66,7 +90,7 @@ class TestPrimes(unittest.TestCase):
             Atom("b")))), Atom("c")), And(Atom("b"), Atom("c"))).getNegation())
 
         result = self.sortedResult(pc.compile())
-        #result = (sorted(result[0], key=lambda i: str(i)), sorted(result[1], key=lambda i: str(i)))
+        # result = (sorted(result[0], key=lambda i: str(i)), sorted(result[1], key=lambda i: str(i)))
 
         self.assertEqual(result, ([[Not('a'), Not('b')], [Not('c')]], [
                          [Not('a'), Not('c')], [Not('b'), Not('c')]]))
@@ -76,7 +100,7 @@ class TestPrimes(unittest.TestCase):
 
         pc = PrimeCompilator(formula)
         result = self.sortedResult(pc.compile())
-        #result = (sorted(result[0], key=lambda i: str(i)), sorted(result[1], key=lambda i: str(i)))
+        # result = (sorted(result[0], key=lambda i: str(i)), sorted(result[1], key=lambda i: str(i)))
 
         self.assertEqual(result[0], [['a', 'b'], [Not('a'), Not('b')]])
         self.assertEqual(result[1], [[Not('a'), 'b'], [Not('b'), 'a']])

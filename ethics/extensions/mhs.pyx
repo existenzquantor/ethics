@@ -5,7 +5,6 @@ from libc.limits cimport INT_MAX
 from libc.time cimport clock,clock_t,CLOCKS_PER_SEC
 from libc.stdint cimport uintptr_t, uint64_t
 
-#cdef HASH_TABLE_SIZE = 500000
 cdef uint64_t HASH_TABLE_SIZE = 500000 # 2^40
 ctypedef unsigned int UInt
 
@@ -84,12 +83,10 @@ cdef DdNode* hash_table_search(HashTable *table, DdNode *key_node):
     
     return NULL
 
-
-
 cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):
     """Implementation of Knuth's algorithm as explained in 
     The Art of Computer Programming Volume 4A, Combinatorical Algorithms Part 1.
-    This version also incorportates a modification proposed by Takeo Imai (2015):
+    This version also incorporates a modification proposed by Takeo Imai (2015):
     https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_action_common_download&item_id=145832&item_no=1&attribute_id=1&file_no=1
     """
     cdef DdNode *r
@@ -125,10 +122,6 @@ cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):
     r_high = _difference(zdd, r, r_low)
     Cudd_Ref(r_high)
 
-    if Cudd_NodeReadIndex(f) != f.index:
-        printf("NOT EQUAL\n")
-
-
     cdef int f_index = Cudd_NodeReadIndex(f)
 
     unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
@@ -143,6 +136,8 @@ cdef DdNode* _mhs(DdManager *zdd, DdNode *f, HashTable *hash_table):
     return unique_node
 
 cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):
+    cdef DdNode *unique_node
+
     if g == Cudd_ReadZero(zdd):
         return f
     if f == Cudd_ReadZero(zdd) or g == Cudd_ReadOne(zdd) or f == g:
@@ -164,7 +159,12 @@ cdef DdNode* _difference(DdManager *zdd, DdNode *f, DdNode *g):
         r_low = _difference(zdd, Cudd_E(f), Cudd_E(g))
         r_high = _difference(zdd, Cudd_T(f), Cudd_T(g))
 
-    return cuddZddGetNode(zdd, f_index, r_high, r_low)
+    unique_node = cuddZddGetNode(zdd, f_index, r_high, r_low)
+
+    if unique_node.ref == 0:
+        Cudd_Ref(unique_node)
+
+    return unique_node
 
 cdef object get_paths(DdManager *zdd, DdNode *top_node):
     paths = []
@@ -184,6 +184,7 @@ cdef object get_paths(DdManager *zdd, DdNode *top_node):
         if not Cudd_zddNextPath(generator, &path):
             break
     
+    #Cudd_GenFree(generator)
     return paths
 
 

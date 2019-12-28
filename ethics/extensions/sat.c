@@ -34,12 +34,12 @@
         "library_dirs": [
             "/Users/dennis/Code/ethics/cudd-3.0.0/cudd/.libs"
         ],
-        "name": "ethics.extensions.parser",
+        "name": "ethics.extensions.sat",
         "sources": [
-            "/Users/dennis/Code/ethics/ethics/extensions/parser.pyx"
+            "/Users/dennis/Code/ethics/ethics/extensions/sat.pyx"
         ]
     },
-    "module_name": "ethics.extensions.parser"
+    "module_name": "ethics.extensions.sat"
 }
 END: Cython Metadata */
 
@@ -633,16 +633,18 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__ethics__extensions__parser
-#define __PYX_HAVE_API__ethics__extensions__parser
+#define __PYX_HAVE__ethics__extensions__sat
+#define __PYX_HAVE_API__ethics__extensions__sat
 /* Early includes */
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include "cuddInt.h"
 #include "cudd.h"
 #include <limits.h>
+#include <stddef.h>
+#include <time.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -851,7 +853,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "ethics/extensions/parser.pyx",
+  "ethics/extensions/sat.pyx",
 };
 
 /*--- Type declarations ---*/
@@ -930,51 +932,21 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
-/* PyDictVersioning.proto */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-#define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
-#define __PYX_GET_DICT_VERSION(dict)  (((PyDictObject*)(dict))->ma_version_tag)
-#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)\
-    (version_var) = __PYX_GET_DICT_VERSION(dict);\
-    (cache_var) = (value);
-#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP) {\
-    static PY_UINT64_T __pyx_dict_version = 0;\
-    static PyObject *__pyx_dict_cached_value = NULL;\
-    if (likely(__PYX_GET_DICT_VERSION(DICT) == __pyx_dict_version)) {\
-        (VAR) = __pyx_dict_cached_value;\
-    } else {\
-        (VAR) = __pyx_dict_cached_value = (LOOKUP);\
-        __pyx_dict_version = __PYX_GET_DICT_VERSION(DICT);\
-    }\
+/* ListAppend.proto */
+#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
+static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len) & likely(len > (L->allocated >> 1))) {
+        Py_INCREF(x);
+        PyList_SET_ITEM(list, len, x);
+        Py_SIZE(list) = len+1;
+        return 0;
+    }
+    return PyList_Append(list, x);
 }
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj);
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj);
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version);
 #else
-#define __PYX_GET_DICT_VERSION(dict)  (0)
-#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)
-#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
-#endif
-
-/* GetModuleGlobalName.proto */
-#if CYTHON_USE_DICT_VERSIONS
-#define __Pyx_GetModuleGlobalName(var, name)  {\
-    static PY_UINT64_T __pyx_dict_version = 0;\
-    static PyObject *__pyx_dict_cached_value = NULL;\
-    (var) = (likely(__pyx_dict_version == __PYX_GET_DICT_VERSION(__pyx_d))) ?\
-        (likely(__pyx_dict_cached_value) ? __Pyx_NewRef(__pyx_dict_cached_value) : __Pyx_GetBuiltinName(name)) :\
-        __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
-}
-#define __Pyx_GetModuleGlobalNameUncached(var, name)  {\
-    PY_UINT64_T __pyx_dict_version;\
-    PyObject *__pyx_dict_cached_value;\
-    (var) = __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
-}
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value);
-#else
-#define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
-#define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
+#define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
 #endif
 
 /* GetItemInt.proto */
@@ -999,11 +971,104 @@ static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
 
-/* ObjectGetItem.proto */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
+/* RaiseDoubleKeywords.proto */
+static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
+
+/* ParseKeywords.proto */
+static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
+    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
+    const char* function_name);
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
 #else
-#define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
+#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
+#endif
+
+/* py_dict_items.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyDict_Items(PyObject* d);
+
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
+/* UnpackUnboundCMethod.proto */
+typedef struct {
+    PyObject *type;
+    PyObject **method_name;
+    PyCFunction func;
+    PyObject *method;
+    int flag;
+} __Pyx_CachedCFunction;
+
+/* CallUnboundCMethod0.proto */
+static PyObject* __Pyx__CallUnboundCMethod0(__Pyx_CachedCFunction* cfunc, PyObject* self);
+#if CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_CallUnboundCMethod0(cfunc, self)\
+    (likely((cfunc)->func) ?\
+        (likely((cfunc)->flag == METH_NOARGS) ?  (*((cfunc)->func))(self, NULL) :\
+         (PY_VERSION_HEX >= 0x030600B1 && likely((cfunc)->flag == METH_FASTCALL) ?\
+            (PY_VERSION_HEX >= 0x030700A0 ?\
+                (*(__Pyx_PyCFunctionFast)(void*)(PyCFunction)(cfunc)->func)(self, &__pyx_empty_tuple, 0) :\
+                (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)(cfunc)->func)(self, &__pyx_empty_tuple, 0, NULL)) :\
+          (PY_VERSION_HEX >= 0x030700A0 && (cfunc)->flag == (METH_FASTCALL | METH_KEYWORDS) ?\
+            (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)(cfunc)->func)(self, &__pyx_empty_tuple, 0, NULL) :\
+            (likely((cfunc)->flag == (METH_VARARGS | METH_KEYWORDS)) ?  ((*(PyCFunctionWithKeywords)(void*)(PyCFunction)(cfunc)->func)(self, __pyx_empty_tuple, NULL)) :\
+               ((cfunc)->flag == METH_VARARGS ?  (*((cfunc)->func))(self, __pyx_empty_tuple) :\
+               __Pyx__CallUnboundCMethod0(cfunc, self)))))) :\
+        __Pyx__CallUnboundCMethod0(cfunc, self))
+#else
+#define __Pyx_CallUnboundCMethod0(cfunc, self)  __Pyx__CallUnboundCMethod0(cfunc, self)
+#endif
+
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
+
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* IterFinish.proto */
+static CYTHON_INLINE int __Pyx_IterFinish(void);
+
+/* UnpackItemEndCheck.proto */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* Import.proto */
+static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
+
+/* PyDictVersioning.proto */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+#define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
+#define __PYX_GET_DICT_VERSION(dict)  (((PyDictObject*)(dict))->ma_version_tag)
+#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)\
+    (version_var) = __PYX_GET_DICT_VERSION(dict);\
+    (cache_var) = (value);
+#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP) {\
+    static PY_UINT64_T __pyx_dict_version = 0;\
+    static PyObject *__pyx_dict_cached_value = NULL;\
+    if (likely(__PYX_GET_DICT_VERSION(DICT) == __pyx_dict_version)) {\
+        (VAR) = __pyx_dict_cached_value;\
+    } else {\
+        (VAR) = __pyx_dict_cached_value = (LOOKUP);\
+        __pyx_dict_version = __PYX_GET_DICT_VERSION(DICT);\
+    }\
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj);
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj);
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version);
+#else
+#define __PYX_GET_DICT_VERSION(dict)  (0)
+#define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)
+#define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
 #endif
 
 /* PyThreadStateGet.proto */
@@ -1042,14 +1107,6 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 #define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
 #endif
 
-/* WriteUnraisableException.proto */
-static void __Pyx_WriteUnraisable(const char *name, int clineno,
-                                  int lineno, const char *filename,
-                                  int full_traceback, int nogil);
-
-/* Import.proto */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
-
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
 #define __Pyx_CLineForTraceback(tstate, c_line)  (((CYTHON_CLINE_IN_TRACEBACK)) ? c_line : 0)
@@ -1079,11 +1136,14 @@ static void __Pyx_AddTraceback(const char *funcname, int c_line,
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
 
-/* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
-
 /* CIntFromPy.proto */
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
+
+/* CIntFromPy.proto */
+static CYTHON_INLINE Cudd_ReorderingType __Pyx_PyInt_As_Cudd_ReorderingType(PyObject *);
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
 /* CIntFromPy.proto */
 static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *);
@@ -1107,20 +1167,20 @@ static CYTHON_INLINE int __Pyx_StrEq(const char *, const char *);
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(void);
 
-/* FunctionExport.proto */
-static int __Pyx_ExportFunction(const char *name, void (*f)(void), const char *sig);
+/* FunctionImport.proto */
+static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig);
 
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 
-/* Module declarations from 'libcpp' */
-
 /* Module declarations from 'libc.string' */
 
-/* Module declarations from 'libc.stdio' */
-
 /* Module declarations from 'libc.stdlib' */
+
+/* Module declarations from 'libcpp' */
+
+/* Module declarations from 'libc.stdio' */
 
 /* Module declarations from 'libc' */
 
@@ -1128,1193 +1188,639 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* Module declarations from 'ethics.extensions.c_cudd' */
 
+/* Module declarations from 'ethics.extensions.parser' */
+static DdNode *(*__pyx_f_6ethics_10extensions_6parser_parse_formula)(DdManager *, PyObject *, PyObject *); /*proto*/
+
 /* Module declarations from 'libc.limits' */
 
-/* Module declarations from 'ethics.extensions.parser' */
-static DdNode *__pyx_f_6ethics_10extensions_6parser__parse_formula(DdManager *, PyObject *, PyObject *); /*proto*/
-static int **__pyx_f_6ethics_10extensions_6parser__create_c_family(PyObject *); /*proto*/
-static DdNode *__pyx_f_6ethics_10extensions_6parser__parse_family(DdManager *, int **, int, int); /*proto*/
-#define __Pyx_MODULE_NAME "ethics.extensions.parser"
-extern int __pyx_module_is_main_ethics__extensions__parser;
-int __pyx_module_is_main_ethics__extensions__parser = 0;
+/* Module declarations from 'libc.stddef' */
 
-/* Implementation of 'ethics.extensions.parser' */
+/* Module declarations from 'libc.time' */
+
+/* Module declarations from 'ethics.extensions.sat' */
+static PyObject *__pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT = 0;
+static PyObject *__pyx_f_6ethics_10extensions_3sat_get_cubes(DdManager *, DdNode *, PyObject *); /*proto*/
+#define __Pyx_MODULE_NAME "ethics.extensions.sat"
+extern int __pyx_module_is_main_ethics__extensions__sat;
+int __pyx_module_is_main_ethics__extensions__sat = 0;
+
+/* Implementation of 'ethics.extensions.sat' */
 static PyObject *__pyx_builtin_range;
+static PyObject *__pyx_builtin_enumerate;
 static const char __pyx_k_[] = "*";
-static const char __pyx_k_Or[] = "Or";
-static const char __pyx_k_f1[] = "f1";
-static const char __pyx_k_f2[] = "f2";
-static const char __pyx_k_And[] = "And";
-static const char __pyx_k_Not[] = "Not";
-static const char __pyx_k_Atom[] = "Atom";
-static const char __pyx_k_Impl[] = "Impl";
+static const char __pyx_k_bdd[] = "bdd";
+static const char __pyx_k_key[] = "key";
+static const char __pyx_k_sat[] = "sat";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_atoms[] = "atoms";
+static const char __pyx_k_cubes[] = "cubes";
+static const char __pyx_k_index[] = "index";
+static const char __pyx_k_items[] = "items";
 static const char __pyx_k_range[] = "range";
-static const char __pyx_k_BiImpl[] = "BiImpl";
+static const char __pyx_k_value[] = "value";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_TwoPlaced[] = "TwoPlaced";
+static const char __pyx_k_formula[] = "formula";
+static const char __pyx_k_top_node[] = "top_node";
+static const char __pyx_k_enumerate[] = "enumerate";
+static const char __pyx_k_atom_for_index[] = "atom_for_index";
+static const char __pyx_k_index_for_atom[] = "index_for_atom";
 static const char __pyx_k_ethics_language[] = "ethics.language";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_ethics_extensions_sat[] = "ethics.extensions.sat";
+static const char __pyx_k_ethics_extensions_sat_pyx[] = "ethics/extensions/sat.pyx";
 static PyObject *__pyx_n_s_;
-static PyObject *__pyx_n_s_And;
-static PyObject *__pyx_n_s_Atom;
-static PyObject *__pyx_n_s_BiImpl;
-static PyObject *__pyx_n_s_Impl;
-static PyObject *__pyx_n_s_Not;
-static PyObject *__pyx_n_s_Or;
-static PyObject *__pyx_n_s_TwoPlaced;
+static PyObject *__pyx_n_s_atom_for_index;
+static PyObject *__pyx_n_s_atoms;
+static PyObject *__pyx_n_s_bdd;
 static PyObject *__pyx_n_s_cline_in_traceback;
+static PyObject *__pyx_n_s_cubes;
+static PyObject *__pyx_n_s_enumerate;
+static PyObject *__pyx_n_s_ethics_extensions_sat;
+static PyObject *__pyx_kp_s_ethics_extensions_sat_pyx;
 static PyObject *__pyx_n_s_ethics_language;
-static PyObject *__pyx_n_s_f1;
-static PyObject *__pyx_n_s_f2;
+static PyObject *__pyx_n_s_formula;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_index;
+static PyObject *__pyx_n_s_index_for_atom;
+static PyObject *__pyx_n_s_items;
+static PyObject *__pyx_n_s_key;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_range;
+static PyObject *__pyx_n_s_sat;
 static PyObject *__pyx_n_s_test;
+static PyObject *__pyx_n_s_top_node;
+static PyObject *__pyx_n_s_value;
+static PyObject *__pyx_pf_6ethics_10extensions_3sat_sat(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_formula, PyObject *__pyx_v_atoms); /* proto */
+static __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_items = {0, &__pyx_n_s_items, 0, 0, 0};
+static PyObject *__pyx_int_0;
+static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_14;
+static PyObject *__pyx_tuple__2;
+static PyObject *__pyx_codeobj__3;
 /* Late includes */
 
-/* "ethics/extensions/parser.pyx":9
- * from libc.stdint cimport uintptr_t, uint64_t
+/* "ethics/extensions/sat.pyx":11
+ * cdef CUDD_REORDER_GROUP_SIFT = 14
  * 
- * cdef print_c_family(int** family, int length):             # <<<<<<<<<<<<<<
- *     cdef int set_index = 0
- *     cdef int element_index = 0
+ * cdef object get_cubes(DdManager *bdd, DdNode *top_node, object atom_for_index):             # <<<<<<<<<<<<<<
+ *     cubes = []
+ * 
  */
 
-static PyObject *__pyx_f_6ethics_10extensions_6parser_print_c_family(int **__pyx_v_family, int __pyx_v_length) {
-  int __pyx_v_set_index;
-  int __pyx_v_element_index;
+static PyObject *__pyx_f_6ethics_10extensions_3sat_get_cubes(DdManager *__pyx_v_bdd, DdNode *__pyx_v_top_node, PyObject *__pyx_v_atom_for_index) {
+  PyObject *__pyx_v_cubes = NULL;
+  int *__pyx_v_cube;
+  double __pyx_v_value;
+  int __pyx_v_cube_size;
+  struct DdGen *__pyx_v_generator;
+  int __pyx_v_index;
+  PyObject *__pyx_v_new_cube = NULL;
   PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  __Pyx_RefNannySetupContext("print_c_family", 0);
-
-  /* "ethics/extensions/parser.pyx":10
- * 
- * cdef print_c_family(int** family, int length):
- *     cdef int set_index = 0             # <<<<<<<<<<<<<<
- *     cdef int element_index = 0
- *     while set_index < length:
- */
-  __pyx_v_set_index = 0;
-
-  /* "ethics/extensions/parser.pyx":11
- * cdef print_c_family(int** family, int length):
- *     cdef int set_index = 0
- *     cdef int element_index = 0             # <<<<<<<<<<<<<<
- *     while set_index < length:
- *         printf("[")
- */
-  __pyx_v_element_index = 0;
-
-  /* "ethics/extensions/parser.pyx":12
- *     cdef int set_index = 0
- *     cdef int element_index = 0
- *     while set_index < length:             # <<<<<<<<<<<<<<
- *         printf("[")
- *         element_index = 0
- */
-  while (1) {
-    __pyx_t_1 = ((__pyx_v_set_index < __pyx_v_length) != 0);
-    if (!__pyx_t_1) break;
-
-    /* "ethics/extensions/parser.pyx":13
- *     cdef int element_index = 0
- *     while set_index < length:
- *         printf("[")             # <<<<<<<<<<<<<<
- *         element_index = 0
- *         while element_index < INT_MAX:
- */
-    (void)(printf(((char const *)"[")));
-
-    /* "ethics/extensions/parser.pyx":14
- *     while set_index < length:
- *         printf("[")
- *         element_index = 0             # <<<<<<<<<<<<<<
- *         while element_index < INT_MAX:
- *             if family[set_index][element_index] == INT_MAX:
- */
-    __pyx_v_element_index = 0;
-
-    /* "ethics/extensions/parser.pyx":15
- *         printf("[")
- *         element_index = 0
- *         while element_index < INT_MAX:             # <<<<<<<<<<<<<<
- *             if family[set_index][element_index] == INT_MAX:
- *                 break
- */
-    while (1) {
-      __pyx_t_1 = ((__pyx_v_element_index < INT_MAX) != 0);
-      if (!__pyx_t_1) break;
-
-      /* "ethics/extensions/parser.pyx":16
- *         element_index = 0
- *         while element_index < INT_MAX:
- *             if family[set_index][element_index] == INT_MAX:             # <<<<<<<<<<<<<<
- *                 break
- *             printf("%d, ", family[set_index][element_index])
- */
-      __pyx_t_1 = ((((__pyx_v_family[__pyx_v_set_index])[__pyx_v_element_index]) == INT_MAX) != 0);
-      if (__pyx_t_1) {
-
-        /* "ethics/extensions/parser.pyx":17
- *         while element_index < INT_MAX:
- *             if family[set_index][element_index] == INT_MAX:
- *                 break             # <<<<<<<<<<<<<<
- *             printf("%d, ", family[set_index][element_index])
- *             element_index += 1
- */
-        goto __pyx_L6_break;
-
-        /* "ethics/extensions/parser.pyx":16
- *         element_index = 0
- *         while element_index < INT_MAX:
- *             if family[set_index][element_index] == INT_MAX:             # <<<<<<<<<<<<<<
- *                 break
- *             printf("%d, ", family[set_index][element_index])
- */
-      }
-
-      /* "ethics/extensions/parser.pyx":18
- *             if family[set_index][element_index] == INT_MAX:
- *                 break
- *             printf("%d, ", family[set_index][element_index])             # <<<<<<<<<<<<<<
- *             element_index += 1
- *         printf("\b\b] ")
- */
-      (void)(printf(((char const *)"%d, "), ((__pyx_v_family[__pyx_v_set_index])[__pyx_v_element_index])));
-
-      /* "ethics/extensions/parser.pyx":19
- *                 break
- *             printf("%d, ", family[set_index][element_index])
- *             element_index += 1             # <<<<<<<<<<<<<<
- *         printf("\b\b] ")
- *         set_index += 1
- */
-      __pyx_v_element_index = (__pyx_v_element_index + 1);
-    }
-    __pyx_L6_break:;
-
-    /* "ethics/extensions/parser.pyx":20
- *             printf("%d, ", family[set_index][element_index])
- *             element_index += 1
- *         printf("\b\b] ")             # <<<<<<<<<<<<<<
- *         set_index += 1
- * 
- */
-    (void)(printf(((char const *)"\010\010] ")));
-
-    /* "ethics/extensions/parser.pyx":21
- *             element_index += 1
- *         printf("\b\b] ")
- *         set_index += 1             # <<<<<<<<<<<<<<
- * 
- * 
- */
-    __pyx_v_set_index = (__pyx_v_set_index + 1);
-  }
-
-  /* "ethics/extensions/parser.pyx":9
- * from libc.stdint cimport uintptr_t, uint64_t
- * 
- * cdef print_c_family(int** family, int length):             # <<<<<<<<<<<<<<
- *     cdef int set_index = 0
- *     cdef int element_index = 0
- */
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ethics/extensions/parser.pyx":24
- * 
- * 
- * cdef DdNode* parse_formula(DdManager *bdd, object formula, object var_cache):             # <<<<<<<<<<<<<<
- *     cdef DdNode *top_node = _parse_formula(bdd, formula, var_cache)
- *     return top_node
- */
-
-static DdNode *__pyx_f_6ethics_10extensions_6parser_parse_formula(DdManager *__pyx_v_bdd, PyObject *__pyx_v_formula, PyObject *__pyx_v_var_cache) {
-  DdNode *__pyx_v_top_node;
-  DdNode *__pyx_r;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("parse_formula", 0);
-
-  /* "ethics/extensions/parser.pyx":25
- * 
- * cdef DdNode* parse_formula(DdManager *bdd, object formula, object var_cache):
- *     cdef DdNode *top_node = _parse_formula(bdd, formula, var_cache)             # <<<<<<<<<<<<<<
- *     return top_node
- * 
- */
-  __pyx_v_top_node = __pyx_f_6ethics_10extensions_6parser__parse_formula(__pyx_v_bdd, __pyx_v_formula, __pyx_v_var_cache);
-
-  /* "ethics/extensions/parser.pyx":26
- * cdef DdNode* parse_formula(DdManager *bdd, object formula, object var_cache):
- *     cdef DdNode *top_node = _parse_formula(bdd, formula, var_cache)
- *     return top_node             # <<<<<<<<<<<<<<
- * 
- * cdef DdNode* _parse_formula(DdManager *bdd, object formula, object var_cache):
- */
-  __pyx_r = __pyx_v_top_node;
-  goto __pyx_L0;
-
-  /* "ethics/extensions/parser.pyx":24
- * 
- * 
- * cdef DdNode* parse_formula(DdManager *bdd, object formula, object var_cache):             # <<<<<<<<<<<<<<
- *     cdef DdNode *top_node = _parse_formula(bdd, formula, var_cache)
- *     return top_node
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ethics/extensions/parser.pyx":28
- *     return top_node
- * 
- * cdef DdNode* _parse_formula(DdManager *bdd, object formula, object var_cache):             # <<<<<<<<<<<<<<
- *     cdef DdNode *left_function
- *     cdef DdNode *right_function
- */
-
-static DdNode *__pyx_f_6ethics_10extensions_6parser__parse_formula(DdManager *__pyx_v_bdd, PyObject *__pyx_v_formula, PyObject *__pyx_v_var_cache) {
-  DdNode *__pyx_v_left_function;
-  DdNode *__pyx_v_right_function;
-  DdNode *__pyx_v_new_function;
-  DdNode *__pyx_r;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
   int __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_4;
   int __pyx_t_5;
-  __Pyx_RefNannySetupContext("_parse_formula", 0);
+  int __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
+  __Pyx_RefNannySetupContext("get_cubes", 0);
 
-  /* "ethics/extensions/parser.pyx":33
- *     cdef DdNode *new_function
+  /* "ethics/extensions/sat.pyx":12
  * 
- *     if isinstance(formula, Atom):             # <<<<<<<<<<<<<<
- *         left_function = Cudd_bddIthVar(bdd, var_cache[formula.f1])
- *         return left_function
+ * cdef object get_cubes(DdManager *bdd, DdNode *top_node, object atom_for_index):
+ *     cubes = []             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int *cube
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Atom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 33, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = (__pyx_t_2 != 0);
-  if (__pyx_t_3) {
+  __pyx_v_cubes = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-    /* "ethics/extensions/parser.pyx":34
- * 
- *     if isinstance(formula, Atom):
- *         left_function = Cudd_bddIthVar(bdd, var_cache[formula.f1])             # <<<<<<<<<<<<<<
- *         return left_function
+  /* "ethics/extensions/sat.pyx":16
+ *     cdef int *cube
+ *     cdef double value
+ *     cdef int cube_size = Cudd_ReadSize(bdd)             # <<<<<<<<<<<<<<
+ *     cdef DdGen *generator = Cudd_FirstCube(bdd, top_node, &cube, &value)
  * 
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_v_cube_size = Cudd_ReadSize(__pyx_v_bdd);
+
+  /* "ethics/extensions/sat.pyx":17
+ *     cdef double value
+ *     cdef int cube_size = Cudd_ReadSize(bdd)
+ *     cdef DdGen *generator = Cudd_FirstCube(bdd, top_node, &cube, &value)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int index
+ */
+  __pyx_v_generator = Cudd_FirstCube(__pyx_v_bdd, __pyx_v_top_node, (&__pyx_v_cube), (&__pyx_v_value));
+
+  /* "ethics/extensions/sat.pyx":20
+ * 
+ *     cdef int index
+ *     while Cudd_IsGenEmpty(generator) == 0:             # <<<<<<<<<<<<<<
+ *         new_cube = dict()
+ *         cubes.append(new_cube)
+ */
+  while (1) {
+    __pyx_t_2 = ((Cudd_IsGenEmpty(__pyx_v_generator) == 0) != 0);
+    if (!__pyx_t_2) break;
+
+    /* "ethics/extensions/sat.pyx":21
+ *     cdef int index
+ *     while Cudd_IsGenEmpty(generator) == 0:
+ *         new_cube = dict()             # <<<<<<<<<<<<<<
+ *         cubes.append(new_cube)
+ *         for index in range(0, cube_size):
+ */
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_var_cache, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_left_function = Cudd_bddIthVar(__pyx_v_bdd, __pyx_t_5);
+    __Pyx_XDECREF_SET(__pyx_v_new_cube, ((PyObject*)__pyx_t_1));
+    __pyx_t_1 = 0;
 
-    /* "ethics/extensions/parser.pyx":35
- *     if isinstance(formula, Atom):
- *         left_function = Cudd_bddIthVar(bdd, var_cache[formula.f1])
- *         return left_function             # <<<<<<<<<<<<<<
- * 
- *     if isinstance(formula, Not):
+    /* "ethics/extensions/sat.pyx":22
+ *     while Cudd_IsGenEmpty(generator) == 0:
+ *         new_cube = dict()
+ *         cubes.append(new_cube)             # <<<<<<<<<<<<<<
+ *         for index in range(0, cube_size):
+ *             if cube[index] != 2:
  */
-    __pyx_r = __pyx_v_left_function;
-    goto __pyx_L0;
+    __pyx_t_3 = __Pyx_PyList_Append(__pyx_v_cubes, __pyx_v_new_cube); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 22, __pyx_L1_error)
 
-    /* "ethics/extensions/parser.pyx":33
- *     cdef DdNode *new_function
- * 
- *     if isinstance(formula, Atom):             # <<<<<<<<<<<<<<
- *         left_function = Cudd_bddIthVar(bdd, var_cache[formula.f1])
- *         return left_function
+    /* "ethics/extensions/sat.pyx":23
+ *         new_cube = dict()
+ *         cubes.append(new_cube)
+ *         for index in range(0, cube_size):             # <<<<<<<<<<<<<<
+ *             if cube[index] != 2:
+ *                 new_cube[atom_for_index[index]] = True if cube[index] == 1 else False
  */
+    __pyx_t_4 = __pyx_v_cube_size;
+    __pyx_t_5 = __pyx_t_4;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_index = __pyx_t_6;
+
+      /* "ethics/extensions/sat.pyx":24
+ *         cubes.append(new_cube)
+ *         for index in range(0, cube_size):
+ *             if cube[index] != 2:             # <<<<<<<<<<<<<<
+ *                 new_cube[atom_for_index[index]] = True if cube[index] == 1 else False
+ * 
+ */
+      __pyx_t_2 = (((__pyx_v_cube[__pyx_v_index]) != 2) != 0);
+      if (__pyx_t_2) {
+
+        /* "ethics/extensions/sat.pyx":25
+ *         for index in range(0, cube_size):
+ *             if cube[index] != 2:
+ *                 new_cube[atom_for_index[index]] = True if cube[index] == 1 else False             # <<<<<<<<<<<<<<
+ * 
+ *         Cudd_NextCube(generator, &cube, &value)
+ */
+        if ((((__pyx_v_cube[__pyx_v_index]) == 1) != 0)) {
+          __Pyx_INCREF(Py_True);
+          __pyx_t_1 = Py_True;
+        } else {
+          __Pyx_INCREF(Py_False);
+          __pyx_t_1 = Py_False;
+        }
+        __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_atom_for_index, __pyx_v_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        if (unlikely(PyDict_SetItem(__pyx_v_new_cube, __pyx_t_7, __pyx_t_1) < 0)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+        /* "ethics/extensions/sat.pyx":24
+ *         cubes.append(new_cube)
+ *         for index in range(0, cube_size):
+ *             if cube[index] != 2:             # <<<<<<<<<<<<<<
+ *                 new_cube[atom_for_index[index]] = True if cube[index] == 1 else False
+ * 
+ */
+      }
+    }
+
+    /* "ethics/extensions/sat.pyx":27
+ *                 new_cube[atom_for_index[index]] = True if cube[index] == 1 else False
+ * 
+ *         Cudd_NextCube(generator, &cube, &value)             # <<<<<<<<<<<<<<
+ * 
+ *     Cudd_GenFree(generator)
+ */
+    (void)(Cudd_NextCube(__pyx_v_generator, (&__pyx_v_cube), (&__pyx_v_value)));
   }
 
-  /* "ethics/extensions/parser.pyx":37
- *         return left_function
+  /* "ethics/extensions/sat.pyx":29
+ *         Cudd_NextCube(generator, &cube, &value)
  * 
- *     if isinstance(formula, Not):             # <<<<<<<<<<<<<<
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)
- *         #Cudd_Ref(left_function)
+ *     Cudd_GenFree(generator)             # <<<<<<<<<<<<<<
+ *     return cubes
+ * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_Not); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_4); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_2 = (__pyx_t_3 != 0);
-  if (__pyx_t_2) {
+  (void)(Cudd_GenFree(__pyx_v_generator));
 
-    /* "ethics/extensions/parser.pyx":38
+  /* "ethics/extensions/sat.pyx":30
  * 
- *     if isinstance(formula, Not):
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)             # <<<<<<<<<<<<<<
- *         #Cudd_Ref(left_function)
- *         # Negate the function
+ *     Cudd_GenFree(generator)
+ *     return cubes             # <<<<<<<<<<<<<<
+ * 
+ * def sat(formula, atoms):
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 38, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_v_left_function = __pyx_f_6ethics_10extensions_6parser__parse_formula(__pyx_v_bdd, __pyx_t_4, __pyx_v_var_cache);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "ethics/extensions/parser.pyx":41
- *         #Cudd_Ref(left_function)
- *         # Negate the function
- *         new_function = Cudd_Not(left_function)             # <<<<<<<<<<<<<<
- * 
- *         Cudd_Ref(new_function)
- */
-    __pyx_v_new_function = Cudd_Not(__pyx_v_left_function);
-
-    /* "ethics/extensions/parser.pyx":43
- *         new_function = Cudd_Not(left_function)
- * 
- *         Cudd_Ref(new_function)             # <<<<<<<<<<<<<<
- * 
- *         if not isinstance(formula.f1, Atom):
- */
-    Cudd_Ref(__pyx_v_new_function);
-
-    /* "ethics/extensions/parser.pyx":45
- *         Cudd_Ref(new_function)
- * 
- *         if not isinstance(formula.f1, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Atom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_t_4, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 45, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
-    if (__pyx_t_3) {
-
-      /* "ethics/extensions/parser.pyx":46
- * 
- *         if not isinstance(formula.f1, Atom):
- *             Cudd_RecursiveDeref(bdd, left_function)             # <<<<<<<<<<<<<<
- * 
- *         return new_function
- */
-      Cudd_RecursiveDeref(__pyx_v_bdd, __pyx_v_left_function);
-
-      /* "ethics/extensions/parser.pyx":45
- *         Cudd_Ref(new_function)
- * 
- *         if not isinstance(formula.f1, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- */
-    }
-
-    /* "ethics/extensions/parser.pyx":48
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- *         return new_function             # <<<<<<<<<<<<<<
- * 
- *     if isinstance(formula, TwoPlaced):
- */
-    __pyx_r = __pyx_v_new_function;
-    goto __pyx_L0;
-
-    /* "ethics/extensions/parser.pyx":37
- *         return left_function
- * 
- *     if isinstance(formula, Not):             # <<<<<<<<<<<<<<
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)
- *         #Cudd_Ref(left_function)
- */
-  }
-
-  /* "ethics/extensions/parser.pyx":50
- *         return new_function
- * 
- *     if isinstance(formula, TwoPlaced):             # <<<<<<<<<<<<<<
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)
- *         #Cudd_Ref(left_function)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TwoPlaced); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_2 = (__pyx_t_3 != 0);
-  if (__pyx_t_2) {
-
-    /* "ethics/extensions/parser.pyx":51
- * 
- *     if isinstance(formula, TwoPlaced):
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)             # <<<<<<<<<<<<<<
- *         #Cudd_Ref(left_function)
- * 
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_v_left_function = __pyx_f_6ethics_10extensions_6parser__parse_formula(__pyx_v_bdd, __pyx_t_1, __pyx_v_var_cache);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "ethics/extensions/parser.pyx":54
- *         #Cudd_Ref(left_function)
- * 
- *         right_function = _parse_formula(bdd, formula.f2, var_cache)             # <<<<<<<<<<<<<<
- *         #Cudd_Ref(right_function)
- * 
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_v_right_function = __pyx_f_6ethics_10extensions_6parser__parse_formula(__pyx_v_bdd, __pyx_t_1, __pyx_v_var_cache);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "ethics/extensions/parser.pyx":57
- *         #Cudd_Ref(right_function)
- * 
- *         if isinstance(formula, And):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)
- *         elif isinstance(formula, Or):
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_And); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 57, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = (__pyx_t_2 != 0);
-    if (__pyx_t_3) {
-
-      /* "ethics/extensions/parser.pyx":58
- * 
- *         if isinstance(formula, And):
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)             # <<<<<<<<<<<<<<
- *         elif isinstance(formula, Or):
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- */
-      __pyx_v_new_function = Cudd_bddAnd(__pyx_v_bdd, __pyx_v_left_function, __pyx_v_right_function);
-
-      /* "ethics/extensions/parser.pyx":57
- *         #Cudd_Ref(right_function)
- * 
- *         if isinstance(formula, And):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)
- *         elif isinstance(formula, Or):
- */
-      goto __pyx_L7;
-    }
-
-    /* "ethics/extensions/parser.pyx":59
- *         if isinstance(formula, And):
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)
- *         elif isinstance(formula, Or):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- *         elif isinstance(formula, Impl):
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Or); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_2 = (__pyx_t_3 != 0);
-    if (__pyx_t_2) {
-
-      /* "ethics/extensions/parser.pyx":60
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)
- *         elif isinstance(formula, Or):
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)             # <<<<<<<<<<<<<<
- *         elif isinstance(formula, Impl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- */
-      __pyx_v_new_function = Cudd_bddOr(__pyx_v_bdd, __pyx_v_left_function, __pyx_v_right_function);
-
-      /* "ethics/extensions/parser.pyx":59
- *         if isinstance(formula, And):
- *             new_function = Cudd_bddAnd(bdd, left_function, right_function)
- *         elif isinstance(formula, Or):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- *         elif isinstance(formula, Impl):
- */
-      goto __pyx_L7;
-    }
-
-    /* "ethics/extensions/parser.pyx":61
- *         elif isinstance(formula, Or):
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- *         elif isinstance(formula, Impl):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- *         elif isinstance(formula, BiImpl):
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Impl); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 61, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = (__pyx_t_2 != 0);
-    if (__pyx_t_3) {
-
-      /* "ethics/extensions/parser.pyx":62
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- *         elif isinstance(formula, Impl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))             # <<<<<<<<<<<<<<
- *         elif isinstance(formula, BiImpl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))
- */
-      __pyx_v_new_function = Cudd_bddIte(__pyx_v_bdd, __pyx_v_left_function, __pyx_v_right_function, Cudd_ReadOne(__pyx_v_bdd));
-
-      /* "ethics/extensions/parser.pyx":61
- *         elif isinstance(formula, Or):
- *             new_function = Cudd_bddOr(bdd, left_function, right_function)
- *         elif isinstance(formula, Impl):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- *         elif isinstance(formula, BiImpl):
- */
-      goto __pyx_L7;
-    }
-
-    /* "ethics/extensions/parser.pyx":63
- *         elif isinstance(formula, Impl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- *         elif isinstance(formula, BiImpl):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_BiImpl); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_formula, __pyx_t_1); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_2 = (__pyx_t_3 != 0);
-    if (__pyx_t_2) {
-
-      /* "ethics/extensions/parser.pyx":64
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- *         elif isinstance(formula, BiImpl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))             # <<<<<<<<<<<<<<
- * 
- *         Cudd_Ref(new_function)
- */
-      __pyx_v_new_function = Cudd_bddIte(__pyx_v_bdd, __pyx_v_left_function, __pyx_v_right_function, Cudd_Not(__pyx_v_right_function));
-
-      /* "ethics/extensions/parser.pyx":63
- *         elif isinstance(formula, Impl):
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_ReadOne(bdd))
- *         elif isinstance(formula, BiImpl):             # <<<<<<<<<<<<<<
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))
- * 
- */
-    }
-    __pyx_L7:;
-
-    /* "ethics/extensions/parser.pyx":66
- *             new_function = Cudd_bddIte(bdd, left_function, right_function, Cudd_Not(right_function))
- * 
- *         Cudd_Ref(new_function)             # <<<<<<<<<<<<<<
- * 
- *         if not isinstance(formula.f1, Atom):
- */
-    Cudd_Ref(__pyx_v_new_function);
-
-    /* "ethics/extensions/parser.pyx":68
- *         Cudd_Ref(new_function)
- * 
- *         if not isinstance(formula.f1, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_Atom); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_t_1, __pyx_t_4); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 68, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
-    if (__pyx_t_3) {
-
-      /* "ethics/extensions/parser.pyx":69
- * 
- *         if not isinstance(formula.f1, Atom):
- *             Cudd_RecursiveDeref(bdd, left_function)             # <<<<<<<<<<<<<<
- * 
- *         if not isinstance(formula.f2, Atom):
- */
-      Cudd_RecursiveDeref(__pyx_v_bdd, __pyx_v_left_function);
-
-      /* "ethics/extensions/parser.pyx":68
- *         Cudd_Ref(new_function)
- * 
- *         if not isinstance(formula.f1, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- */
-    }
-
-    /* "ethics/extensions/parser.pyx":71
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- *         if not isinstance(formula.f2, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, right_function)
- * 
- */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_formula, __pyx_n_s_f2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Atom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_t_4, __pyx_t_1); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
-    if (__pyx_t_2) {
-
-      /* "ethics/extensions/parser.pyx":72
- * 
- *         if not isinstance(formula.f2, Atom):
- *             Cudd_RecursiveDeref(bdd, right_function)             # <<<<<<<<<<<<<<
- * 
- *         return new_function
- */
-      Cudd_RecursiveDeref(__pyx_v_bdd, __pyx_v_right_function);
-
-      /* "ethics/extensions/parser.pyx":71
- *             Cudd_RecursiveDeref(bdd, left_function)
- * 
- *         if not isinstance(formula.f2, Atom):             # <<<<<<<<<<<<<<
- *             Cudd_RecursiveDeref(bdd, right_function)
- * 
- */
-    }
-
-    /* "ethics/extensions/parser.pyx":74
- *             Cudd_RecursiveDeref(bdd, right_function)
- * 
- *         return new_function             # <<<<<<<<<<<<<<
- * 
- *     return NULL
- */
-    __pyx_r = __pyx_v_new_function;
-    goto __pyx_L0;
-
-    /* "ethics/extensions/parser.pyx":50
- *         return new_function
- * 
- *     if isinstance(formula, TwoPlaced):             # <<<<<<<<<<<<<<
- *         left_function = _parse_formula(bdd, formula.f1, var_cache)
- *         #Cudd_Ref(left_function)
- */
-  }
-
-  /* "ethics/extensions/parser.pyx":76
- *         return new_function
- * 
- *     return NULL             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_r = NULL;
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_cubes);
+  __pyx_r = __pyx_v_cubes;
   goto __pyx_L0;
 
-  /* "ethics/extensions/parser.pyx":28
- *     return top_node
+  /* "ethics/extensions/sat.pyx":11
+ * cdef CUDD_REORDER_GROUP_SIFT = 14
  * 
- * cdef DdNode* _parse_formula(DdManager *bdd, object formula, object var_cache):             # <<<<<<<<<<<<<<
- *     cdef DdNode *left_function
- *     cdef DdNode *right_function
+ * cdef object get_cubes(DdManager *bdd, DdNode *top_node, object atom_for_index):             # <<<<<<<<<<<<<<
+ *     cubes = []
+ * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_WriteUnraisable("ethics.extensions.parser._parse_formula", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_AddTraceback("ethics.extensions.sat.get_cubes", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_cubes);
+  __Pyx_XDECREF(__pyx_v_new_cube);
+  __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "ethics/extensions/parser.pyx":79
+/* "ethics/extensions/sat.pyx":32
+ *     return cubes
  * 
+ * def sat(formula, atoms):             # <<<<<<<<<<<<<<
  * 
- * cdef DdNode* parse_family(DdManager *zdd, object family):             # <<<<<<<<<<<<<<
- *     cdef int** c_family = _create_c_family(family)
- *     cdef DdNode *top_node = _parse_family(zdd, c_family, len(family), 0)
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}
  */
 
-static DdNode *__pyx_f_6ethics_10extensions_6parser_parse_family(DdManager *__pyx_v_zdd, PyObject *__pyx_v_family) {
-  int **__pyx_v_c_family;
-  DdNode *__pyx_v_top_node;
-  DdNode *__pyx_r;
+/* Python wrapper */
+static PyObject *__pyx_pw_6ethics_10extensions_3sat_1sat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_6ethics_10extensions_3sat_1sat = {"sat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6ethics_10extensions_3sat_1sat, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6ethics_10extensions_3sat_1sat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_formula = 0;
+  PyObject *__pyx_v_atoms = 0;
+  PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  __Pyx_RefNannySetupContext("parse_family", 0);
-
-  /* "ethics/extensions/parser.pyx":80
- * 
- * cdef DdNode* parse_family(DdManager *zdd, object family):
- *     cdef int** c_family = _create_c_family(family)             # <<<<<<<<<<<<<<
- *     cdef DdNode *top_node = _parse_family(zdd, c_family, len(family), 0)
- *     return top_node
- */
-  __pyx_v_c_family = __pyx_f_6ethics_10extensions_6parser__create_c_family(__pyx_v_family);
-
-  /* "ethics/extensions/parser.pyx":81
- * cdef DdNode* parse_family(DdManager *zdd, object family):
- *     cdef int** c_family = _create_c_family(family)
- *     cdef DdNode *top_node = _parse_family(zdd, c_family, len(family), 0)             # <<<<<<<<<<<<<<
- *     return top_node
- * 
- */
-  __pyx_t_1 = PyObject_Length(__pyx_v_family); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 81, __pyx_L1_error)
-  __pyx_v_top_node = __pyx_f_6ethics_10extensions_6parser__parse_family(__pyx_v_zdd, __pyx_v_c_family, __pyx_t_1, 0);
-
-  /* "ethics/extensions/parser.pyx":82
- *     cdef int** c_family = _create_c_family(family)
- *     cdef DdNode *top_node = _parse_family(zdd, c_family, len(family), 0)
- *     return top_node             # <<<<<<<<<<<<<<
- * 
- * cdef int** _create_c_family(object family):
- */
-  __pyx_r = __pyx_v_top_node;
-  goto __pyx_L0;
-
-  /* "ethics/extensions/parser.pyx":79
- * 
- * 
- * cdef DdNode* parse_family(DdManager *zdd, object family):             # <<<<<<<<<<<<<<
- *     cdef int** c_family = _create_c_family(family)
- *     cdef DdNode *top_node = _parse_family(zdd, c_family, len(family), 0)
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_WriteUnraisable("ethics.extensions.parser.parse_family", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
-  __pyx_r = 0;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ethics/extensions/parser.pyx":84
- *     return top_node
- * 
- * cdef int** _create_c_family(object family):             # <<<<<<<<<<<<<<
- *     """Turn a list of integer lists (python objects) into a int**.
- *     Each list is terminated by INT_MAX.
- */
-
-static int **__pyx_f_6ethics_10extensions_6parser__create_c_family(PyObject *__pyx_v_family) {
-  int __pyx_v_family_size;
-  int __pyx_v_set_size;
-  int **__pyx_v_c_family;
-  int __pyx_v_set_index;
-  int __pyx_v_element_index;
-  int **__pyx_r;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  int __pyx_t_2;
-  int __pyx_t_3;
-  int __pyx_t_4;
-  PyObject *__pyx_t_5 = NULL;
-  long __pyx_t_6;
-  long __pyx_t_7;
-  int __pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
-  __Pyx_RefNannySetupContext("_create_c_family", 0);
-
-  /* "ethics/extensions/parser.pyx":91
- *         int** -- The family represented as a c data type.
- *     """
- *     cdef int family_size = len(family)             # <<<<<<<<<<<<<<
- *     cdef int set_size = 0
- *     cdef int **c_family
- */
-  __pyx_t_1 = PyObject_Length(__pyx_v_family); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 91, __pyx_L1_error)
-  __pyx_v_family_size = __pyx_t_1;
-
-  /* "ethics/extensions/parser.pyx":92
- *     """
- *     cdef int family_size = len(family)
- *     cdef int set_size = 0             # <<<<<<<<<<<<<<
- *     cdef int **c_family
- *     cdef int set_index = 0
- */
-  __pyx_v_set_size = 0;
-
-  /* "ethics/extensions/parser.pyx":94
- *     cdef int set_size = 0
- *     cdef int **c_family
- *     cdef int set_index = 0             # <<<<<<<<<<<<<<
- *     cdef int element_index = 0
- * 
- */
-  __pyx_v_set_index = 0;
-
-  /* "ethics/extensions/parser.pyx":95
- *     cdef int **c_family
- *     cdef int set_index = 0
- *     cdef int element_index = 0             # <<<<<<<<<<<<<<
- * 
- *     # Allocate memory for the number of sets in the family
- */
-  __pyx_v_element_index = 0;
-
-  /* "ethics/extensions/parser.pyx":98
- * 
- *     # Allocate memory for the number of sets in the family
- *     c_family = <int **> malloc(family_size * sizeof(int*))             # <<<<<<<<<<<<<<
- * 
- *     for set_index in range(family_size):
- */
-  __pyx_v_c_family = ((int **)malloc((__pyx_v_family_size * (sizeof(int *)))));
-
-  /* "ethics/extensions/parser.pyx":100
- *     c_family = <int **> malloc(family_size * sizeof(int*))
- * 
- *     for set_index in range(family_size):             # <<<<<<<<<<<<<<
- *         set_size = len(family[set_index]) + 1 # +1 because of INT_MAX at the end
- *         c_family[set_index] = <int *> malloc(set_size * sizeof(int))
- */
-  __pyx_t_2 = __pyx_v_family_size;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_set_index = __pyx_t_4;
-
-    /* "ethics/extensions/parser.pyx":101
- * 
- *     for set_index in range(family_size):
- *         set_size = len(family[set_index]) + 1 # +1 because of INT_MAX at the end             # <<<<<<<<<<<<<<
- *         c_family[set_index] = <int *> malloc(set_size * sizeof(int))
- * 
- */
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_family, __pyx_v_set_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 101, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 101, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_v_set_size = (__pyx_t_1 + 1);
-
-    /* "ethics/extensions/parser.pyx":102
- *     for set_index in range(family_size):
- *         set_size = len(family[set_index]) + 1 # +1 because of INT_MAX at the end
- *         c_family[set_index] = <int *> malloc(set_size * sizeof(int))             # <<<<<<<<<<<<<<
- * 
- *         for element_index in range(set_size - 1):
- */
-    (__pyx_v_c_family[__pyx_v_set_index]) = ((int *)malloc((__pyx_v_set_size * (sizeof(int)))));
-
-    /* "ethics/extensions/parser.pyx":104
- *         c_family[set_index] = <int *> malloc(set_size * sizeof(int))
- * 
- *         for element_index in range(set_size - 1):             # <<<<<<<<<<<<<<
- *             c_family[set_index][element_index] = family[set_index][element_index]
- * 
- */
-    __pyx_t_6 = (__pyx_v_set_size - 1);
-    __pyx_t_7 = __pyx_t_6;
-    for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
-      __pyx_v_element_index = __pyx_t_8;
-
-      /* "ethics/extensions/parser.pyx":105
- * 
- *         for element_index in range(set_size - 1):
- *             c_family[set_index][element_index] = family[set_index][element_index]             # <<<<<<<<<<<<<<
- * 
- *         c_family[set_index][set_size-1] = INT_MAX
- */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_family, __pyx_v_set_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 105, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_element_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 105, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 105, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      ((__pyx_v_c_family[__pyx_v_set_index])[__pyx_v_element_index]) = __pyx_t_10;
-    }
-
-    /* "ethics/extensions/parser.pyx":107
- *             c_family[set_index][element_index] = family[set_index][element_index]
- * 
- *         c_family[set_index][set_size-1] = INT_MAX             # <<<<<<<<<<<<<<
- * 
- *     return c_family
- */
-    ((__pyx_v_c_family[__pyx_v_set_index])[(__pyx_v_set_size - 1)]) = INT_MAX;
-  }
-
-  /* "ethics/extensions/parser.pyx":109
- *         c_family[set_index][set_size-1] = INT_MAX
- * 
- *     return c_family             # <<<<<<<<<<<<<<
- * 
- * cdef DdNode* _parse_family(DdManager *zdd, int** family, int count, int item):
- */
-  __pyx_r = __pyx_v_c_family;
-  goto __pyx_L0;
-
-  /* "ethics/extensions/parser.pyx":84
- *     return top_node
- * 
- * cdef int** _create_c_family(object family):             # <<<<<<<<<<<<<<
- *     """Turn a list of integer lists (python objects) into a int**.
- *     Each list is terminated by INT_MAX.
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_WriteUnraisable("ethics.extensions.parser._create_c_family", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
-  __pyx_r = 0;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ethics/extensions/parser.pyx":111
- *     return c_family
- * 
- * cdef DdNode* _parse_family(DdManager *zdd, int** family, int count, int item):             # <<<<<<<<<<<<<<
- *     cdef DdNode* node
- *     cdef int smallest_value = family[0][item]
- */
-
-static DdNode *__pyx_f_6ethics_10extensions_6parser__parse_family(DdManager *__pyx_v_zdd, int **__pyx_v_family, int __pyx_v_count, int __pyx_v_item) {
-  DdNode *__pyx_v_node;
-  int __pyx_v_smallest_value;
-  int __pyx_v_separator;
-  DdNode *__pyx_v_high_node;
-  DdNode *__pyx_v_low_node;
-  DdNode *__pyx_r;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  int __pyx_t_2;
-  __Pyx_RefNannySetupContext("_parse_family", 0);
-
-  /* "ethics/extensions/parser.pyx":113
- * cdef DdNode* _parse_family(DdManager *zdd, int** family, int count, int item):
- *     cdef DdNode* node
- *     cdef int smallest_value = family[0][item]             # <<<<<<<<<<<<<<
- *     cdef int separator = 1
- *     cdef DdNode *high_node
- */
-  __pyx_v_smallest_value = ((__pyx_v_family[0])[__pyx_v_item]);
-
-  /* "ethics/extensions/parser.pyx":114
- *     cdef DdNode* node
- *     cdef int smallest_value = family[0][item]
- *     cdef int separator = 1             # <<<<<<<<<<<<<<
- *     cdef DdNode *high_node
- *     cdef DdNode *low_node
- */
-  __pyx_v_separator = 1;
-
-  /* "ethics/extensions/parser.pyx":118
- *     cdef DdNode *low_node
- * 
- *     if count == 0:             # <<<<<<<<<<<<<<
- *         node = Cudd_ReadZero(zdd)
- *         Cudd_Ref(node)
- */
-  __pyx_t_1 = ((__pyx_v_count == 0) != 0);
-  if (__pyx_t_1) {
-
-    /* "ethics/extensions/parser.pyx":119
- * 
- *     if count == 0:
- *         node = Cudd_ReadZero(zdd)             # <<<<<<<<<<<<<<
- *         Cudd_Ref(node)
- *         return node
- */
-    __pyx_v_node = Cudd_ReadZero(__pyx_v_zdd);
-
-    /* "ethics/extensions/parser.pyx":120
- *     if count == 0:
- *         node = Cudd_ReadZero(zdd)
- *         Cudd_Ref(node)             # <<<<<<<<<<<<<<
- *         return node
- * 
- */
-    Cudd_Ref(__pyx_v_node);
-
-    /* "ethics/extensions/parser.pyx":121
- *         node = Cudd_ReadZero(zdd)
- *         Cudd_Ref(node)
- *         return node             # <<<<<<<<<<<<<<
- * 
- *     if smallest_value == INT_MAX:
- */
-    __pyx_r = __pyx_v_node;
-    goto __pyx_L0;
-
-    /* "ethics/extensions/parser.pyx":118
- *     cdef DdNode *low_node
- * 
- *     if count == 0:             # <<<<<<<<<<<<<<
- *         node = Cudd_ReadZero(zdd)
- *         Cudd_Ref(node)
- */
-  }
-
-  /* "ethics/extensions/parser.pyx":123
- *         return node
- * 
- *     if smallest_value == INT_MAX:             # <<<<<<<<<<<<<<
- *         node = Cudd_ReadOne(zdd)
- *         Cudd_Ref(node)
- */
-  __pyx_t_1 = ((__pyx_v_smallest_value == INT_MAX) != 0);
-  if (__pyx_t_1) {
-
-    /* "ethics/extensions/parser.pyx":124
- * 
- *     if smallest_value == INT_MAX:
- *         node = Cudd_ReadOne(zdd)             # <<<<<<<<<<<<<<
- *         Cudd_Ref(node)
- *         return node
- */
-    __pyx_v_node = Cudd_ReadOne(__pyx_v_zdd);
-
-    /* "ethics/extensions/parser.pyx":125
- *     if smallest_value == INT_MAX:
- *         node = Cudd_ReadOne(zdd)
- *         Cudd_Ref(node)             # <<<<<<<<<<<<<<
- *         return node
- * 
- */
-    Cudd_Ref(__pyx_v_node);
-
-    /* "ethics/extensions/parser.pyx":126
- *         node = Cudd_ReadOne(zdd)
- *         Cudd_Ref(node)
- *         return node             # <<<<<<<<<<<<<<
- * 
- *     while separator < count and family[separator][item] == smallest_value:
- */
-    __pyx_r = __pyx_v_node;
-    goto __pyx_L0;
-
-    /* "ethics/extensions/parser.pyx":123
- *         return node
- * 
- *     if smallest_value == INT_MAX:             # <<<<<<<<<<<<<<
- *         node = Cudd_ReadOne(zdd)
- *         Cudd_Ref(node)
- */
-  }
-
-  /* "ethics/extensions/parser.pyx":128
- *         return node
- * 
- *     while separator < count and family[separator][item] == smallest_value:             # <<<<<<<<<<<<<<
- *         separator += 1
- * 
- */
-  while (1) {
-    __pyx_t_2 = ((__pyx_v_separator < __pyx_v_count) != 0);
-    if (__pyx_t_2) {
+  __Pyx_RefNannySetupContext("sat (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_formula,&__pyx_n_s_atoms,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_formula)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_atoms)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("sat", 1, 2, 2, 1); __PYX_ERR(0, 32, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "sat") < 0)) __PYX_ERR(0, 32, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      __pyx_t_1 = __pyx_t_2;
-      goto __pyx_L7_bool_binop_done;
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_t_2 = ((((__pyx_v_family[__pyx_v_separator])[__pyx_v_item]) == __pyx_v_smallest_value) != 0);
-    __pyx_t_1 = __pyx_t_2;
-    __pyx_L7_bool_binop_done:;
-    if (!__pyx_t_1) break;
-
-    /* "ethics/extensions/parser.pyx":129
- * 
- *     while separator < count and family[separator][item] == smallest_value:
- *         separator += 1             # <<<<<<<<<<<<<<
- * 
- *     high_node = _parse_family(zdd, family, separator, item + 1)
- */
-    __pyx_v_separator = (__pyx_v_separator + 1);
+    __pyx_v_formula = values[0];
+    __pyx_v_atoms = values[1];
   }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("sat", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 32, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("ethics.extensions.sat.sat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6ethics_10extensions_3sat_sat(__pyx_self, __pyx_v_formula, __pyx_v_atoms);
 
-  /* "ethics/extensions/parser.pyx":131
- *         separator += 1
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6ethics_10extensions_3sat_sat(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_formula, PyObject *__pyx_v_atoms) {
+  PyObject *__pyx_v_index_for_atom = NULL;
+  PyObject *__pyx_v_atom_for_index = NULL;
+  DdManager *__pyx_v_bdd;
+  DdNode *__pyx_v_top_node;
+  PyObject *__pyx_v_cubes = NULL;
+  PyObject *__pyx_7genexpr__pyx_v_index = NULL;
+  PyObject *__pyx_7genexpr__pyx_v_value = NULL;
+  PyObject *__pyx_8genexpr1__pyx_v_key = NULL;
+  PyObject *__pyx_8genexpr1__pyx_v_value = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  Py_ssize_t __pyx_t_4;
+  PyObject *(*__pyx_t_5)(PyObject *);
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *(*__pyx_t_9)(PyObject *);
+  Cudd_ReorderingType __pyx_t_10;
+  __Pyx_RefNannySetupContext("sat", 0);
+
+  /* "ethics/extensions/sat.pyx":34
+ * def sat(formula, atoms):
  * 
- *     high_node = _parse_family(zdd, family, separator, item + 1)             # <<<<<<<<<<<<<<
- *     low_node = _parse_family(zdd, family + separator, count - separator, item)
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}             # <<<<<<<<<<<<<<
+ *     atom_for_index = {value: key for key, value in index_for_atom.items()}
  * 
  */
-  __pyx_v_high_node = __pyx_f_6ethics_10extensions_6parser__parse_family(__pyx_v_zdd, __pyx_v_family, __pyx_v_separator, (__pyx_v_item + 1));
+  { /* enter inner scope */
+    __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L5_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx_int_0);
+    __pyx_t_2 = __pyx_int_0;
+    if (likely(PyList_CheckExact(__pyx_v_atoms)) || PyTuple_CheckExact(__pyx_v_atoms)) {
+      __pyx_t_3 = __pyx_v_atoms; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
+      __pyx_t_5 = NULL;
+    } else {
+      __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 34, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 34, __pyx_L5_error)
+    }
+    for (;;) {
+      if (likely(!__pyx_t_5)) {
+        if (likely(PyList_CheckExact(__pyx_t_3))) {
+          if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 34, __pyx_L5_error)
+          #else
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L5_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          #endif
+        } else {
+          if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 34, __pyx_L5_error)
+          #else
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L5_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          #endif
+        }
+      } else {
+        __pyx_t_6 = __pyx_t_5(__pyx_t_3);
+        if (unlikely(!__pyx_t_6)) {
+          PyObject* exc_type = PyErr_Occurred();
+          if (exc_type) {
+            if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+            else __PYX_ERR(0, 34, __pyx_L5_error)
+          }
+          break;
+        }
+        __Pyx_GOTREF(__pyx_t_6);
+      }
+      __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_value, __pyx_t_6);
+      __pyx_t_6 = 0;
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_index, __pyx_t_2);
+      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_2);
+      __pyx_t_2 = __pyx_t_6;
+      __pyx_t_6 = 0;
+      if (unlikely(PyDict_SetItem(__pyx_t_1, (PyObject*)__pyx_7genexpr__pyx_v_value, (PyObject*)__pyx_7genexpr__pyx_v_index))) __PYX_ERR(0, 34, __pyx_L5_error)
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_7genexpr__pyx_v_index); __pyx_7genexpr__pyx_v_index = 0;
+    __Pyx_XDECREF(__pyx_7genexpr__pyx_v_value); __pyx_7genexpr__pyx_v_value = 0;
+    goto __pyx_L8_exit_scope;
+    __pyx_L5_error:;
+    __Pyx_XDECREF(__pyx_7genexpr__pyx_v_index); __pyx_7genexpr__pyx_v_index = 0;
+    __Pyx_XDECREF(__pyx_7genexpr__pyx_v_value); __pyx_7genexpr__pyx_v_value = 0;
+    goto __pyx_L1_error;
+    __pyx_L8_exit_scope:;
+  } /* exit inner scope */
+  __pyx_v_index_for_atom = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "ethics/extensions/parser.pyx":132
+  /* "ethics/extensions/sat.pyx":35
  * 
- *     high_node = _parse_family(zdd, family, separator, item + 1)
- *     low_node = _parse_family(zdd, family + separator, count - separator, item)             # <<<<<<<<<<<<<<
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}
+ *     atom_for_index = {value: key for key, value in index_for_atom.items()}             # <<<<<<<<<<<<<<
  * 
- *     node = cuddZddGetNode(zdd, smallest_value, high_node, low_node)
+ *     cdef DdManager *bdd = Cudd_Init(0, 0, 0, 0, 0)
  */
-  __pyx_v_low_node = __pyx_f_6ethics_10extensions_6parser__parse_family(__pyx_v_zdd, (__pyx_v_family + __pyx_v_separator), (__pyx_v_count - __pyx_v_separator), __pyx_v_item);
+  { /* enter inner scope */
+    __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L11_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = __Pyx_PyDict_Items(__pyx_v_index_for_atom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L11_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
+      __pyx_t_3 = __pyx_t_2; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
+      __pyx_t_5 = NULL;
+    } else {
+      __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L11_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 35, __pyx_L11_error)
+    }
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    for (;;) {
+      if (likely(!__pyx_t_5)) {
+        if (likely(PyList_CheckExact(__pyx_t_3))) {
+          if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 35, __pyx_L11_error)
+          #else
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L11_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          #endif
+        } else {
+          if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
+          #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+          __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 35, __pyx_L11_error)
+          #else
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L11_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          #endif
+        }
+      } else {
+        __pyx_t_2 = __pyx_t_5(__pyx_t_3);
+        if (unlikely(!__pyx_t_2)) {
+          PyObject* exc_type = PyErr_Occurred();
+          if (exc_type) {
+            if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+            else __PYX_ERR(0, 35, __pyx_L11_error)
+          }
+          break;
+        }
+        __Pyx_GOTREF(__pyx_t_2);
+      }
+      if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
+        PyObject* sequence = __pyx_t_2;
+        Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+        if (unlikely(size != 2)) {
+          if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+          else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+          __PYX_ERR(0, 35, __pyx_L11_error)
+        }
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        if (likely(PyTuple_CheckExact(sequence))) {
+          __pyx_t_6 = PyTuple_GET_ITEM(sequence, 0); 
+          __pyx_t_7 = PyTuple_GET_ITEM(sequence, 1); 
+        } else {
+          __pyx_t_6 = PyList_GET_ITEM(sequence, 0); 
+          __pyx_t_7 = PyList_GET_ITEM(sequence, 1); 
+        }
+        __Pyx_INCREF(__pyx_t_6);
+        __Pyx_INCREF(__pyx_t_7);
+        #else
+        __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 35, __pyx_L11_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 35, __pyx_L11_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        #endif
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      } else {
+        Py_ssize_t index = -1;
+        __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 35, __pyx_L11_error)
+        __Pyx_GOTREF(__pyx_t_8);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_9 = Py_TYPE(__pyx_t_8)->tp_iternext;
+        index = 0; __pyx_t_6 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_6)) goto __pyx_L14_unpacking_failed;
+        __Pyx_GOTREF(__pyx_t_6);
+        index = 1; __pyx_t_7 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_7)) goto __pyx_L14_unpacking_failed;
+        __Pyx_GOTREF(__pyx_t_7);
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 35, __pyx_L11_error)
+        __pyx_t_9 = NULL;
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        goto __pyx_L15_unpacking_done;
+        __pyx_L14_unpacking_failed:;
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __pyx_t_9 = NULL;
+        if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+        __PYX_ERR(0, 35, __pyx_L11_error)
+        __pyx_L15_unpacking_done:;
+      }
+      __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_key, __pyx_t_6);
+      __pyx_t_6 = 0;
+      __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_value, __pyx_t_7);
+      __pyx_t_7 = 0;
+      if (unlikely(PyDict_SetItem(__pyx_t_1, (PyObject*)__pyx_8genexpr1__pyx_v_value, (PyObject*)__pyx_8genexpr1__pyx_v_key))) __PYX_ERR(0, 35, __pyx_L11_error)
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_key); __pyx_8genexpr1__pyx_v_key = 0;
+    __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_value); __pyx_8genexpr1__pyx_v_value = 0;
+    goto __pyx_L16_exit_scope;
+    __pyx_L11_error:;
+    __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_key); __pyx_8genexpr1__pyx_v_key = 0;
+    __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_value); __pyx_8genexpr1__pyx_v_value = 0;
+    goto __pyx_L1_error;
+    __pyx_L16_exit_scope:;
+  } /* exit inner scope */
+  __pyx_v_atom_for_index = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "ethics/extensions/parser.pyx":134
- *     low_node = _parse_family(zdd, family + separator, count - separator, item)
+  /* "ethics/extensions/sat.pyx":37
+ *     atom_for_index = {value: key for key, value in index_for_atom.items()}
  * 
- *     node = cuddZddGetNode(zdd, smallest_value, high_node, low_node)             # <<<<<<<<<<<<<<
- *     Cudd_Ref(node)
+ *     cdef DdManager *bdd = Cudd_Init(0, 0, 0, 0, 0)             # <<<<<<<<<<<<<<
+ *     cdef DdNode *top_node = parse_formula(bdd, formula, index_for_atom)
  * 
  */
-  __pyx_v_node = cuddZddGetNode(__pyx_v_zdd, __pyx_v_smallest_value, __pyx_v_high_node, __pyx_v_low_node);
+  __pyx_v_bdd = Cudd_Init(0, 0, 0, 0, 0);
 
-  /* "ethics/extensions/parser.pyx":135
+  /* "ethics/extensions/sat.pyx":38
  * 
- *     node = cuddZddGetNode(zdd, smallest_value, high_node, low_node)
- *     Cudd_Ref(node)             # <<<<<<<<<<<<<<
+ *     cdef DdManager *bdd = Cudd_Init(0, 0, 0, 0, 0)
+ *     cdef DdNode *top_node = parse_formula(bdd, formula, index_for_atom)             # <<<<<<<<<<<<<<
  * 
- *     Cudd_RecursiveDerefZdd(zdd, high_node)
+ *     # Not sure what happens to top_node after this but the unit tests still work
  */
-  Cudd_Ref(__pyx_v_node);
+  __pyx_v_top_node = __pyx_f_6ethics_10extensions_6parser_parse_formula(__pyx_v_bdd, __pyx_v_formula, __pyx_v_index_for_atom);
 
-  /* "ethics/extensions/parser.pyx":137
- *     Cudd_Ref(node)
+  /* "ethics/extensions/sat.pyx":42
+ *     # Not sure what happens to top_node after this but the unit tests still work
+ *     # and the number of models if ridiculuously reduced
+ *     Cudd_ReduceHeap(bdd, CUDD_REORDER_GROUP_SIFT, 1)             # <<<<<<<<<<<<<<
  * 
- *     Cudd_RecursiveDerefZdd(zdd, high_node)             # <<<<<<<<<<<<<<
- *     Cudd_RecursiveDerefZdd(zdd, low_node)
- * 
+ *     cubes = get_cubes(bdd, top_node, atom_for_index)
  */
-  (void)(Cudd_RecursiveDerefZdd(__pyx_v_zdd, __pyx_v_high_node));
+  __pyx_t_10 = ((Cudd_ReorderingType)__Pyx_PyInt_As_Cudd_ReorderingType(__pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 42, __pyx_L1_error)
+  (void)(Cudd_ReduceHeap(__pyx_v_bdd, __pyx_t_10, 1));
 
-  /* "ethics/extensions/parser.pyx":138
+  /* "ethics/extensions/sat.pyx":44
+ *     Cudd_ReduceHeap(bdd, CUDD_REORDER_GROUP_SIFT, 1)
  * 
- *     Cudd_RecursiveDerefZdd(zdd, high_node)
- *     Cudd_RecursiveDerefZdd(zdd, low_node)             # <<<<<<<<<<<<<<
+ *     cubes = get_cubes(bdd, top_node, atom_for_index)             # <<<<<<<<<<<<<<
+ *     return cubes
  * 
- *     return node
  */
-  (void)(Cudd_RecursiveDerefZdd(__pyx_v_zdd, __pyx_v_low_node));
+  __pyx_t_1 = __pyx_f_6ethics_10extensions_3sat_get_cubes(__pyx_v_bdd, __pyx_v_top_node, __pyx_v_atom_for_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_cubes = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "ethics/extensions/parser.pyx":140
- *     Cudd_RecursiveDerefZdd(zdd, low_node)
+  /* "ethics/extensions/sat.pyx":45
  * 
- *     return node             # <<<<<<<<<<<<<<
+ *     cubes = get_cubes(bdd, top_node, atom_for_index)
+ *     return cubes             # <<<<<<<<<<<<<<
+ * 
  */
-  __pyx_r = __pyx_v_node;
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_cubes);
+  __pyx_r = __pyx_v_cubes;
   goto __pyx_L0;
 
-  /* "ethics/extensions/parser.pyx":111
- *     return c_family
+  /* "ethics/extensions/sat.pyx":32
+ *     return cubes
  * 
- * cdef DdNode* _parse_family(DdManager *zdd, int** family, int count, int item):             # <<<<<<<<<<<<<<
- *     cdef DdNode* node
- *     cdef int smallest_value = family[0][item]
+ * def sat(formula, atoms):             # <<<<<<<<<<<<<<
+ * 
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_AddTraceback("ethics.extensions.sat.sat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_index_for_atom);
+  __Pyx_XDECREF(__pyx_v_atom_for_index);
+  __Pyx_XDECREF(__pyx_v_cubes);
+  __Pyx_XDECREF(__pyx_7genexpr__pyx_v_index);
+  __Pyx_XDECREF(__pyx_7genexpr__pyx_v_value);
+  __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_key);
+  __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_value);
+  __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -2332,11 +1838,10 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "DdNode",
     "DdSubtable",
     "FILE",
-    "__pyx_ctuple_int",
-    "__pyx_ctuple_int_struct",
-    "__pyx_ctuple_long",
-    "__pyx_ctuple_long_struct",
+    "__pyx_ctuple_long__and_int",
+    "__pyx_ctuple_long__and_int_struct",
     "bool",
+    "clock_t",
     "uint64_t",
     "uintptr_t",
     0
@@ -2350,6 +1855,11 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     type_name++;
   }
   if (0);
+  else if (__Pyx_StrEq(name, "CUDD_REORDER_GROUP_SIFT")) {
+    Py_INCREF(o);
+    Py_DECREF(__pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT);
+    __pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT = o;
+  }
   else {
     if (PyObject_SetAttr(__pyx_m, py_name, o) < 0) goto bad;
   }
@@ -2467,17 +1977,17 @@ bad:
 #if PY_MAJOR_VERSION >= 3
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_parser(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_sat(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_parser},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_sat},
   {0, NULL}
 };
 #endif
 
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    "parser",
+    "sat",
     0, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
@@ -2507,26 +2017,33 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_, __pyx_k_, sizeof(__pyx_k_), 0, 0, 1, 1},
-  {&__pyx_n_s_And, __pyx_k_And, sizeof(__pyx_k_And), 0, 0, 1, 1},
-  {&__pyx_n_s_Atom, __pyx_k_Atom, sizeof(__pyx_k_Atom), 0, 0, 1, 1},
-  {&__pyx_n_s_BiImpl, __pyx_k_BiImpl, sizeof(__pyx_k_BiImpl), 0, 0, 1, 1},
-  {&__pyx_n_s_Impl, __pyx_k_Impl, sizeof(__pyx_k_Impl), 0, 0, 1, 1},
-  {&__pyx_n_s_Not, __pyx_k_Not, sizeof(__pyx_k_Not), 0, 0, 1, 1},
-  {&__pyx_n_s_Or, __pyx_k_Or, sizeof(__pyx_k_Or), 0, 0, 1, 1},
-  {&__pyx_n_s_TwoPlaced, __pyx_k_TwoPlaced, sizeof(__pyx_k_TwoPlaced), 0, 0, 1, 1},
+  {&__pyx_n_s_atom_for_index, __pyx_k_atom_for_index, sizeof(__pyx_k_atom_for_index), 0, 0, 1, 1},
+  {&__pyx_n_s_atoms, __pyx_k_atoms, sizeof(__pyx_k_atoms), 0, 0, 1, 1},
+  {&__pyx_n_s_bdd, __pyx_k_bdd, sizeof(__pyx_k_bdd), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
+  {&__pyx_n_s_cubes, __pyx_k_cubes, sizeof(__pyx_k_cubes), 0, 0, 1, 1},
+  {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
+  {&__pyx_n_s_ethics_extensions_sat, __pyx_k_ethics_extensions_sat, sizeof(__pyx_k_ethics_extensions_sat), 0, 0, 1, 1},
+  {&__pyx_kp_s_ethics_extensions_sat_pyx, __pyx_k_ethics_extensions_sat_pyx, sizeof(__pyx_k_ethics_extensions_sat_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_ethics_language, __pyx_k_ethics_language, sizeof(__pyx_k_ethics_language), 0, 0, 1, 1},
-  {&__pyx_n_s_f1, __pyx_k_f1, sizeof(__pyx_k_f1), 0, 0, 1, 1},
-  {&__pyx_n_s_f2, __pyx_k_f2, sizeof(__pyx_k_f2), 0, 0, 1, 1},
+  {&__pyx_n_s_formula, __pyx_k_formula, sizeof(__pyx_k_formula), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_index, __pyx_k_index, sizeof(__pyx_k_index), 0, 0, 1, 1},
+  {&__pyx_n_s_index_for_atom, __pyx_k_index_for_atom, sizeof(__pyx_k_index_for_atom), 0, 0, 1, 1},
+  {&__pyx_n_s_items, __pyx_k_items, sizeof(__pyx_k_items), 0, 0, 1, 1},
+  {&__pyx_n_s_key, __pyx_k_key, sizeof(__pyx_k_key), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
+  {&__pyx_n_s_sat, __pyx_k_sat, sizeof(__pyx_k_sat), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+  {&__pyx_n_s_top_node, __pyx_k_top_node, sizeof(__pyx_k_top_node), 0, 0, 1, 1},
+  {&__pyx_n_s_value, __pyx_k_value, sizeof(__pyx_k_value), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 34, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2535,12 +2052,31 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
 static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
+
+  /* "ethics/extensions/sat.pyx":32
+ *     return cubes
+ * 
+ * def sat(formula, atoms):             # <<<<<<<<<<<<<<
+ * 
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}
+ */
+  __pyx_tuple__2 = PyTuple_Pack(11, __pyx_n_s_formula, __pyx_n_s_atoms, __pyx_n_s_index_for_atom, __pyx_n_s_atom_for_index, __pyx_n_s_bdd, __pyx_n_s_top_node, __pyx_n_s_cubes, __pyx_n_s_index, __pyx_n_s_value, __pyx_n_s_key, __pyx_n_s_value); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__2);
+  __Pyx_GIVEREF(__pyx_tuple__2);
+  __pyx_codeobj__3 = (PyObject*)__Pyx_PyCode_New(2, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__2, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ethics_extensions_sat_pyx, __pyx_n_s_sat, 32, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__3)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
+  __pyx_umethod_PyDict_Type_items.type = (PyObject*)&PyDict_Type;
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_14 = PyInt_FromLong(14); if (unlikely(!__pyx_int_14)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2558,6 +2094,7 @@ static int __Pyx_modinit_global_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_global_init_code", 0);
   /*--- Global init code ---*/
+  __pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT = Py_None; Py_INCREF(Py_None);
   __Pyx_RefNannyFinishContext();
   return 0;
 }
@@ -2574,13 +2111,8 @@ static int __Pyx_modinit_function_export_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_export_code", 0);
   /*--- Function export code ---*/
-  if (__Pyx_ExportFunction("parse_family", (void (*)(void))__pyx_f_6ethics_10extensions_6parser_parse_family, "DdNode *(DdManager *, PyObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ExportFunction("parse_formula", (void (*)(void))__pyx_f_6ethics_10extensions_6parser_parse_formula, "DdNode *(DdManager *, PyObject *, PyObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
-  __pyx_L1_error:;
-  __Pyx_RefNannyFinishContext();
-  return -1;
 }
 
 static int __Pyx_modinit_type_init_code(void) {
@@ -2609,10 +2141,18 @@ static int __Pyx_modinit_variable_import_code(void) {
 
 static int __Pyx_modinit_function_import_code(void) {
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
+  __pyx_t_1 = PyImport_ImportModule("ethics.extensions.parser"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "parse_formula", (void (**)(void))&__pyx_f_6ethics_10extensions_6parser_parse_formula, "DdNode *(DdManager *, PyObject *, PyObject *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 
@@ -2632,11 +2172,11 @@ static int __Pyx_modinit_function_import_code(void) {
 
 
 #if PY_MAJOR_VERSION < 3
-__Pyx_PyMODINIT_FUNC initparser(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC initparser(void)
+__Pyx_PyMODINIT_FUNC initsat(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC initsat(void)
 #else
-__Pyx_PyMODINIT_FUNC PyInit_parser(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_parser(void)
+__Pyx_PyMODINIT_FUNC PyInit_sat(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_sat(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -2703,7 +2243,7 @@ bad:
 }
 
 
-static CYTHON_SMALL_CODE int __pyx_pymod_exec_parser(PyObject *__pyx_pyinit_module)
+static CYTHON_SMALL_CODE int __pyx_pymod_exec_sat(PyObject *__pyx_pyinit_module)
 #endif
 #endif
 {
@@ -2713,7 +2253,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_parser(PyObject *__pyx_pyinit_modu
   #if CYTHON_PEP489_MULTI_PHASE_INIT
   if (__pyx_m) {
     if (__pyx_m == __pyx_pyinit_module) return 0;
-    PyErr_SetString(PyExc_RuntimeError, "Module 'parser' has already been imported. Re-initialisation is not supported.");
+    PyErr_SetString(PyExc_RuntimeError, "Module 'sat' has already been imported. Re-initialisation is not supported.");
     return -1;
   }
   #elif PY_MAJOR_VERSION >= 3
@@ -2728,7 +2268,7 @@ if (!__Pyx_RefNanny) {
       Py_FatalError("failed to import 'refnanny' module");
 }
 #endif
-  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_parser(void)", 0);
+  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_sat(void)", 0);
   if (__Pyx_check_binary_version() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #ifdef __Pxy_PyFrame_Initialize_Offsets
   __Pxy_PyFrame_Initialize_Offsets();
@@ -2767,7 +2307,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("parser", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("sat", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -2785,14 +2325,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_ethics__extensions__parser) {
+  if (__pyx_module_is_main_ethics__extensions__sat) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "ethics.extensions.parser")) {
-      if (unlikely(PyDict_SetItemString(modules, "ethics.extensions.parser", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "ethics.extensions.sat")) {
+      if (unlikely(PyDict_SetItemString(modules, "ethics.extensions.sat", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -2803,38 +2343,62 @@ if (!__Pyx_RefNanny) {
   /*--- Global type/function init code ---*/
   (void)__Pyx_modinit_global_init_code();
   (void)__Pyx_modinit_variable_export_code();
-  if (unlikely(__Pyx_modinit_function_export_code() != 0)) goto __pyx_L1_error;
+  (void)__Pyx_modinit_function_export_code();
   (void)__Pyx_modinit_type_init_code();
   (void)__Pyx_modinit_type_import_code();
   (void)__Pyx_modinit_variable_import_code();
-  (void)__Pyx_modinit_function_import_code();
+  if (unlikely(__Pyx_modinit_function_import_code() != 0)) goto __pyx_L1_error;
   /*--- Execution code ---*/
   #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "ethics/extensions/parser.pyx":6
- * from libc.stdio cimport printf
- * from libc.limits cimport INT_MAX
- * from ethics.language import *             # <<<<<<<<<<<<<<
+  /* "ethics/extensions/sat.pyx":7
+ * from libc.time cimport clock,clock_t,CLOCKS_PER_SEC
  * from libc.stdint cimport uintptr_t, uint64_t
+ * from ethics.language import *             # <<<<<<<<<<<<<<
  * 
+ * cdef CUDD_REORDER_GROUP_SIFT = 14
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_);
   __Pyx_GIVEREF(__pyx_n_s_);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_ethics_language, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_ethics_language, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_import_star(__pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error);
+  if (__pyx_import_star(__pyx_t_2) < 0) __PYX_ERR(0, 7, __pyx_L1_error);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ethics/extensions/parser.pyx":1
- * from ethics.extensions.c_cudd cimport *             # <<<<<<<<<<<<<<
- * #from primecompilator.cudd cimport Manager, Node
- * from libc.stdlib cimport malloc, free
+  /* "ethics/extensions/sat.pyx":9
+ * from ethics.language import *
+ * 
+ * cdef CUDD_REORDER_GROUP_SIFT = 14             # <<<<<<<<<<<<<<
+ * 
+ * cdef object get_cubes(DdManager *bdd, DdNode *top_node, object atom_for_index):
+ */
+  __Pyx_INCREF(__pyx_int_14);
+  __Pyx_XGOTREF(__pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT);
+  __Pyx_DECREF_SET(__pyx_v_6ethics_10extensions_3sat_CUDD_REORDER_GROUP_SIFT, __pyx_int_14);
+  __Pyx_GIVEREF(__pyx_int_14);
+
+  /* "ethics/extensions/sat.pyx":32
+ *     return cubes
+ * 
+ * def sat(formula, atoms):             # <<<<<<<<<<<<<<
+ * 
+ *     index_for_atom = {value: index for index, value in enumerate(atoms)}
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_6ethics_10extensions_3sat_1sat, NULL, __pyx_n_s_ethics_extensions_sat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_sat, __pyx_t_2) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ethics/extensions/sat.pyx":1
+ * from libc.stdlib cimport malloc, free, calloc             # <<<<<<<<<<<<<<
+ * from ethics.extensions.c_cudd cimport *
+ * from ethics.extensions.parser cimport parse_formula
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2849,11 +2413,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init ethics.extensions.parser", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init ethics.extensions.sat", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init ethics.extensions.parser");
+    PyErr_SetString(PyExc_ImportError, "init ethics.extensions.sat");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -2910,67 +2474,6 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
 #endif
     }
     return result;
-}
-
-/* PyDictVersioning */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* GetModuleGlobalName */
-#if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
 }
 
 /* GetItemInt */
@@ -3060,99 +2563,397 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
     return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
 }
 
-/* ObjectGetItem */
-#if CYTHON_USE_TYPE_SLOTS
-static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
-    PyObject *runerr;
-    Py_ssize_t key_value;
-    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
-    if (unlikely(!(m && m->sq_item))) {
-        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
-        return NULL;
-    }
-    key_value = __Pyx_PyIndex_AsSsize_t(index);
-    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
-        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
-    }
-    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
-        PyErr_Clear();
-        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
-    }
-    return NULL;
-}
-static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
-    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
-    if (likely(m && m->mp_subscript)) {
-        return m->mp_subscript(obj, key);
-    }
-    return __Pyx_PyObject_GetIndex(obj, key);
-}
-#endif
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
-
-/* WriteUnraisableException */
-static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
-                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
-                                  int full_traceback, CYTHON_UNUSED int nogil) {
-    PyObject *old_exc, *old_val, *old_tb;
-    PyObject *ctx;
-    __Pyx_PyThreadState_declare
-#ifdef WITH_THREAD
-    PyGILState_STATE state;
-    if (nogil)
-        state = PyGILState_Ensure();
-#ifdef _MSC_VER
-    else state = (PyGILState_STATE)-1;
-#endif
-#endif
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
-    if (full_traceback) {
-        Py_XINCREF(old_exc);
-        Py_XINCREF(old_val);
-        Py_XINCREF(old_tb);
-        __Pyx_ErrRestore(old_exc, old_val, old_tb);
-        PyErr_PrintEx(1);
-    }
-    #if PY_MAJOR_VERSION < 3
-    ctx = PyString_FromString(name);
-    #else
-    ctx = PyUnicode_FromString(name);
-    #endif
-    __Pyx_ErrRestore(old_exc, old_val, old_tb);
-    if (!ctx) {
-        PyErr_WriteUnraisable(Py_None);
+/* RaiseArgTupleInvalid */
+static void __Pyx_RaiseArgtupleInvalid(
+    const char* func_name,
+    int exact,
+    Py_ssize_t num_min,
+    Py_ssize_t num_max,
+    Py_ssize_t num_found)
+{
+    Py_ssize_t num_expected;
+    const char *more_or_less;
+    if (num_found < num_min) {
+        num_expected = num_min;
+        more_or_less = "at least";
     } else {
-        PyErr_WriteUnraisable(ctx);
-        Py_DECREF(ctx);
+        num_expected = num_max;
+        more_or_less = "at most";
     }
-#ifdef WITH_THREAD
-    if (nogil)
-        PyGILState_Release(state);
+    if (exact) {
+        more_or_less = "exactly";
+    }
+    PyErr_Format(PyExc_TypeError,
+                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                 func_name, more_or_less, num_expected,
+                 (num_expected == 1) ? "" : "s", num_found);
+}
+
+/* RaiseDoubleKeywords */
+static void __Pyx_RaiseDoubleKeywordsError(
+    const char* func_name,
+    PyObject* kw_name)
+{
+    PyErr_Format(PyExc_TypeError,
+        #if PY_MAJOR_VERSION >= 3
+        "%s() got multiple values for keyword argument '%U'", func_name, kw_name);
+        #else
+        "%s() got multiple values for keyword argument '%s'", func_name,
+        PyString_AsString(kw_name));
+        #endif
+}
+
+/* ParseKeywords */
+static int __Pyx_ParseOptionalKeywords(
+    PyObject *kwds,
+    PyObject **argnames[],
+    PyObject *kwds2,
+    PyObject *values[],
+    Py_ssize_t num_pos_args,
+    const char* function_name)
+{
+    PyObject *key = 0, *value = 0;
+    Py_ssize_t pos = 0;
+    PyObject*** name;
+    PyObject*** first_kw_arg = argnames + num_pos_args;
+    while (PyDict_Next(kwds, &pos, &key, &value)) {
+        name = first_kw_arg;
+        while (*name && (**name != key)) name++;
+        if (*name) {
+            values[name-argnames] = value;
+            continue;
+        }
+        name = first_kw_arg;
+        #if PY_MAJOR_VERSION < 3
+        if (likely(PyString_CheckExact(key)) || likely(PyString_Check(key))) {
+            while (*name) {
+                if ((CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**name) == PyString_GET_SIZE(key))
+                        && _PyString_Eq(**name, key)) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    if ((**argname == key) || (
+                            (CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**argname) == PyString_GET_SIZE(key))
+                             && _PyString_Eq(**argname, key))) {
+                        goto arg_passed_twice;
+                    }
+                    argname++;
+                }
+            }
+        } else
+        #endif
+        if (likely(PyUnicode_Check(key))) {
+            while (*name) {
+                int cmp = (**name == key) ? 0 :
+                #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                    (PyUnicode_GET_SIZE(**name) != PyUnicode_GET_SIZE(key)) ? 1 :
+                #endif
+                    PyUnicode_Compare(**name, key);
+                if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                if (cmp == 0) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    int cmp = (**argname == key) ? 0 :
+                    #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                        (PyUnicode_GET_SIZE(**argname) != PyUnicode_GET_SIZE(key)) ? 1 :
+                    #endif
+                        PyUnicode_Compare(**argname, key);
+                    if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                    if (cmp == 0) goto arg_passed_twice;
+                    argname++;
+                }
+            }
+        } else
+            goto invalid_keyword_type;
+        if (kwds2) {
+            if (unlikely(PyDict_SetItem(kwds2, key, value))) goto bad;
+        } else {
+            goto invalid_keyword;
+        }
+    }
+    return 0;
+arg_passed_twice:
+    __Pyx_RaiseDoubleKeywordsError(function_name, key);
+    goto bad;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    goto bad;
+invalid_keyword:
+    PyErr_Format(PyExc_TypeError,
+    #if PY_MAJOR_VERSION < 3
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
+bad:
+    return -1;
+}
+
+/* PyIntBinop */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
+    (void)inplace;
+    (void)zerodivision_check;
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long x;
+        long a = PyInt_AS_LONG(op1);
+            x = (long)((unsigned long)a + b);
+            if (likely((x^a) >= 0 || (x^b) >= 0))
+                return PyInt_FromLong(x);
+            return PyLong_Type.tp_as_number->nb_add(op1, op2);
+    }
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        const long b = intval;
+        long a, x;
+#ifdef HAVE_LONG_LONG
+        const PY_LONG_LONG llb = intval;
+        PY_LONG_LONG lla, llx;
 #endif
+        const digit* digits = ((PyLongObject*)op1)->ob_digit;
+        const Py_ssize_t size = Py_SIZE(op1);
+        if (likely(__Pyx_sst_abs(size) <= 1)) {
+            a = likely(size) ? digits[0] : 0;
+            if (size == -1) a = -a;
+        } else {
+            switch (size) {
+                case -2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                default: return PyLong_Type.tp_as_number->nb_add(op1, op2);
+            }
+        }
+                x = a + b;
+            return PyLong_FromLong(x);
+#ifdef HAVE_LONG_LONG
+        long_long:
+                llx = lla + llb;
+            return PyLong_FromLongLong(llx);
+#endif
+        
+        
+    }
+    #endif
+    if (PyFloat_CheckExact(op1)) {
+        const long b = intval;
+        double a = PyFloat_AS_DOUBLE(op1);
+            double result;
+            PyFPE_START_PROTECT("add", return NULL)
+            result = ((double)a) + (double)b;
+            PyFPE_END_PROTECT(result)
+            return PyFloat_FromDouble(result);
+    }
+    return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
+}
+#endif
+
+/* PyObjectCall */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = func->ob_type->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* UnpackUnboundCMethod */
+static int __Pyx_TryUnpackUnboundCMethod(__Pyx_CachedCFunction* target) {
+    PyObject *method;
+    method = __Pyx_PyObject_GetAttrStr(target->type, *target->method_name);
+    if (unlikely(!method))
+        return -1;
+    target->method = method;
+#if CYTHON_COMPILING_IN_CPYTHON
+    #if PY_MAJOR_VERSION >= 3
+    if (likely(__Pyx_TypeCheck(method, &PyMethodDescr_Type)))
+    #endif
+    {
+        PyMethodDescrObject *descr = (PyMethodDescrObject*) method;
+        target->func = descr->d_method->ml_meth;
+        target->flag = descr->d_method->ml_flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_STACKLESS);
+    }
+#endif
+    return 0;
+}
+
+/* CallUnboundCMethod0 */
+static PyObject* __Pyx__CallUnboundCMethod0(__Pyx_CachedCFunction* cfunc, PyObject* self) {
+    PyObject *args, *result = NULL;
+    if (unlikely(!cfunc->method) && unlikely(__Pyx_TryUnpackUnboundCMethod(cfunc) < 0)) return NULL;
+#if CYTHON_ASSUME_SAFE_MACROS
+    args = PyTuple_New(1);
+    if (unlikely(!args)) goto bad;
+    Py_INCREF(self);
+    PyTuple_SET_ITEM(args, 0, self);
+#else
+    args = PyTuple_Pack(1, self);
+    if (unlikely(!args)) goto bad;
+#endif
+    result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
+    Py_DECREF(args);
+bad:
+    return result;
+}
+
+/* py_dict_items */
+static CYTHON_INLINE PyObject* __Pyx_PyDict_Items(PyObject* d) {
+    if (PY_MAJOR_VERSION >= 3)
+        return __Pyx_CallUnboundCMethod0(&__pyx_umethod_PyDict_Type_items, d);
+    else
+        return PyDict_Items(d);
+}
+
+/* RaiseTooManyValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
+    PyErr_Format(PyExc_ValueError,
+                 "too many values to unpack (expected %" CYTHON_FORMAT_SSIZE_T "d)", expected);
+}
+
+/* RaiseNeedMoreValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index) {
+    PyErr_Format(PyExc_ValueError,
+                 "need more than %" CYTHON_FORMAT_SSIZE_T "d value%.1s to unpack",
+                 index, (index == 1) ? "" : "s");
+}
+
+/* IterFinish */
+static CYTHON_INLINE int __Pyx_IterFinish(void) {
+#if CYTHON_FAST_THREAD_STATE
+    PyThreadState *tstate = __Pyx_PyThreadState_Current;
+    PyObject* exc_type = tstate->curexc_type;
+    if (unlikely(exc_type)) {
+        if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) {
+            PyObject *exc_value, *exc_tb;
+            exc_value = tstate->curexc_value;
+            exc_tb = tstate->curexc_traceback;
+            tstate->curexc_type = 0;
+            tstate->curexc_value = 0;
+            tstate->curexc_traceback = 0;
+            Py_DECREF(exc_type);
+            Py_XDECREF(exc_value);
+            Py_XDECREF(exc_tb);
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+    return 0;
+#else
+    if (unlikely(PyErr_Occurred())) {
+        if (likely(PyErr_ExceptionMatches(PyExc_StopIteration))) {
+            PyErr_Clear();
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+    return 0;
+#endif
+}
+
+/* UnpackItemEndCheck */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
+    if (unlikely(retval)) {
+        Py_DECREF(retval);
+        __Pyx_RaiseTooManyValuesError(expected);
+        return -1;
+    } else {
+        return __Pyx_IterFinish();
+    }
+    return 0;
 }
 
 /* Import */
@@ -3219,6 +3020,56 @@ bad:
     Py_XDECREF(empty_dict);
     return module;
 }
+
+/* PyDictVersioning */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
 
 /* CLineInTraceback */
 #ifndef CYTHON_CLINE_IN_TRACEBACK
@@ -3427,28 +3278,6 @@ bad:
     Py_XDECREF(py_frame);
 }
 
-/* CIntFromPyVerify */
-#define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
-#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
-#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
-    {\
-        func_type value = func_value;\
-        if (sizeof(target_type) < sizeof(func_type)) {\
-            if (unlikely(value != (func_type) (target_type) value)) {\
-                func_type zero = 0;\
-                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
-                    return (target_type) -1;\
-                if (is_unsigned && unlikely(value < zero))\
-                    goto raise_neg_overflow;\
-                else\
-                    goto raise_overflow;\
-            }\
-        }\
-        return (target_type) value;\
-    }
-
 /* CIntToPy */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     const int neg_one = (int) ((int) 0 - (int) 1), const_zero = (int) 0;
@@ -3480,36 +3309,27 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     }
 }
 
-/* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
-    const long neg_one = (long) ((long) 0 - (long) 1), const_zero = (long) 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(long) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(long) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
+/* CIntFromPyVerify */
+#define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
+#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
+#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
+    {\
+        func_type value = func_value;\
+        if (sizeof(target_type) < sizeof(func_type)) {\
+            if (unlikely(value != (func_type) (target_type) value)) {\
+                func_type zero = 0;\
+                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
+                    return (target_type) -1;\
+                if (is_unsigned && unlikely(value < zero))\
+                    goto raise_neg_overflow;\
+                else\
+                    goto raise_overflow;\
+            }\
+        }\
+        return (target_type) value;\
     }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(long),
-                                     little, !is_unsigned);
-    }
-}
 
 /* CIntFromPy */
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
@@ -3698,6 +3518,226 @@ raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
         "can't convert negative value to int");
     return (int) -1;
+}
+
+/* CIntFromPy */
+static CYTHON_INLINE Cudd_ReorderingType __Pyx_PyInt_As_Cudd_ReorderingType(PyObject *x) {
+    const Cudd_ReorderingType neg_one = (Cudd_ReorderingType) ((Cudd_ReorderingType) 0 - (Cudd_ReorderingType) 1), const_zero = (Cudd_ReorderingType) 0;
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if (sizeof(Cudd_ReorderingType) < sizeof(long)) {
+            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (Cudd_ReorderingType) val;
+        }
+    } else
+#endif
+    if (likely(PyLong_Check(x))) {
+        if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (Cudd_ReorderingType) 0;
+                case  1: __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, digit, digits[0])
+                case 2:
+                    if (8 * sizeof(Cudd_ReorderingType) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) >= 2 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((((Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(Cudd_ReorderingType) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) >= 3 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((((((Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(Cudd_ReorderingType) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) >= 4 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((((((((Cudd_ReorderingType)digits[3]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0]));
+                        }
+                    }
+                    break;
+            }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON
+            if (unlikely(Py_SIZE(x) < 0)) {
+                goto raise_neg_overflow;
+            }
+#else
+            {
+                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                if (unlikely(result < 0))
+                    return (Cudd_ReorderingType) -1;
+                if (unlikely(result == 1))
+                    goto raise_neg_overflow;
+            }
+#endif
+            if (sizeof(Cudd_ReorderingType) <= sizeof(unsigned long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(Cudd_ReorderingType, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(Cudd_ReorderingType) <= sizeof(unsigned PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(Cudd_ReorderingType, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+            }
+        } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (Cudd_ReorderingType) 0;
+                case -1: __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, sdigit, (sdigit) (-(sdigit)digits[0]))
+                case  1: __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType,  digit, +digits[0])
+                case -2:
+                    if (8 * sizeof(Cudd_ReorderingType) - 1 > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 2 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((Cudd_ReorderingType)-1)*(((((Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if (8 * sizeof(Cudd_ReorderingType) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 2 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) ((((((Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if (8 * sizeof(Cudd_ReorderingType) - 1 > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 3 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((Cudd_ReorderingType)-1)*(((((((Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(Cudd_ReorderingType) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 3 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) ((((((((Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if (8 * sizeof(Cudd_ReorderingType) - 1 > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 4 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) (((Cudd_ReorderingType)-1)*(((((((((Cudd_ReorderingType)digits[3]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(Cudd_ReorderingType) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(Cudd_ReorderingType, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(Cudd_ReorderingType) - 1 > 4 * PyLong_SHIFT) {
+                            return (Cudd_ReorderingType) ((((((((((Cudd_ReorderingType)digits[3]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[2]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[1]) << PyLong_SHIFT) | (Cudd_ReorderingType)digits[0])));
+                        }
+                    }
+                    break;
+            }
+#endif
+            if (sizeof(Cudd_ReorderingType) <= sizeof(long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(Cudd_ReorderingType, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(Cudd_ReorderingType) <= sizeof(PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(Cudd_ReorderingType, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+            }
+        }
+        {
+#if CYTHON_COMPILING_IN_PYPY && !defined(_PyLong_AsByteArray)
+            PyErr_SetString(PyExc_RuntimeError,
+                            "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
+#else
+            Cudd_ReorderingType val;
+            PyObject *v = __Pyx_PyNumber_IntOrLong(x);
+ #if PY_MAJOR_VERSION < 3
+            if (likely(v) && !PyLong_Check(v)) {
+                PyObject *tmp = v;
+                v = PyNumber_Long(tmp);
+                Py_DECREF(tmp);
+            }
+ #endif
+            if (likely(v)) {
+                int one = 1; int is_little = (int)*(unsigned char *)&one;
+                unsigned char *bytes = (unsigned char *)&val;
+                int ret = _PyLong_AsByteArray((PyLongObject *)v,
+                                              bytes, sizeof(val),
+                                              is_little, !is_unsigned);
+                Py_DECREF(v);
+                if (likely(!ret))
+                    return val;
+            }
+#endif
+            return (Cudd_ReorderingType) -1;
+        }
+    } else {
+        Cudd_ReorderingType val;
+        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
+        if (!tmp) return (Cudd_ReorderingType) -1;
+        val = __Pyx_PyInt_As_Cudd_ReorderingType(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to Cudd_ReorderingType");
+    return (Cudd_ReorderingType) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to Cudd_ReorderingType");
+    return (Cudd_ReorderingType) -1;
+}
+
+/* CIntToPy */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+    const long neg_one = (long) ((long) 0 - (long) 1), const_zero = (long) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(long) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(long) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(long),
+                                     little, !is_unsigned);
+    }
 }
 
 /* CIntFromPy */
@@ -4011,42 +4051,59 @@ static int __Pyx_check_binary_version(void) {
     return 0;
 }
 
-/* FunctionExport */
-static int __Pyx_ExportFunction(const char *name, void (*f)(void), const char *sig) {
+/* FunctionImport */
+#ifndef __PYX_HAVE_RT_ImportFunction
+#define __PYX_HAVE_RT_ImportFunction
+static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
     PyObject *d = 0;
     PyObject *cobj = 0;
     union {
         void (*fp)(void);
         void *p;
     } tmp;
-    d = PyObject_GetAttrString(__pyx_m, (char *)"__pyx_capi__");
-    if (!d) {
-        PyErr_Clear();
-        d = PyDict_New();
-        if (!d)
-            goto bad;
-        Py_INCREF(d);
-        if (PyModule_AddObject(__pyx_m, (char *)"__pyx_capi__", d) < 0)
-            goto bad;
+    d = PyObject_GetAttrString(module, (char *)"__pyx_capi__");
+    if (!d)
+        goto bad;
+    cobj = PyDict_GetItemString(d, funcname);
+    if (!cobj) {
+        PyErr_Format(PyExc_ImportError,
+            "%.200s does not export expected C function %.200s",
+                PyModule_GetName(module), funcname);
+        goto bad;
     }
-    tmp.fp = f;
 #if PY_VERSION_HEX >= 0x02070000
-    cobj = PyCapsule_New(tmp.p, sig, 0);
+    if (!PyCapsule_IsValid(cobj, sig)) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, PyCapsule_GetName(cobj));
+        goto bad;
+    }
+    tmp.p = PyCapsule_GetPointer(cobj, sig);
 #else
-    cobj = PyCObject_FromVoidPtrAndDesc(tmp.p, (void *)sig, 0);
+    {const char *desc, *s1, *s2;
+    desc = (const char *)PyCObject_GetDesc(cobj);
+    if (!desc)
+        goto bad;
+    s1 = desc; s2 = sig;
+    while (*s1 != '\0' && *s1 == *s2) { s1++; s2++; }
+    if (*s1 != *s2) {
+        PyErr_Format(PyExc_TypeError,
+            "C function %.200s.%.200s has wrong signature (expected %.500s, got %.500s)",
+             PyModule_GetName(module), funcname, sig, desc);
+        goto bad;
+    }
+    tmp.p = PyCObject_AsVoidPtr(cobj);}
 #endif
-    if (!cobj)
+    *f = tmp.fp;
+    if (!(*f))
         goto bad;
-    if (PyDict_SetItemString(d, name, cobj) < 0)
-        goto bad;
-    Py_DECREF(cobj);
     Py_DECREF(d);
     return 0;
 bad:
-    Py_XDECREF(cobj);
     Py_XDECREF(d);
     return -1;
 }
+#endif
 
 /* InitStrings */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
