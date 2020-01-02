@@ -1,0 +1,56 @@
+actions:
+    - name: pull_lever1_left
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever1_left: true}
+    - name: pull_lever1_right
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever1_left: false} 
+    - name: pull_lever2_left
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever2_left: true}
+    - name: pull_lever2_right
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever2_left: false}  
+    - name: pull_lever3_left
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever3_left: true}
+    - name: pull_lever3_right
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {lever3_left: false}    
+events:
+    - name: move_tram
+      preconditions: {}
+      effects:
+        - condition: {lever1_left: false}
+          effect: {man_dead: true, tram_at_goal: true}
+        - condition: {lever1_left: true, lever2_left: false, lever3_left: false}
+          effect: {tram_at_goal: true}
+      timepoints: [3]     
+utilities:
+    - fact: {man_dead: true}
+      utility: -1
+affects:
+    man: 
+      pos: [{man_dead: false}]
+      neg: [{man_dead: true}]
+plan: [pull_lever2_right, pull_lever3_right]
+goal: {tram_at_goal: true}
+initialState: {tram_at_goal: false, man_dead: false, lever1_left: true, lever2_left: true, lever3_left: true}

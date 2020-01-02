@@ -4,7 +4,13 @@ actions:
       preconditions: {}
       effects:
         - condition: {}
-          effect: {frank_motivated: true}              
+          effect: {frank_motivated: true}    
+    - name: beg_frank
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {frank_motivated: true}             
 events:
     - name: franks_action
       preconditions: {}
@@ -21,6 +27,6 @@ affects:
     frank: 
       pos: [{frank_healthy: true}]
       neg: [{frank_healthy: false}]
-plan: [lie_to_frank]
+plan: [beg_frank]
 goal: {frank_healthy: true}
 initialState: {frank_motivated: false, frank_does_workout: false, frank_healthy: false}

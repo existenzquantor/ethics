@@ -7,7 +7,7 @@ from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalH
 print("*"*50)
 print("JSON")
 print("*"*50)
-sit = Situation("cases/plans/robot_and_frank.yaml")
+sit = Situation("cases/plans/multi_track.yaml")
 sit_alt = Situation("cases/plans/robot_and_frank.yaml")
 sit_alt.plan = Plan([]) # Compare to empty plan
 sit.alethicAlternatives.append(sit_alt)
@@ -20,6 +20,14 @@ perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
 print("Deontology Explanation:", sit.explain(Deontology))
 
+
+
+perm = sit.evaluate(DoNoHarm)
+print("DoNoHarm: ", perm)
+print("DoNoHarm Explanation:", sit.explain(DoNoHarm))
+
+
+"""
 perm = sit.evaluate(GoalDeontology)
 print("GoalDeontology: ", perm)
 print("GoalDeontology Explanation:", sit.explain(GoalDeontology))
@@ -28,9 +36,6 @@ perm = sit.evaluate(KantianHumanity)
 print("Kantian: ", perm)
 print("Kantian Explanation:", sit.explain(KantianHumanity))
 
-perm = sit.evaluate(DoNoHarm)
-print("DoNoHarm: ", perm)
-print("DoNoHarm Explanation:", sit.explain(DoNoHarm))
 
 perm = sit.evaluate(AvoidAnyHarm)
 print("AvoidAnyHarm: ", perm)
@@ -59,3 +64,4 @@ if p:
     print("Planned: ", p.plan)
 else:
     print("No Plan found")
+"""
