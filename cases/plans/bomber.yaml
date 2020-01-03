@@ -21,6 +21,6 @@ events:
 utilities:
     - fact: {school_destroyed: true}
       utility: -1
-plan: [bomb_fabric]
+plan: [bomb_school]
 goal: {war_end: true}
 initialState: {war_end: false, fabric_destroyed: false, school_destroyed: false}
