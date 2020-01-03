@@ -1,0 +1,26 @@
+actions:
+    - name: bomb_fabric
+      intrinsicvalue: bad
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {fabric_destroyed: true, school_destroyed: true, war_end: true}    
+    - name: bomb_school
+      intrinsicvalue: bad
+      preconditions: {}
+      effects:
+        - condition: {}
+          effect: {school_destroyed: true}             
+events:
+    - name: end_war
+      preconditions: {}
+      effects:
+        - condition: {school_destroyed: true}
+          effect: {war_end: true}
+      timepoints: [1]     
+utilities:
+    - fact: {school_destroyed: true}
+      utility: -1
+plan: [bomb_fabric]
+goal: {war_end: true}
+initialState: {war_end: false, fabric_destroyed: false, school_destroyed: false}
