@@ -1,0 +1,16 @@
+actions:
+    - name: sally_throws
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {bs: false}
+          effect: {bs: true}    
+    - name: bob_throws
+      intrinsicvalue: neutral
+      preconditions: {}
+      effects:
+        - condition: {bs: false}
+          effect: {bs: true}    
+plan: [sally_throws, bob_throws]
+goal: {bs: true}
+initialState: {bs: false}

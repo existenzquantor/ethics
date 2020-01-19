@@ -11,7 +11,20 @@ class Plan:
         :type endoPlan: list
         """
         self.endoActions = endoPlan
-    
+
+    def substitute_fixed_effects(self, cause, positions):
+        p = copy.deepcopy(self)
+        for i in range(len(positions)):
+            if positions[i] and not cause[i]:
+                new_action = Action(p.endoActions[i].name, dict(), [{"condition": dict(), "effect": p.endoActions[i].last_actual_effects}], p.endoActions[i].intrinsicvalue)
+                p.endoActions[i] = new_action
+        return p
+
+    def compute_all_fixed_effect_alternatives(self, cause):
+        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
+            if sum(b) > 0:
+                yield self.substitute_fixed_effects(cause, b)
+
     def substitute_empty_actions(self, positions):
         """Substitute actions in the plan by the empty action at the given positions.
         
@@ -118,6 +131,8 @@ class Action:
         self.pre = pre
         self.eff = eff
         self.intrinsicvalue = intrinsicvalue
+
+        self.last_actual_effects = dict()
         
     def __str__(self):
         """String representation of an action
@@ -170,7 +185,7 @@ class EmptyAction(Action):
     """Empty Action"""
 
     def __init__(self):
-        super().__init__("epsilon", dict(), dict(), "neutral")
+        super().__init__("epsilon", dict(), [{"condition": dict(), "effect": dict()}], "neutral")
     
     def has_effect_somewhere(self, effect):
         return False

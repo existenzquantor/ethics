@@ -250,7 +250,21 @@ class Situation:
                     if not self.__is_satisfied(effect, sit.simulate()):
                         return True
         return False
-        
+
+    def causes(self, cause, effect):
+        #cause = [1, 0]
+        #effect = {"bs": true}
+        if not self.__is_satisfied(effect, self.simulate()):
+            return False
+        plans = self.plan.compute_all_fixed_effect_alternatives(cause)
+        for p in plans:
+            pp = p.substitute_empty_actions(cause)
+            s = self.clone_situation()
+            s.plan = pp
+            if not self.__is_satisfied(effect, s.simulate()):
+                return True
+        return False
+
     def evaluate(self, principle, *args):
         """Check if the situation is permissible according to a given ethical principle.
         
@@ -300,13 +314,15 @@ class Situation:
         :type state: List
         :return: New state
         :rtype: dict
-        """   
+        """
+        action.last_actual_effects = dict()
         si = copy.deepcopy(state)
         if self.is_applicable(action, state):
             for condeff in action.eff:
                 if self.__is_satisfied(condeff["condition"], state):
                     for v in condeff["effect"].keys():
                         si[v] = condeff["effect"][v]
+                        action.last_actual_effects[v] = condeff["effect"][v]
         return si
 
     def __apply_all_events(self, state, time):
