@@ -1,0 +1,27 @@
+# A drug cures an illness, but kills the patient in 10% of cases
+description: Dangerous Drug
+actions: [giveDrug, refraining]
+patients: [patient, doctor]
+consequences: [patientDead, patientHealed]
+background: [drugDeadly]
+allSituations:
+  utilities:
+    patientDead: -2
+    patientHealed: +1
+    Not('patientHealed'): -1
+  affects:
+    patientDead: [[patient, -]]
+    patientHealed: [[patient, +]]
+    Not('patientHealed'): [[patient, -]]
+  goals:
+    giveDrug: [patientHealed]
+    refraining: []
+  mechanisms:
+    patientHealed: And('giveDrug', Not('drugDeadly'))
+    patientDead: And('giveDrug', 'drugDeadly')
+situations:
+  - situation:
+      probability: 0.9
+  - situation:
+      information: [drugDeadly]
+      probability: 0.1
