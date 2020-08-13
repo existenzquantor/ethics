@@ -1,0 +1,25 @@
+# A person has fun playing russian roulette with another unknowing person
+description: Russian Roulette
+actions: [play, refrain]
+patients: [player, victim]
+consequences: [playerFun, victimDead]
+background: [bulletInBarrel]
+allSituations:
+  utilities:
+    victimDead: -5
+    playerFun: 1
+  affects:
+    victimDead: [[victim, -]]
+    playerFun: [[player, +]]
+  goals:
+    play: [playerFun]
+    refrain: []
+  mechanisms:
+    victimDead: And('play', 'bulletInBarrel')
+    playerFun: 'play'
+situations:
+  - situation:
+      probability: 0.8
+  - situation:
+      information: [bulletInBarrel]
+      probability: 0.2

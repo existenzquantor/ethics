@@ -1,0 +1,52 @@
+# The USA can choose three different strategies regarding nuclear weapon capacities.
+description: Cold War
+actions: [USSuperiority, USEquivalence, USNuclearDisarmament]
+consequences: [USFirstStrikeCapacity, USSecondStrikeCapacity, relaxation, SUFirstStrikeCapacity, SUSecondStrikeCapacity, USDestroyed, SUDestroyed, SUPowerGain, USPowerGain, NuclearWar]
+background: [SUSuperiority, SUEquivalence, SUNuclearDisarmament, SUStrikes, SURefrains, SUPowerGainPossible, USPowerGainPossible]
+patients: [USPeople, USState, SUPeople, SUState, World]
+allSituations:
+  utilities:
+    USDestroyed: -100
+    SUDestroyed: -100
+    SUPowerGain: -50
+    USPowerGain: 30
+  affects:
+    USDestroyed: [[USPeople, -], [USState, -], [SUState, +]]
+    SUDestroyed: [[SUPeople, -], [SUState, -], [USState, +]]
+    SUPowerGain: [[SUState, +], [USState, -]]
+    USPowerGain: [[USState, +], [SUState, -]]
+    NuclearWar: [[World, -]]
+  goals:
+    USSuperiority: [USFirstStrikeCapacity]
+    USEquivalence: [USSecondStrikeCapacity]
+    USNuclearDisarmament: [relaxation]
+  mechanisms:
+    USFirstStrikeCapacity: And('USSuperiority', Not('SUSuperiority'))
+    SUFirstStrikeCapacity: And('SUSuperiority', Not('USSuperiority'))
+    USSecondStrikeCapacity: Or(And('USSuperiority', 'SUSuperiority'), And('USEquivalence', Not('SUSuperiority')))
+    SUSecondStrikeCapacity: Or(And('SUSuperiority', 'USSuperiority'), And('SUEquivalence', Not('USSuperiority')))
+    relaxation: Or('USNuclearDisarmament', 'SUNuclearDisarmament')
+    USDestroyed: 'SUStrikes'
+    SUDestroyed: And('USSecondStrikeCapacity', 'SUStrikes')
+    USPowerGain: And(Or(And('USFirstStrikeCapacity', Or('SUSecondStrikeCapacity', 'SUNuclearDisarmament')), And('USSecondStrikeCapacity', 'SUNuclearDisarmament')), USPowerGainPossible)
+    SUPowerGain: And(Or(And('SUFirstStrikeCapacity', Or('USSecondStrikeCapacity', 'USNuclearDisarmament')), And('SUSecondStrikeCapacity', 'USNuclearDisarmament')), SUPowerGainPossible)
+    NuclearWar: And('SUStrikes', 'USSecondStrikeCapacity')
+situations:
+  - situation:
+      probability: 0.3
+      information: [SUSuperiority, SURefrains, USPowerGainPossible, SUPowerGainPossible]
+  - situation:
+      probability: 0.2
+      information: [SUEquivalence, SURefrains, USPowerGainPossible, SUPowerGainPossible]
+  - situation:
+      probability: 0.1
+      information: [SUNuclearDisarmament, SURefrains, USPowerGainPossible, SUPowerGainPossible]
+  - situation:
+      probability: 0.2
+      information: [SUSuperiority, SUStrikes, USPowerGainPossible, SUPowerGainPossible]
+  - situation:
+      probability: 0.1
+      information: [SUEquivalence, SUStrikes, USPowerGainPossible, SUPowerGainPossible]
+  - situation:
+      probability: 0.1
+      information: [SUNuclearDisarmament, SUStrikes, USPowerGainPossible, SUPowerGainPossible]

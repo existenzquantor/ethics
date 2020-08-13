@@ -1,0 +1,25 @@
+# Use a gas stove even though this puts a risk on the neighbor (stove may explode)
+description: Gas Stove
+actions: [use, refrain]
+patients: [person, neighbor]
+consequences: [warmFood, neighborDead]
+background: [stoveFaulty]
+allSituations:
+  utilities:
+    warmFood: 1
+    neighborDead: -5
+  affects:
+    warmFood: [[person, +]]
+    neighborDead: [[neighbor, -]]
+  goals:
+    use: [warmFood]
+    refrain: [Not('neighborDead')]
+  mechanisms:
+    neighborDead: And('use', 'stoveFaulty')
+    warmFood: And('use', Not('stoveFaulty'))
+situations:
+  - situation:
+      probability: 0.999
+  - situation:
+      information: [stoveFaulty]
+      probability: 0.001

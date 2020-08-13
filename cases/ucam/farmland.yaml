@@ -1,0 +1,31 @@
+# A truck want's to drive through farmland to deliver his (urgently needed) goods, but there could be children playing there.
+description: Farmland
+actions: [takeRoad, takeFarmland]
+patients: [truck, inhabitants, children]
+consequences: [inhabitantsSaved, childrenDead, longDrive, shortDrive, inhabitantsDead]
+background: [childrenInFarmland, littleFood]
+allSituations:
+  utilities:
+    inhabitantsSaved: 10
+    childrenDead: -5
+    shortDrive: 1
+    longDrive: -1
+  affects:
+    inhabitantsDead: [[inhabitants, -]]
+    childrenDead: [[children, -]]
+  goals:
+    takeRoad: [Not(childrenDead)]
+    takeFarmland: [inhabitantsSaved, shortDrive]
+  mechanisms:
+    inhabitantsSaved: And('shortDrive', 'littleFood')
+    inhabitantsDead: And('longDrive', 'littleFood')
+    childrenDead: And('takeFarmland', 'childrenInFarmland')
+    longDrive: 'takeRoad'
+    shortDrive: 'takeFarmland'
+situations:
+  - situation:
+      probability: 0.8
+      information: [littleFood]
+  - situation:
+      probability: 0.2
+      information: [childrenInFarmland, littleFood]
