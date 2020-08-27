@@ -1,28 +1,27 @@
 # A lifeguard can save one of two groups of people with varying probability of success.
 description: Drowning
 actions: [goLeft, goRight, refrain]
-consequences: [leftGroupDead, rightGroupDead]
-background: [leftCloseEnough, rightCloseEnough]
+consequences: [leftGroupSaved, rightGroupSaved]
 patients: [leftGroup, rightGroup]
 allSituations:
   utilities:
-    leftGroupDead: -8
-    rightGroupDead: -7
+    leftGroupSaved: 7
+    rightGroupSaved: 8
   affects:
-    leftGroupDead: [[leftGroup, -]]
-    rightGroupDead: [[rightGroup, -]]
+    leftGroupSaved: [[leftGroup, +]]
+    rightGroupSaved: [[rightGroup, +]]
   goals:
-    goLeft: [Not(leftGroupDead)]
-    goRight: [Not(rightGroupDead)]
-  mechanisms:
-    leftGroupDead: Or('goRight', Not('leftCloseEnough'))
-    rightGroupDead: Or('goLeft', Not('rightCloseEnough'))
+    goLeft: [leftGroupSaved]
+    goRight: [rightGroupSaved]
 situations:
   - situation:
       probability: 0.97
-      information: [leftCloseEnough, rightCloseEnough]
+      mechanisms:
+        leftGroupSaved: goLeft
+        rightGroupSaved: goRight
   - situation:
       probability: 0.01
-      information: [rightCloseEnough]
+      mechanisms:
+        leftGroupSaved: goLeft
   - situation:
       probability: 0.02

@@ -1,0 +1,22 @@
+# Hear loud music, unknowing if the neighbor is home and would be disturbed
+description: Loud music
+actions: [hearMusic, refrain]
+patients: [person, neighbor]
+consequences: [fun, noise]
+allSituations:
+  goals:
+    hearMusic: [fun]
+    refrain: [Not('noise')]
+  mechanisms:
+    fun: 'hearMusic'
+    noise: 'hearMusic'
+situations:
+  - situation:
+      probability: 0.8
+      affects:
+        fun: [[person, +]]
+  - situation:
+      probability: 0.2
+      affects:
+        fun: [[person, +]]
+        noise: [[neighbor, -]]

@@ -64,9 +64,11 @@ class EthicalSituation(CausalModel):
         except KeyError:
             self.background = []
         try:
-            mechanisms = {str(k): my_eval(v) for k, v in kwargs["mechanisms"].items()}
+            # use a dummy action for non existing mechanisms
+            mechanisms = {**{str(k): Atom('dummy') for k in kwargs["consequences"]},
+                          **{str(k): my_eval(v) for k, v in kwargs["mechanisms"].items()}}
         except KeyError:
-            mechanisms = dict()
+            mechanisms = {str(k): Atom('dummy') for k in kwargs["consequences"]}
         try:
             self.goals = {str(k): list(map(my_eval, v)) for k, v in kwargs["goals"].items()}
         except KeyError:
@@ -160,6 +162,7 @@ class UncertainModel:
             except KeyError:
                 self.patients = []
 
+<<<<<<< HEAD
 
             # create situations
             situations = []
@@ -167,6 +170,18 @@ class UncertainModel:
                 situations.append(EthicalSituation(
                     **self.model, **self.model["allSituations"], **situation["situation"]))
             self.situations = situations
+=======
+            try:
+                # create situations
+                situations = []
+                for situation in self.model["situations"]:
+                    situations.append(EthicalSituation(
+                        **self.model, **self.model["allSituations"], **situation["situation"]))
+                self.situations = situations
+            except TypeError:
+                print("\nAn error occurred, the input file is probably malformed:\n")
+                raise
+>>>>>>> d2145de
 
     def different_situations(self, situations):
         """

@@ -1,27 +1,20 @@
 # A drone can kill a target, believed to be a high ranking terrorist, but the person could also be a innocent civilian
 description: Drone
 actions: [shoot, refrain]
-consequences: [terroristDead, civilianDead]
-background: [terrorist, civilian]
+consequences: [targetDead]
 patients: [target, drone]
 allSituations:
-  utilities:
-    terroristDead: 100
-    civilianDead: -1
-  affects:
-    terroristDead: [[drone, +]]
-    civilianDead: [[drone, -]]
   goals:
-    shoot: [terroristDead]
-    refrain: [Not(civilianDead)]
+    shoot: [targetDead]
+    refrain: [Not(targetDead)]
   mechanisms:
-    terroristDead: And('terrorist', 'shoot')
-    civilianDead: And('civilian, 'shoot')
+    targetDead: 'shoot'
 situations:
   - situation:
       probability: 0.9
-      information: [terrorist]
+      utilities:
+        targetDead: 100
   - situation:
       probability: 0.1
-      information: [civilian]
-
+      utilities:
+        targetDead: -1
