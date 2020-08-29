@@ -162,15 +162,6 @@ class UncertainModel:
             except KeyError:
                 self.patients = []
 
-<<<<<<< HEAD
-
-            # create situations
-            situations = []
-            for situation in self.model["situations"]:
-                situations.append(EthicalSituation(
-                    **self.model, **self.model["allSituations"], **situation["situation"]))
-            self.situations = situations
-=======
             try:
                 # create situations
                 situations = []
@@ -181,7 +172,6 @@ class UncertainModel:
             except TypeError:
                 print("\nAn error occurred, the input file is probably malformed:\n")
                 raise
->>>>>>> d2145de
 
     def different_situations(self, situations):
         """
