@@ -189,6 +189,8 @@ class Formula(object):
                 s = [s]
             if isinstance(s, tuple):
                 s = list(s)
+            if isinstance(s, And):
+                return s
         f = None
         for e in s:
             if f == None:
@@ -220,6 +222,87 @@ class Formula(object):
                 f = e
             else:
                 f = Or(f, e)
+        return f
+
+    @staticmethod
+    def makeSum(s):
+        """
+        >>> Formula.makeSum(["a"])
+        'a'
+        >>> Formula.makeSum(["a", "b", "c"])
+        Add("c", Add("b", "a"))
+        """
+        if not isinstance(s, list):
+            if isinstance(s, Atom):
+                s = [s]
+            elif isinstance(s, tuple):
+                s = list(s)
+            elif isinstance(s, Add):
+                return s
+            else:
+                raise TypeError(f'Cannot make a sum with type {type(s)}')
+        f = None
+        for e in s:
+            if f == None:
+                f = e
+            else:
+                f = Add(f, e)
+        if f == None:
+            return 0
+        return f
+
+    @staticmethod
+    def makeMax(s):
+        """
+        >>> Formula.makeMax(["a"])
+        'a'
+        >>> Formula.makeMax(["a", "b", "c"])
+        Max("c", Max("b", "a"))
+        """
+        if not isinstance(s, list):
+            if isinstance(s, Atom):
+                s = [s]
+            elif isinstance(s, tuple):
+                s = list(s)
+            elif isinstance(s, Max):
+                return s
+            else:
+                raise TypeError(f'Cannot make Max with type {type(s)}')
+        f = None
+        for e in s:
+            if f == None:
+                f = e
+            else:
+                f = Max(f, e)
+        if f == None:
+            return 0
+        return f
+
+    @staticmethod
+    def makeMin(s):
+        """
+        >>> Formula.makeMin(["a"])
+        'a'
+        >>> Formula.makeMin(["a", "b", "c"])
+        Min("c", Min("b", "a"))
+        """
+        if not isinstance(s, list):
+            if isinstance(s, Atom):
+                s = [s]
+            elif isinstance(s, tuple):
+                s = list(s)
+            elif isinstance(s, Min):
+                return s
+            else:
+                raise TypeError(f'Cannot make Max with type {type(s)}')
+        f = None
+        for e in s:
+            if f == None:
+                f = e
+            else:
+                f = Min(f, e)
+        if f == None:
+            return 0
         return f
 
     def __eq__(self, other):
@@ -626,9 +709,27 @@ class Term(object):
         if isinstance(self, Minus):
             return "Minus("+str(t1)+")"
         if isinstance(self, Sub):
-            return "Sub("+str(t1)+", +"+str(t2)+")"
+            return "Sub("+str(t1)+", "+str(t2)+")"
         if isinstance(self, Add):
-            return "Add("+str(t1)+", +"+str(t2)+")"
+            return "Add("+str(t1)+", "+str(t2)+")"
+        if isinstance(self, Uo):
+            return "Uo("+str(t1)+")"
+        if isinstance(self, Um):
+            return "Um("+str(t1)+")"
+        if isinstance(self, Up):
+            return "Up("+str(t1)+")"
+        if isinstance(self, P):
+            return "P("+str(t1)+", "+str(t2)+")"
+        if isinstance(self, Ps):
+            return "Ps("+str(t1)+")"
+        if isinstance(self, Mul):
+            return "Mul("+str(t1)+", "+str(t2)+")"
+        if isinstance(self, S):
+            return "S("+str(t1)+", "+str(t2)+")"
+        if isinstance(self, Max):
+            return "Max("+str(t1)+", "+str(t2)+")"
+        if isinstance(self, Min):
+            return "Min("+str(t1)+", "+str(t2)+")"
 
     def stripParentsFromMechanism(self):
         """ Only for preprocessing the mechanisms. """
@@ -646,12 +747,33 @@ class OnePlacedTerm(Term):
 class TwoPlacedTerm(Term):
     def __init__(self, t1, t2):
         super(TwoPlacedTerm, self).__init__(t1, t2)
-        
+
+
 class U(OnePlacedTerm):
     def __init__(self, t1):
         super(U, self).__init__(t1)
 
-        
+
+class Uo(OnePlacedTerm):
+    def __init__(self, t1):
+        super(Uo, self).__init__(t1)
+
+
+class Um(OnePlacedTerm):
+    def __init__(self, t1):
+        super(Um, self).__init__(t1)
+
+
+class Up(OnePlacedTerm):
+    def __init__(self, t1):
+        super(Up, self).__init__(t1)        
+
+
+class Ps(OnePlacedTerm):
+    def __init__(self, t1):
+        super(Ps, self).__init__(t1)
+
+
 class DR(TwoPlacedTerm):
     def __init__(self, t1, t2):
         super(DR, self).__init__(t1, t2)
@@ -675,7 +797,33 @@ class Sub(TwoPlacedTerm):
 class Add(TwoPlacedTerm):
     def __init__(self, t1, t2):
         super(Add, self).__init__(t1, t2)
-        
+
+
+class Mul(TwoPlacedTerm):
+    def __init__(self, t1, t2):
+        super(Mul, self).__init__(t1, t2)
+
+
+class P(TwoPlacedTerm):
+    def __init__(self, t1, t2):
+        super(P, self).__init__(t1, t2)
+
+
+class S(TwoPlacedTerm):
+    def __init__(self, t1, t2):
+        super(S, self).__init__(t1, t2)
+
+
+class Max(TwoPlacedTerm):
+    def __init__(self, t1, t2):
+        super(Max, self).__init__(t1, t2)
+
+
+class Min(TwoPlacedTerm):
+    def __init__(self, t1, t2):
+        super(Min, self).__init__(t1, t2)
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

@@ -9,11 +9,11 @@ Classes:
 
 import copy
 import io
-import json
 import yaml
 
 from ethics.cam.semantics import CausalModel
-from ethics.language import Atom, Formula, GEq, U
+from ethics.language import Add, And, Atom, BiImpl, Bool, Eq, Formula, GEq, \
+                            Gt, Impl, Max, Min, Minus, Mul, Not, Or, P, Ps, S, Sub, U, Um, Uo, Up
 from ethics.tools import my_eval
 
 
@@ -23,7 +23,7 @@ class EthicalSituation(CausalModel):
         to be used in the Uncertain Model (UCAM).
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, number, **kwargs):
         """
         Initialize a Ethical Situation.
 
@@ -33,6 +33,7 @@ class EthicalSituation(CausalModel):
                 consequences, background, mechanisms, goals, affects.
         """
         # Mandatory entries
+        self.number = number
         try:
             self.actions = [Atom(a) for a in kwargs["actions"]]
         except KeyError:
@@ -55,6 +56,10 @@ class EthicalSituation(CausalModel):
             self.description = str(kwargs["description"])
         except KeyError:
             self.description = "No Description"
+        try:
+            self.designation = str(kwargs["designation"])
+        except KeyError:
+            self.designation = self.description + "#" + str(self.number)
         try:
             self.consequences = [Atom(c) for c in kwargs["consequences"]]
         except KeyError:
@@ -93,14 +98,16 @@ class EthicalSituation(CausalModel):
 
     def get_utility(self):
         """
-        Return the utility that the currently set action produces in the Ethical Situation.
+        Return the formula for the utility that the currently set action
+            produces in the Ethical Situation.
         """
-        utility = 0
+        utility = []
         consequences = self.get_actual_consequences()
         for consequence in self.utilities:
+            consequence = Atom(consequence)
             if consequence in consequences:
-                utility += self.utilities[str(consequence)]
-        return utility
+                utility.append(S(self.designation, U(consequence)))
+        return Formula.makeSum(utility)
 
     def set_action(self, var):
         """
@@ -109,8 +116,22 @@ class EthicalSituation(CausalModel):
         self.action = var
         self.set_world({**self.world, **{v:0 for v in self.actions}, self.action:1})
 
-    def __str__(self):
-        string = "Ethical Situation: " + self.description + "\n" \
+    def _evaluate_term(self, term):
+        if isinstance(term, Uo):
+            self.set_action(term.t1)
+            return super()._evaluate_term(
+                U(Formula.makeConjunction(self.get_actual_consequences())))
+        if isinstance(term, Um):
+            return min(super()._evaluate_term(U(term.t1)), 0)
+        if isinstance(term, Up):
+            return max(super()._evaluate_term(U(term.t1)), 0)
+        # Everything else
+        return super()._evaluate_term(term)
+    evaluate_term = _evaluate_term # for compatibility
+
+    def __repr__(self):
+        string = "Ethical Situation: " + self.designation + "\n" \
+        + "In UCAM: " + self.description + "\n" \
         + "Probability: " + str(self.probability) + "\n" \
         + "Action set: " + str(self.action) + "\n" \
         + "World:" + str(self.world)
@@ -119,6 +140,9 @@ class EthicalSituation(CausalModel):
         except KeyError:
             pass
         return string
+
+    def __str__(self):
+        return self.designation
 
 
 class UncertainModel:
@@ -133,12 +157,10 @@ class UncertainModel:
         Argument:
         file -- the file the Model can be read from, either YAML or JSON.
         """
-        self.file = file
-        with io.open(file) as data_file:
-            if self.file.split(".") == "json":
-                self.model = json.load(data_file)
-            else:
-                self.model = yaml.load(data_file, Loader=yaml.FullLoader)
+        if isinstance(file, str):
+            file = io.open(file)
+        with file as data_file:
+            self.model = yaml.load(data_file, Loader=yaml.FullLoader)
 
             try:
                 self.description = str(self.model["description"])
@@ -165,9 +187,14 @@ class UncertainModel:
             try:
                 # create situations
                 situations = []
+                number = 0
                 for situation in self.model["situations"]:
                     situations.append(EthicalSituation(
-                        **self.model, **self.model["allSituations"], **situation["situation"]))
+                        number,
+                        **self.model,
+                        **self.model["allSituations"],
+                        **situation["situation"]))
+                    number += 1
                 self.situations = situations
             except TypeError:
                 print("\nAn error occurred, the input file is probably malformed:\n")
@@ -186,9 +213,11 @@ class UncertainModel:
         """
         result = copy.deepcopy(self)
         result.situations = []
+        number = 0
         for situation in situations:
             result.situations.append(EthicalSituation(
-                **result.model, **result.model["allSituations"], **situation))
+                number, **result.model, **result.model["allSituations"], **situation))
+            number += 1
         return result
 
     def evaluate(self, principle, action, **kwargs):
@@ -199,6 +228,39 @@ class UncertainModel:
         Additional arguments for the principle must be given as keyword arguments.
         """
         return principle(self, action, **kwargs).permissible()
+
+    def explain(self, principle, action, **kwargs):
+        """
+        Explain the decision of the given principle in the Uncertain Model.
+
+        Additional arguments for the principle must be given as keyword arguments.
+        """
+        return principle(self, action, **kwargs).explain()
+
+    def models(self, formula):
+        """
+        Return whether the given formula holds in the Uncertain Model.
+        """
+        if isinstance(formula, Eq):
+            return self.evaluate_term(formula.f1) == self.evaluate_term(formula.f2)
+        if isinstance(formula, Gt):
+            return self.evaluate_term(formula.f1) > self.evaluate_term(formula.f2)
+        if isinstance(formula, GEq):
+            return self.evaluate_term(formula.f1) >= self.evaluate_term(formula.f2)
+        if isinstance(formula, Or):
+            return self.models(formula.f1) or self.models(formula.f2)
+        if isinstance(formula, And):
+            return self.models(formula.f1) and self.models(formula.f2)
+        if isinstance(formula, Not):
+            return not self.models(formula.f1)
+        if isinstance(formula, Impl):
+            return not self.models(formula.f1) or self.models(formula.f2)
+        if isinstance(formula, BiImpl):
+            return self.models(Impl(formula.f1, formula.f2)) and \
+                   self.models(Impl(formula.f2, formula.f1))
+        if isinstance(formula, Bool):
+            return formula.f1
+        raise TypeError(f'The type {type(formula)} of the given formula is not supported.')
 
     def necessary(self, formula):
         """
@@ -235,22 +297,44 @@ class UncertainModel:
                 probability += situation.probability
         return probability
 
-    def utility_probability(self, bound, action):
+    def evaluate_term(self, term):
         """
-        Determine the probability with witch the overall utility
-            is higher or equal to the given bound.
+        Determine the value, that the given term has in the Uncertain Model.
         """
-        probability = 0
-        for situation in self.situations:
-            situation.set_action(action)
-            utilities = U(Formula.makeConjunction(situation.get_actual_consequences()))
-            if situation.models(GEq(utilities, bound)):
-                probability += situation.probability
-        return probability
+        if isinstance(term, (int, float)):
+            return term
+        if isinstance(term, Minus):
+            return -1*self.evaluate_term(term.f1)
+        if isinstance(term, Add):
+            return self.evaluate_term(term.t1) + self.evaluate_term(term.t2)
+        if isinstance(term, Sub):
+            return self.evaluate_term(term.t1) - self.evaluate_term(term.t2)
+        if isinstance(term, Mul):
+            return self.evaluate_term(term.t1) * self.evaluate_term(term.t2)
+        if isinstance(term, Max):
+            return max(self.evaluate_term(term.t1), self.evaluate_term(term.t2))
+        if isinstance(term, Min):
+            return min(self.evaluate_term(term.t1), self.evaluate_term(term.t2))
+        if isinstance(term, P):
+            return self.probability(term.t1, term.t2)
+        if isinstance(term, Ps):
+            return self._get_situation_from_designation(term.t1).probability
+        if isinstance(term, S):
+            return self._get_situation_from_designation(term.t1).evaluate_term(term.t2)
+        raise TypeError(f'The type {type(term)} of the given term is not supported.')
 
-    def __str__(self):
+    def _get_situation_from_designation(self, designation):
+        for situation in self.situations:
+            if situation.designation == designation:
+                return situation
+        raise KeyError()
+
+    def __repr__(self):
         return "Uncertain Model: " + self.description + "\n" \
         + "Actions: " + str(self.actions) + "\n" \
         + "Background: " + str(self.background) + "\n" \
         + "Consequences: " + str(self.consequences) + "\n" \
         + f"{len(self.situations)} Situations" + "\n"
+
+    def __str__(self):
+        return self.description

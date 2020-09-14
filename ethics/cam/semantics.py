@@ -248,15 +248,15 @@ class CausalModel(CausalNetwork):
                 
             super().__init__(self.actions + self.events + self.background, self.consequences, mechanisms, world)
 
-    def __evaluate_term(self, term):
+    def _evaluate_term(self, term):
         if isinstance(term, int):
             return term
         if isinstance(term, Minus):
-            return -1*self.__evaluate_term(term.f1)
+            return -1*self._evaluate_term(term.f1)
         if isinstance(term, Add):
-            return self.__evaluate_term(term.t1) + self.__evaluate_term(term.t2)
+            return self._evaluate_term(term.t1) + self._evaluate_term(term.t2)
         if isinstance(term, Sub):
-            return self.__evaluate_term(term.t1) - self.__evaluate_term(term.t2)
+            return self._evaluate_term(term.t1) - self._evaluate_term(term.t2)
         if isinstance(term, U):
             return self.__sum_up(term.t1)
             
@@ -339,17 +339,17 @@ class CausalModel(CausalNetwork):
                     return True
             return False
         if isinstance(f, Eq):
-            return self.__evaluate_term(f.f1) == self.__evaluate_term(f.f2)
+            return self._evaluate_term(f.f1) == self._evaluate_term(f.f2)
         if isinstance(f, Gt):
-            return self.__evaluate_term(f.f1) > self.__evaluate_term(f.f2)
+            return self._evaluate_term(f.f1) > self._evaluate_term(f.f2)
         if isinstance(f, GEq):
-            return self.__evaluate_term(f.f1) >= self.__evaluate_term(f.f2)
+            return self._evaluate_term(f.f1) >= self._evaluate_term(f.f2)
         if isinstance(f, Good):
-            return self.__evaluate_term(U(f.f1)) > 0
+            return self._evaluate_term(U(f.f1)) > 0
         if isinstance(f, Bad):
-            return self.__evaluate_term(U(f.f1)) < 0
+            return self._evaluate_term(U(f.f1)) < 0
         if isinstance(f, Neutral):
-            return self.__evaluate_term(U(f.f1)) == 0
+            return self._evaluate_term(U(f.f1)) == 0
         if isinstance(f, I):
             return f.f1 in self.get_actual_intentions()
         if isinstance(f, Goal):
