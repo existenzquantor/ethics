@@ -1,0 +1,73 @@
+{
+  "actions": [
+    {
+      "effects": [
+        {
+          "condition": {},
+          "effect": {
+            "not-valh(h)": true,
+            "valh(h)": false
+          }
+        }
+      ],
+      "intrinsicvalue": "neutral",
+      "name": "act1 h",
+      "preconditions": {
+        "valh(h)": true
+      }
+    },
+    {
+      "effects": [
+        {
+          "condition": {},
+          "effect": {
+            "not-valg(g)": false,
+            "not-valh(h)": false,
+            "valg(g)": true,
+            "valh(h)": true
+          }
+        }
+      ],
+      "intrinsicvalue": "neutral",
+      "name": "act2 g h",
+      "preconditions": {
+        "not-valh(h)": true
+      }
+    },
+    {
+      "effects": [
+        {
+          "condition": {},
+          "effect": {
+            "not-valg(g)": false,
+            "valg(g)": true
+          }
+        }
+      ],
+      "intrinsicvalue": "neutral",
+      "name": "act3 g",
+      "preconditions": {}
+    }
+  ],
+  "affects": {},
+  "events": [],
+  "goal": {
+    "valg(g)": true
+  },
+  "initialState": {
+    "not-valg(g)": true,
+    "valh(h)": true
+  },
+  "plan": [
+    "act1 g",
+    "act2 g h"
+  ],
+  "utilities": [
+    {
+      "fact": {
+        "valh(h)": true
+      },
+      "utility": -1
+    }
+  ]
+}
