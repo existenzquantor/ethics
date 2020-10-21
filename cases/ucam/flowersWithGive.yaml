@@ -1,0 +1,27 @@
+# Bob is giving flowers to Celia, however, not to make Celia happy, but to make Alice happy, who is happy if Celia is happy.
+description: Flower Example
+actions: [giveflowers, refraining]
+testing: giveflowers
+patients: [celia, alice]
+consequences: [celiahappy, alicehappy]
+allSituations:
+    mechanisms:
+        celiahappy: giveflowers
+        alicehappy: celiahappy
+    affects:
+        giveflowers: []
+        celiahappy: [[celia, +]]
+        alicehappy: [[alice, +]]
+        Not('celiahappy'): [[celia, -]]
+        Not('alicehappy'): [[alice, -]]
+situations:
+    - situation:
+        probability: 0.8
+        goals:
+            giveflowers: [alicehappy, celiahappy]
+            refraining: []
+    - situation:
+        probability: 0.2
+        goals:
+            giveflowers: [alicehappy]
+            refraining: []

@@ -23,7 +23,7 @@ class EthicalSituation(CausalModel):
         to be used in the Uncertain Model (UCAM).
     """
 
-    def __init__(self, number, **kwargs):
+    def __init__(self, number, action, world, **kwargs):
         """
         Initialize a Ethical Situation.
 
@@ -38,7 +38,7 @@ class EthicalSituation(CausalModel):
             self.actions = [Atom(a) for a in kwargs["actions"]]
         except KeyError:
             print("Error: No actions set")
-        self.action = self.actions[0]
+        self.action = action
         try:
             self.probability = kwargs["probability"]
         except KeyError:
@@ -91,7 +91,8 @@ class EthicalSituation(CausalModel):
             information = {v:1 for v in kwargs["information"]}
         except KeyError:
             information = dict()
-        world = {**{v:0 for v in self.actions + self.background}, self.action:1, **information}
+        world = {**{v:0 for v in self.actions + self.background},
+                 self.action:1, **information, **world}
 
         super(CausalModel, self).__init__(
             self.actions + self.background, self.consequences, mechanisms, world)
@@ -150,7 +151,7 @@ class UncertainModel:
     Implements a Causal Agency Model with added Uncertainty (UCAM).
     """
 
-    def __init__(self, file):
+    def __init__(self, file, world=None):
         """
         Initialize a Uncertain Model.
 
@@ -167,8 +168,21 @@ class UncertainModel:
             except KeyError:
                 self.description = "No Description"
 
+            if world is None:
+                self.world = {}
+            else:
+                self.world = world
+
             # Actions are mandatory
             self.actions = [Atom(a) for a in self.model["actions"]]
+
+            try:
+                self.testing_action = Atom(self.model["testing"])
+            except KeyError:
+                if not self.world:
+                    self.testing_action = self.actions[0]
+                else:
+                    self.testing_action = self._get_action_from_world(self.world)
 
             # Optional variables
             try:
@@ -191,6 +205,8 @@ class UncertainModel:
                 for situation in self.model["situations"]:
                     situations.append(EthicalSituation(
                         number,
+                        self.testing_action,
+                        self.world,
                         **self.model,
                         **self.model["allSituations"],
                         **situation["situation"]))
@@ -199,6 +215,16 @@ class UncertainModel:
             except TypeError:
                 print("\nAn error occurred, the input file is probably malformed:\n")
                 raise
+
+    def different_action(self, action):
+        """
+        Create the same Uncertain Model with a different action.
+        """
+        result = copy.deepcopy(self)
+        result.testing_action = Atom(action)
+        for situation in result.situations:
+            situation.set_action(action)
+        return result
 
     def different_situations(self, situations):
         """
@@ -216,26 +242,51 @@ class UncertainModel:
         number = 0
         for situation in situations:
             result.situations.append(EthicalSituation(
-                number, **result.model, **result.model["allSituations"], **situation))
+                number,
+                self.testing_action,
+                self.world,
+                **result.model,
+                **result.model["allSituations"],
+                **situation))
             number += 1
         return result
 
-    def evaluate(self, principle, action, **kwargs):
+    def different_world(self, world):
+        """
+        Create the same Uncertain Model with a different world.
+        """
+        result = copy.deepcopy(self)
+        result.testing_action = self._get_action_from_world(world)
+        result.world = world
+        result.situations = []
+        number = 0
+        for situation in self.situations:
+            result.situations.append(EthicalSituation(
+                number,
+                result.testing_action,
+                result.world,
+                **result.model,
+                **result.model["allSituations"],
+                **situation))
+            number += 1
+        return result
+
+    def evaluate(self, principle, **kwargs):
         """
         Test if the given action is allowed to be performed
             under the given principle in the Uncertain Model.
 
         Additional arguments for the principle must be given as keyword arguments.
         """
-        return principle(self, action, **kwargs).permissible()
+        return principle(self, self.testing_action, **kwargs).permissible()
 
-    def explain(self, principle, action, **kwargs):
+    def explain(self, principle, **kwargs):
         """
         Explain the decision of the given principle in the Uncertain Model.
 
         Additional arguments for the principle must be given as keyword arguments.
         """
-        return principle(self, action, **kwargs).explain()
+        return principle(self, self.testing_action, **kwargs).explain()
 
     def models(self, formula):
         """
@@ -323,6 +374,12 @@ class UncertainModel:
             return self._get_situation_from_designation(term.t1).evaluate_term(term.t2)
         raise TypeError(f'The type {type(term)} of the given term is not supported.')
 
+    def _get_action_from_world(self, world):
+        for variable, truth in world.items():
+            if truth == 1 and Atom(variable) in self.actions:
+                return Atom(variable)
+        raise ValueError(f"The given world ({world}) does not set an action.")
+
     def _get_situation_from_designation(self, designation):
         for situation in self.situations:
             if situation.designation == designation:
@@ -332,6 +389,7 @@ class UncertainModel:
     def __repr__(self):
         return "Uncertain Model: " + self.description + "\n" \
         + "Actions: " + str(self.actions) + "\n" \
+        + "Testing Action: " + str(self.testing_action) + "\n" \
         + "Background: " + str(self.background) + "\n" \
         + "Consequences: " + str(self.consequences) + "\n" \
         + f"{len(self.situations)} Situations" + "\n"
