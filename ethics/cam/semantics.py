@@ -13,10 +13,7 @@ class Model(object):
         self.alternatives = []
         
     def models(self, formula):
-        try:
-            return self.checker.models(self, formula)
-        except:
-            raise "No Model Checker"
+        pass
 
     def evaluate(self, principle):
         try:
@@ -95,8 +92,8 @@ class CausalNetwork(Model):
         return var in self.causal_network_model
     
     def __get_model(self):
-        return And(Formula.makeConjunction([f for f in self.causal_network_model if self.causal_network_model[f]]), \
-                Formula.makeConjunction([Not(f) for f in self.causal_network_model if not self.causal_network_model[f]]))
+        return And(Formula.makeConjunction([f for f in self.causal_network_model if self.__is_true(f)]), \
+                Formula.makeConjunction([Not(f) for f in self.causal_network_model if not self.__is_true(f)]))
     
     def __compute_model(self, *additional):
         s = []
@@ -181,7 +178,7 @@ class CausalNetwork(Model):
         if isinstance(f, Or):
             return self.models(f.f1) or self.models(f.f2)
         if isinstance(f, Atom):
-            return f in self.causal_network_model
+            return self.__is_true(f)
         if isinstance(f, Bool):
             return f.f1
 
