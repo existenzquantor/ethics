@@ -2,6 +2,8 @@ import json
 import yaml
 import io
 import copy
+import subprocess
+import os, sys
 
 from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
                             Bad, Good, Neutral, Instrumental, Impl, BiImpl, Avoidable, \
@@ -9,6 +11,7 @@ from ethics.language import Not, Or, And, Finally, Caused, Minus, Add, Sub, U, \
 from ethics.tools import powerset
 from ethics.plans.concepts import Plan, Action, EmptyAction, Event
 from ethics.plans.planner import Planner
+from ethics.tools import situation_to_prolog, plan_to_prolog
 
 class Situation:
     """Representation of a situation"""
@@ -239,18 +242,30 @@ class Situation:
         :return: True or False
         :rtype: bool
         """
-        if not self.__is_satisfied(effect, self.simulate()):
+        
+        if "CAUSALITY" in os.environ:
+            f = open(os.environ['CAUSALITY']+"/examples/temp.pl", "w")
+            f.write(situation_to_prolog(self))
+            f.close()
+            plan = plan_to_prolog(self)
+            e = "'"+list(effect.keys())[0]+"'" if effect[list(effect.keys())[0]] else "not('"+list(effect.keys())[0]+"')"
+            result = subprocess.run(os.environ['CAUSALITY']+"/causality" + " " + os.environ['CAUSALITY']+"/examples/temp.pl" + " \"" + plan + "\" \"" + e + "\" temporal_empty", stdout=subprocess.PIPE, shell=True)
+            os.remove(os.environ['CAUSALITY']+"/examples/temp.pl")
+            return not result.stdout.decode("utf-8").rstrip() == "[]"
+        else:
+            if not self.__is_satisfied(effect, self.simulate()):
+                return False
+            sit = self.clone_situation()
+            for e in self.__compute_event_subsets():
+                sit.events = e
+                if self.__is_satisfied(effect, sit.simulate()):
+                    for p in self.plan.compute_all_epsilon_alternatives():
+                        sit.plan = p
+                        if not self.__is_satisfied(effect, sit.simulate()):
+                            return True
             return False
-        sit = self.clone_situation()
-        for e in self.__compute_event_subsets():
-            sit.events = e
-            if self.__is_satisfied(effect, sit.simulate()):
-                for p in self.plan.compute_all_epsilon_alternatives():
-                    sit.plan = p
-                    if not self.__is_satisfied(effect, sit.simulate()):
-                        return True
-        return False
 
+    """
     def causes(self, cause, effect):
         #cause = [1, 0]
         #effect = {"bs": true}
@@ -264,6 +279,7 @@ class Situation:
             if not self.__is_satisfied(effect, s.simulate()):
                 return True
         return False
+    """
 
     def evaluate(self, principle, *args):
         """Check if the situation is permissible according to a given ethical principle.

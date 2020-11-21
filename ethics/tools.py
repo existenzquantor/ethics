@@ -120,3 +120,97 @@ def timeit(method):
                   (method.__name__, (te - ts) * 1000))
         return result
     return timed
+
+def situation_to_prolog(sit):
+
+    aStr = []
+    for a in sit.actions:
+        preStr = ""
+        for p, v in a.pre.items():
+            p = "'"+p+"'"
+            if v:
+                preStr += p+","
+            else:
+                preStr += "not("+p+"),"
+        preStr = preStr[:-1]
+        for e in a.eff:
+            condStr = ""
+            for p, v in e["condition"].items():
+                p = "'"+p+"'"
+                if v:
+                    condStr += p+","
+                else:
+                    condStr += "not("+p+"),"
+            condStr = condStr[:-1]
+            
+            effStr = ""
+            for p, v in e["effect"].items():
+                p = "'"+p+"'"
+                if v:
+                    effStr += p+","
+                else:
+                    effStr += "not("+p+"),"
+            effStr = effStr[:-1]
+
+            aStr.append("effect('" + a.name + "', [" + preStr + "" + condStr + "], [" + effStr + "]).")
+
+    for a in sit.events:
+        preStr = ""
+        for p, v in a.pre.items():
+            p = "'"+p+"'"
+            if v:
+                preStr += p+","
+            else:
+                preStr += "not("+p+"),"
+        preStr = preStr[:-1]
+        for e in a.eff:
+            condStr = ""
+            for p, v in e["condition"].items():
+                p = "'"+p+"'"
+                if v:
+                    condStr += p+","
+                else:
+                    condStr += "not("+p+"),"
+            condStr = condStr[:-1]
+            
+            effStr = ""
+            for p, v in e["effect"].items():
+                p = "'"+p+"'"
+                if v:
+                    effStr += p+","
+                else:
+                    effStr += "not("+p+"),"
+            effStr = effStr[:-1]
+
+            aStr.append("effect('" + str(a.time) + "', [" + preStr + "" + condStr + "], [" + effStr + "]).")
+
+    effStr = ""
+    for p, v in sit.init.items():
+        p = "'"+p+"'"
+        if v:
+            effStr += p+","
+        else:
+            effStr += "not("+p+"),"
+    effStr = effStr[:-1]
+    aStr.append("init(["+effStr+"]).")
+
+    effStr = ""
+    for p, v in sit.goal.items():
+        p = "'"+p+"'"
+        if v:
+            effStr += p+","
+        else:
+            effStr += "not("+p+"),"
+    effStr = effStr[:-1]
+    aStr.append("goal(["+effStr+"]).")
+   
+    return "\n".join(aStr)
+
+def plan_to_prolog(sit):
+    pArray = []
+    for a in sit.plan.endoActions:
+        pArray.append("'"+a.name+"'")
+    return ":".join(pArray)
+
+
+
