@@ -31,6 +31,11 @@ xcode-select —install
 
 Then try again.
 
+Sometimes, the error message ```ModuleNotFoundError: No module named 'ethics.extensions.mhsModule'``` occurs. In this case, try running:
+```console
+python3 setup.py develop
+```
+
 ## Moral Planning Domain Definitions
 
 ### Plan Situations
